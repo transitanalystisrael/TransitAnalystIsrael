@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>Stops Near TrainStops</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
+
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
+	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
+	<script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
+	
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+	</style>
+
+	<style>
+		#map { width: 100%; height: 100%; }
+		
+		.info { height: 800px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } 
+		.info h4 { margin: 0 0 5px; color: #777; }
+		
+		.legend { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
+		.legend i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
+		
+		.stopStyle { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
+		.stopStyle i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
+		
+		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
+		.savefilecontrol i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
+		</style>
+	
+</head>
+<body>
+
+<div id='map'></div>
+
+<script type="text/javascript" src="trainstop_w_tpd_per_line_20180425.js"></script>
+<script type="text/javascript" src="agency_20180425.js"></script>
+<script type="text/javascript" src="train_stops_20180425.js"></script>
+<script type="text/javascript" src="stops_20180425.js"></script>
+
+<script src="dist/Blob.js"></script>
+<script src="dist/FileSaver.min.js"></script>
+
+<script type="text/javascript">
+	var nearFeatures = {};
+	var nearStops =[];
+	var trainstopsarray = stopsWtpdperline.features;
+	trainstopsarray.forEach(trainstopFunction);
+	function trainstopFunction(trainstop, index, array) {
+		//console.log(trainstop);
+		var trainstoploc = trainstop.geometry.coordinates;
+		var trainstopid = trainstop.properties.trainstop_id;
+		var trainstopname = trainstopsName[trainstopid];
+		//console.log(trainstopid, trainstopname, trainstoploc);
+		nearFeatures[trainstopid] = [];
+		var stopsarray = gtfsStops.features;
+		stopsarray.forEach(stopFunction);
+		function stopFunction(stop, index, array) {
+			//console.log(stop);
+			var stoploc = stop.geometry.coordinates;
+			var stopid = stop.properties.stop_id;
+			//if (index < 4) {
+			//	console.log(trainstopid, trainstopname, trainstoploc);
+			//	console.log(stopid, stoploc);
+			//}
+			//var from = turf.point([-75.343, 39.984]);
+			//var to = turf.point([-75.534, 39.123]);
+			//var options = {units: 'kilometers'};
+			//var distance = turf.distance(from, to, options);
+			//console.log(distance);
+			var maxDistance = 0.5 // Km
+			var pt1 = turf.point([trainstoploc[1],trainstoploc[0]]);
+			var pt2 = turf.point([stoploc[1],stoploc[0]]);
+			var distance = turf.distance(pt1, pt2);
+			if (distance < maxDistance) {
+				//console.log (distance, trainstoploc, stoploc);
+				nearFeatures[trainstopid].push(stopid);
+				nearStops.push(stopid);
+			}
+		}
+	}
+	//console.log(nearFeatures);
+
+
+	var map = L.map('map').setView([32.11057,34.83797], 13);
+
+	var grayscale = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		id: 'mapbox.streets'
+	}).addTo(map);
+	
+
+	// control that shows state info on hover
+	var info = L.control();
+
+	info.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info');
+		this.update();
+		return this._div;
+	};
+
+	info.update = function (props) {
+		var displaystring = '';
+		if (props) {
+			//console.log(nearFeatures[props.trainstop_id]);
+			nearFeatures[props.trainstop_id].forEach(dispFunction);
+		}
+		this._div.innerHTML = '<h3>Stops Near TrainStop</h3>' 
+			+'<br>'+'number of stops near' + ' : ' + 'train stop' + '<br>'
+			+  (props ?
+				'<b>' + trainstopsName[props.trainstop_id] + ' ' + props.trainstop_id + ' : ' + nearFeatures[props.trainstop_id].length + '</b>' + 
+				'<br><br><u>stop id</u>' + 
+				displaystring
+				: 'Hover over a stop');
+
+		function dispFunction(stopid){
+			displaystring += '<br>' + stopid;
+		}
+	};
+
+	info.addTo(map);
+	
+	var savefilecontrol = L.control({position: 'bottomleft'});
+	savefilecontrol.onAdd = function (map) {
+		var div3 = L.DomUtil.create('div', 'savefilecontrol');
+		div3.innerHTML = '<h3>NearStops File: </h3>'
+			+ '<form id="text-options"><input type="submit" value="Save"></input></form>'
+		return div3;
+	};
+	savefilecontrol.addTo(map);
+	
+	//var nearStopsText = nearStops.toString();
+	(function(view) {
+		"use strict";
+		var document = view.document;
+		var session = view.sessionStorage;
+		// only get URL when necessary in case Blob.js hasn't defined it yet
+		//var text = nearStopsText;
+		var text_options_form = document.getElementById("text-options");
+		var text_filename = 'near_stops.txt';
+	
+		text_options_form.addEventListener("submit", function(event) {
+			event.preventDefault();
+			var textString = nearStops.toString()
+			var BB = view.Blob;
+			saveAs(new BB([textString], {type: "text/plain;charset=" + document.characterSet}), text_filename);
+		}, false);
+
+	}(self));
+	
+	
+	var stopswtpdLayer;
+	var freezHighlight = false;
+	
+	function highlightFeature(e) {
+		if (!freezHighlight) {
+			var layer = e.target;
+			layer.setStyle({
+				weight: 6,
+				color: '#666',
+				opacity: 1
+			});
+			if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+				layer.bringToFront();
+			}
+			info.update(layer.feature.properties);
+			//console.log('******');
+		}
+	}
+
+	function resetHighlight(e) {
+		if (!freezHighlight) {
+			stopswtpdLayer.resetStyle(e.target);
+			info.update();
+		}
+	}
+	
+	var frozenLayer;
+	var stopStyleValue = 'walkingdistance';
+	
+	function clickHandler(e) {
+		freezHighlight = !freezHighlight; // toggle freezHighlight
+		if (freezHighlight) frozenLayer = e.target;
+		if (!freezHighlight) {
+			stopswtpdLayer.resetStyle(frozenLayer);
+			highlightFeature(e);
+		}
+	}
+	
+	
+	function clickHandlerall(e) {
+		//console.log(e.target.feature.properties.stop_id, e.target.feature.geometry.coordinates );
+		var stopid = e.target.feature.properties.stop_id;
+		if (nearStops.includes(stopid)) {
+			var index = nearStops.indexOf(stopid);
+			nearStops.splice(index,1);
+			//console.log('removed stop ',stopid);
+		} else {
+			nearStops.push(stopid);
+			//console.log('added stop ',stopid);
+		}
+		allstopsLayer.eachLayer(function (layer) { 
+			layer.setStyle({fillColor: nearStops.includes(layer.feature.properties.stop_id) ? "red" : "white"})
+		});
+		//console.log(nearStops);
+	}
+	
+	
+	function stopStyleChange(v) {
+		console.log(v);
+		stopStyleValue = v;
+		if (stopStyleValue == 'walkingdistance') {
+			stopswtpdLayer.eachLayer(function (layer) { 
+				layer.setRadius(500);
+			});
+		} else {
+			stopswtpdLayer.eachLayer(function (layer) { 
+				layer.setRadius(50);
+			});
+		}
+	}
+
+	function onEachFeature(feature, layer) {
+		layer.on({
+			click: clickHandler,
+			mouseover: highlightFeature,
+			mouseout: resetHighlight
+		});
+	}
+
+	function onEachFeatureall(feature, layer) {
+		layer.on({
+			click: clickHandlerall,
+			//mouseover: highlightFeature,
+			//mouseout: resetHighlight
+		});
+	}
+	
+	function allstopOptions(feature) {
+		return {
+			pane: 'pane1',
+			radius: 25,
+			fillColor: nearStops.includes(feature.properties.stop_id) ? "red" : "white",
+			color: "black",
+			weight: 0.5,
+			opacity: 0.5,
+			fillOpacity: 0.4
+		};
+	}
+
+	function stopOptions(feature) {
+		//tpd = feature.properties.train_tpd + feature.properties.total_bus_tpd;
+		tpd = feature.properties.train_tpd;
+		return {
+		pane: 'pane0',
+			radius: 500,
+			fillColor: "yellow",
+			color: "black",
+			weight: 0.5,
+			opacity: 0.5,
+			fillOpacity: 0.4
+		};
+	}
+	
+	var i;
+	for (i = 0; i < 11; i++) { 
+		map.createPane('pane'+i);
+		map.getPane('pane'+i).style.zIndex = 400+i;
+		map.getPane('pane'+i).style['mix-blend-mode'] = 'normal';
+		//console.log('pane'+i, 400+i)
+	}
+
+	stopswtpdLayer = L.geoJson(stopsWtpdperline, {
+		pointToLayer: function (feature, latlng) {
+			return L.circle(latlng, stopOptions(feature));
+		},
+		onEachFeature: onEachFeature
+	}).addTo(map);
+	
+	allstopsLayer = L.geoJson(gtfsStops, {
+		pointToLayer: function (feature, latlng) {
+			return L.circle(latlng, allstopOptions(feature));
+		},
+		onEachFeature: onEachFeatureall
+	}).addTo(map);
+
+	map.attributionControl.addAttribution('TransitScore data &copy; <a href="http://miu.org.il/">Merhav</a>');
+
+	var stopStyle = L.control({position: 'bottomleft'});
+	stopStyle.onAdd = function (map) {
+		var div2 = L.DomUtil.create('div', 'stopStyle');
+		div2.innerHTML = '<h3>Train Station<br>Display Style Select</h3>'
+			+'<form onclick="stopStyleChange(stopstyle.value)">'
+				+'<input type="radio" name="stopstyle" value="walkingdistance" checked>500m Circle<br>'
+				+'<input type="radio" name="stopstyle" value="stop">Stop Marker'
+			+'</form>';
+		return div2;
+	};
+	stopStyle.addTo(map);
+	
+
+</script>
+</body>
+</html>
