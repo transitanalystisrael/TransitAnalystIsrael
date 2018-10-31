@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>Route Frequency Map</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
+	<script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+	</style>
+
+	<style>
+		#map { width: 100%; height: 100%; }
+		
+		.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } 
+		.info h4 { margin: 0 0 5px; color: #777; }
+		
+		.legend { text-align: left; line-height: 18px; color: #555; } 
+		.legend i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
+	</style>
+	
+	<link rel="stylesheet" href="leaflet-slider-master/dist/leaflet-slider.css"/>
+	
+</head>
+<body>
+
+<script src="leaflet-slider-master/dist/leaflet-slider.js"></script>	
+
+<div id='map'></div>
+
+<script type="text/javascript" src="route_freq_at_0000-2400_20180425.js"></script>
+<script type="text/javascript" src="agency_20180425.js"></script>
+
+<script type="text/javascript">
+
+	var map = L.map('map').setView([32.079, 34.780], 13);
+	
+	var initslidervalue = 60;
+	var slidervalue = initslidervalue;
+	
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		id: 'mapbox.light'
+	}).addTo(map);
+
+		// control that shows state info on hover
+	var info = L.control();
+
+	info.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info');
+		this.update();
+		return this._div;
+	};
+
+	info.update = function (props) {
+		toscore = (props ? props.maxtpdperroute + 9 : 0);
+		this._div.innerHTML = '<h4>Route Frequency Israel</h4>' +
+			'<p>' + 'Trips per Day' + ' : ' + 'line number' + ' - ' + 'agency' + '</p>'
+			+  (props ?
+				'<b>' + props.maxtpdperroute + ' : ' + props.route_short_name + ' - ' + agencies[props.agency_id] + '</b>'
+				: 'Hover over a route');
+	};
+
+	info.addTo(map);
+	
+	// get color depending on tripsperday value
+	function getColor(d) {
+		return  d >= 240 ? '#006837' :
+				d >= 120 ? '#1a9850' :
+				d >= 80 ? '#66bd63' :
+				d >= 60 ? '#a6d96a' :
+				d >= 50 ? '#d9ef8b' :
+				d >= 40 ? '#ffffbf' :
+				d >= 30 ? '#fee08b' :
+				d >= 20 ? '#fdae61' :
+				d >= 10 ? '#f46d43' :
+				d >= 0  ? '#d73027' :
+				'#a50026';
+	}
+	// get weight depending on tripsperday value
+	function getWeight(d) {
+		return  d >= 240 ? 8 :
+				d >= 120 ? 6 :
+				d >= 80 ? 4 :
+				d >= 60 ? 2 :
+				1;
+	}	
+	function style(feature) {
+		var tpd = feature.properties.maxtpdperroute;
+		return {
+			weight: getWeight(tpd),
+			opacity: 0.7,
+			color: getColor(tpd),
+			stroke : (tpd >= slidervalue)
+		};
+	}
+	
+	var circle;
+	function clickHandler(e) {
+	  //var pt = turf.point([0, 0]);
+	  //console.log(pt);
+	  //var line = turf.lineString([[1, 1],[-1, 1]]);
+	  //console.log(line);
+	  //var distance = turf.pointToLineDistance(pt, line);
+	  //console.log(distance);
+	  var maxDistance = 0.1 // Km
+	  var point = e.latlng;
+	  var pt = turf.point([point.lng,point.lat]);
+	  //console.log(pt);
+	  //var circle;
+	  if (typeof circle !== 'undefined') {circle.removeFrom(map);}
+	  circle = L.circle([point.lat,point.lng], { color: 'red', radius: maxDistance * 1000 }).addTo(map); 
+	  var intersectingFeatures = [];
+	  map.eachLayer(function(layer){
+		if (typeof layer.feature !== 'undefined') {
+			var line = layer.feature.geometry.coordinates;
+			//console.log(line);
+			var distance = turf.pointToLineDistance(pt, line);
+			//console.log(distance);
+			if (distance < maxDistance) {
+				//console.log(layer.feature.properties.route_short_name, distance);
+				intersectingFeatures.push(layer);
+				//layer.setStyle({ weight: 6, color: '#666', opacity: 1 });
+			}
+		} 
+      })
+	  // if at least one feature found, show it
+	  if (intersectingFeatures.length) {
+		//console.log(intersectingFeatures[0].feature.properties.maxtpdperroute);
+		var totaltpd = 0;
+		var tpdperlinearray = intersectingFeatures.map(function(o) {
+		  totaltpd += o.feature.properties.maxtpdperroute;
+		  return [o.feature.properties.maxtpdperroute, ' : ' + o.feature.properties.route_short_name + ' - ' + agencies[o.feature.properties.agency_id]]
+		})
+		//console.log(tpdperlinearray);
+
+		tpdperlinearray.sort(function(a, b){return b[0] - a[0]});
+		//console.log(tpdperlinearray);
+		var displayarray = tpdperlinearray.map(function(o) {return[String(o[0])+o[1]]});
+		var html = 'Trips per Day' + ' : ' + 'line number' + ' - ' + 'agency' + "<br/>" + displayarray.join('<br/>')+'<br/>total tpd:'+ totaltpd + '<br/>'+'<br/>average trips per hour per direction:'+ '<br/>' + Math.round(10*totaltpd/2/20)/10;
+
+		map.openPopup(html, e.latlng, {
+		  offset: L.point(0, 0)
+		});
+	  }
+	}
+	
+	function highlightFeature(e) {
+		var layer = e.target;
+		layer.setStyle({
+			weight: 6,
+			color: '#666',
+			opacity: 1
+		});
+
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+
+		info.update(layer.feature.properties);
+	}
+
+	var geojson;
+
+	function resetHighlight(e) {
+		geojson.resetStyle(e.target);
+		info.update();
+	}
+
+//	function zoomToFeature(e) {
+//		map.fitBounds(e.target.getBounds());
+//	}
+
+	function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			click: clickHandler
+		});
+	}
+	//console.log(freqRoutes.features[0].geometry.coordinates);
+	//console.log(freqRoutes.features.length);
+	geojson = L.geoJson(freqRoutes, {
+		style: style,
+		onEachFeature: onEachFeature
+	}).addTo(map);
+
+	map.attributionControl.addAttribution('Route Freq data &copy; <a href="http://miu.org.il/">Merhav</a>');
+
+	function sliderChange(x) {
+		geojson.eachLayer(function (layer) { 
+			//layer.resetStyle;
+			layer.setStyle(
+				style(layer.feature)
+			);
+		});
+		return x;
+	}
+
+	slider = L.control.slider(function(value) {
+			slidervalue = value;
+			slidervalue = sliderChange(value);	
+			console.log(slidervalue);
+		}, {
+		max: 240,
+		min: 60,
+		value: initslidervalue,
+		step:20,
+		size: '160px',
+		orientation:'vertical',
+		collapsed:false,
+		increment: true,
+		syncSlider: true,
+		id: 'slider'			
+	}).addTo(map);
+	
+
+	var legend = L.control({position: 'bottomright'});
+
+	legend.onAdd = function (map) {
+
+		var div = L.DomUtil.create('div', 'info legend'),
+			grades = [60, 80, 120, 240],
+			labels = [],
+			from, to;
+
+		for (var i = 0; i < grades.length; i++) {
+			from = grades[i];
+			to = grades[i + 1];
+
+			labels.push(
+				'<i style="background:' + getColor(from) + '"> </i> ' +
+				from + (to ? '&ndash;' + to : '+'));
+		}
+
+		div.innerHTML = labels.join('<br>');
+		return div;
+	};
+
+	legend.addTo(map);
+
+
+	
+</script>
+
+
+
+</body>
+</html>
