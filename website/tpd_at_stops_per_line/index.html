@@ -32,7 +32,8 @@
 		.stopStyle { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
 		.stopStyle i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 		</style>
-	
+
+		<link rel="stylesheet" href="leaflet-slider-master/dist/leaflet-slider.css"/>
 </head>
 <body>
 <!--
@@ -48,6 +49,8 @@ onload = function(){
 	</script>
 -->
 
+<script src="leaflet-slider-master/dist/leaflet-slider.js"></script>
+
 <div id='map'></div>
 
 <script type="text/javascript" src="stops_w_tpd_per_line_20180425_20180425.js"></script>
@@ -56,6 +59,11 @@ onload = function(){
 <script type="text/javascript">
 
 	var map = L.map('map').setView([32.11057,34.83797], 11);
+	
+		
+	var tpdLevels = [0, 10, 20, 30, 40, 60, 80, 120, 240, 1200];
+	var initslidervalue = 5;
+	var slidervalue = tpdLevels[initslidervalue];
 
 	var grayscale = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 		maxZoom: 18,
@@ -107,31 +115,31 @@ onload = function(){
 
 	// get color depending on value
 	function getColor(d) {
-		return  d >= 1200 ? '#006837' :
-				d >= 240 ? '#1a9850' :
-				d >= 120 ? '#66bd63' :
-				d >= 80 ? '#a6d96a' :
-				d >= 60 ? '#d9ef8b' :
-				d >= 40 ? '#ffffbf' :
-				d >= 30 ? '#fee08b' :
-				d >= 20 ? '#fdae61' :
-				d >= 10 ? '#f46d43' :
-				d >= 0  ? '#d73027' :
+		return  d >= tpdLevels[9] ? '#006837' :
+				d >= tpdLevels[8] ? '#1a9850' :
+				d >= tpdLevels[7] ? '#66bd63' :
+				d >= tpdLevels[6] ? '#a6d96a' :
+				d >= tpdLevels[5] ? '#d9ef8b' :
+				d >= tpdLevels[4] ? '#ffffbf' :
+				d >= tpdLevels[3] ? '#fee08b' :
+				d >= tpdLevels[2] ? '#fdae61' :
+				d >= tpdLevels[1] ? '#f46d43' :
+				d >= tpdLevels[0] ? '#d73027' :
 				'#a50026';
 	}
 
 	// get pane depending on value
 	function getPane(d) {
-		return  d >= 1200 ? 'pane10' :
-				d >= 240 ? 'pane9' :
-				d >= 120 ? 'pane8' :
-				d >= 80 ? 'pane7' :
-				d >= 60 ? 'pane6' :
-				d >= 40 ? 'pane5' :
-				d >= 30 ? 'pane4' :
-				d >= 20 ? 'pane3' :
-				d >= 10 ? 'pane2' :
-				d >= 0  ? 'pane1' :
+		return  d >= tpdLevels[9] ? 'pane10' :
+				d >= tpdLevels[8] ? 'pane9' :
+				d >= tpdLevels[7] ? 'pane8' :
+				d >= tpdLevels[6] ? 'pane7' :
+				d >= tpdLevels[5] ? 'pane6' :
+				d >= tpdLevels[4] ? 'pane5' :
+				d >= tpdLevels[3] ? 'pane4' :
+				d >= tpdLevels[2] ? 'pane3' :
+				d >= tpdLevels[1] ? 'pane2' :
+				d >= tpdLevels[0]  ? 'pane1' :
 				'pane0';
 	}
 
@@ -174,7 +182,7 @@ onload = function(){
 	}
 	
 	function stopStyleChange(v) {
-		console.log(v);
+		//console.log(v);
 		stopStyleValue = v;
 		if (stopStyleValue == 'walkingdistance') {
 			stopswtpdLayer.eachLayer(function (layer) { 
@@ -216,24 +224,64 @@ onload = function(){
 		//console.log('pane'+i, 400+i)
 	}
 
+	function addStoplayertomap() {
+		return L.geoJson(stopsWtpdperline, {
+			pointToLayer: function (feature, latlng) {
+				return L.circle(latlng, stopOptions(feature));
+			},
+			onEachFeature: onEachFeature,
+			filter : function(feature, layer) {return (feature.properties.maxtpdatstop >= slidervalue);}
+		}).addTo(map);
+	}
+	
+	//stopswtpdLayer = addStoplayertomap()
+	/*
 	stopswtpdLayer = L.geoJson(stopsWtpdperline, {
 		pointToLayer: function (feature, latlng) {
 			return L.circle(latlng, stopOptions(feature));
 		},
-		onEachFeature: onEachFeature
+		onEachFeature: onEachFeature,
+		filter : function(feature, layer) {return (feature.properties.maxtpdatstop >= slidervalue);}
 	}).addTo(map);
-
+*/
 	map.attributionControl.addAttribution('TransitScore data &copy; <a href="http://miu.org.il/">Merhav</a>');
 
+	
+	function sliderChange(x) {
+		if (stopswtpdLayer) {stopswtpdLayer.remove()};
+		stopswtpdLayer = addStoplayertomap();
+		return x;
+	}
+
+	slider = L.control.slider(function(value) {
+			slidervalue = tpdLevels[value];
+			slidervalue = sliderChange(tpdLevels[value]);
+			//console.log(slidervalue);
+		}, {
+		position: 'bottomleft',
+		max: 9,
+		min: 0,
+		value: initslidervalue,
+		getValue: function(value){return tpdLevels[value];},
+		step:1,
+		size: '160px',
+		orientation:'vertical',
+		collapsed:false,
+		increment: true,
+		syncSlider: true,
+		id: 'slider'
+	}).addTo(map);
+	
 	var legend = L.control({position: 'bottomleft'});
 	legend.onAdd = function (map) {
 		var div = L.DomUtil.create('div', 'legend'),
-			grades = [0, 10, 20, 30, 40, 60, 80, 120, 240, 1200],
+			grades = tpdLevels,
 			labels = [],
 			from, to;
 		for (var i = 0; i < grades.length; i++) {
-			from = grades[i];
-			to = grades[i + 1];
+			var j = grades.length-i-1;
+			from = grades[j];
+			to = grades[j + 1];
 			labels.push(
 				'<i style="background:' + getColor(from) + '"> </i> ' +
 				from + (to ? '&ndash;' + to : '+'));
