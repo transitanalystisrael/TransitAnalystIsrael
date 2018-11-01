@@ -35,7 +35,7 @@
 		.stopStyle i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 		
 		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
-		.savefilecontrol i { width: 32px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
+		.savefilecontrol i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 		</style>
 	
 </head>
@@ -53,8 +53,9 @@
 
 <script type="text/javascript">
 	var nearFeatures = {};
-	var nearStops =[];
 	var trainstopsarray = stopsWtpdperline.features;
+	var nearStops =[];
+	var stopsarray = gtfsStops.features;
 	trainstopsarray.forEach(trainstopFunction);
 	function trainstopFunction(trainstop, index, array) {
 		//console.log(trainstop);
@@ -63,7 +64,6 @@
 		var trainstopname = trainstopsName[trainstopid];
 		//console.log(trainstopid, trainstopname, trainstoploc);
 		nearFeatures[trainstopid] = [];
-		var stopsarray = gtfsStops.features;
 		stopsarray.forEach(stopFunction);
 		function stopFunction(stop, index, array) {
 			//console.log(stop);
@@ -191,7 +191,7 @@
 	var frozenLayer;
 	var stopStyleValue = 'walkingdistance';
 	
-	function clickHandler(e) {
+	function clickHandler(e) { // click on trainstop
 		freezHighlight = !freezHighlight; // toggle freezHighlight
 		if (freezHighlight) frozenLayer = e.target;
 		if (!freezHighlight) {
@@ -201,10 +201,12 @@
 	}
 	
 	
-	function clickHandlerall(e) {
+	function clickHandlerall(e) { // click on one stop from all stops
 		//console.log(e.target.feature.properties.stop_id, e.target.feature.geometry.coordinates );
 		var stopid = e.target.feature.properties.stop_id;
-		if (nearStops.includes(stopid)) {
+		var stoploc = e.target.feature.geometry.coordinates;
+		// toggle stop: if in nearStop list then remove, if not in then add
+		if (nearStops.includes(stopid)) { 
 			var index = nearStops.indexOf(stopid);
 			nearStops.splice(index,1);
 			//console.log('removed stop ',stopid);
@@ -212,10 +214,43 @@
 			nearStops.push(stopid);
 			//console.log('added stop ',stopid);
 		}
-		allstopsLayer.eachLayer(function (layer) { 
+		allstopsLayer.eachLayer(function (layer) { //restyle based on changed list of stops
 			layer.setStyle({fillColor: nearStops.includes(layer.feature.properties.stop_id) ? "red" : "white"})
 		});
 		//console.log(nearStops);
+		// also toggle from nearFeature list of near stops per trainstop
+		// find nearest trainstop
+		//console.log(stopid, stoploc);
+		var minDistance = 1000; // km. initialize with big distance
+		var nearestTrainstop = '';
+		trainstopsarray.forEach(findtrainstopFunction);
+		function findtrainstopFunction(trainstop, index, array) {
+			//console.log(trainstop);
+			var trainstoploc = trainstop.geometry.coordinates;
+			var trainstopid = trainstop.properties.trainstop_id;
+			var trainstopname = trainstopsName[trainstopid];
+			//console.log(trainstopid, trainstopname, trainstoploc);
+			var pt1 = turf.point([trainstoploc[1],trainstoploc[0]]);
+			var pt2 = turf.point([stoploc[1],stoploc[0]]);
+			var distance = turf.distance(pt1, pt2);
+			//console.log(trainstopname, distance);
+			if (distance <= minDistance) {
+				minDistance = distance;
+				nearestTrainstop = trainstopid;
+			}
+		}
+		//console.log(nearestTrainstop, minDistance);
+		//console.log(nearestTrainstop, nearFeatures[nearestTrainstop]);
+		// toggle stop: if in nearFeature[nearestTrainstop] list then remove, if not in then add
+		if (nearFeatures[nearestTrainstop].includes(stopid)) { 
+			var index = nearFeatures[nearestTrainstop].indexOf(stopid);
+			nearFeatures[nearestTrainstop].splice(index,1);
+			//console.log('removed stop ',stopid);
+		} else {
+			nearFeatures[nearestTrainstop].push(stopid);
+			//console.log('added stop ',stopid);
+		}
+		//console.log(nearestTrainstop, nearFeatures[nearestTrainstop]);
 	}
 	
 	
