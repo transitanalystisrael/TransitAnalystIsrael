@@ -3,7 +3,7 @@
 <html>
 <head>
 	
-	<title>Stops Near TrainStops</title>
+	<title>Stops Near TrainStops Editor</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,12 +47,14 @@
 <script type="text/javascript" src="agency_20180425.js"></script>
 <script type="text/javascript" src="train_stops_20180425.js"></script>
 <script type="text/javascript" src="stops_20180425.js"></script>
+<script type="text/javascript" src="stopsneartrainstop_pre_edit_20180425.js"></script>
 
 <script src="dist/Blob.js"></script>
 <script src="dist/FileSaver.min.js"></script>
 
 <script type="text/javascript">
-	var nearFeatures = {};
+/*
+	var nearTrainstops = {};
 	var trainstopsarray = stopsWtpdperline.features;
 	var nearStops =[];
 	var stopsarray = gtfsStops.features;
@@ -63,7 +65,7 @@
 		var trainstopid = trainstop.properties.trainstop_id;
 		var trainstopname = trainstopsName[trainstopid];
 		//console.log(trainstopid, trainstopname, trainstoploc);
-		nearFeatures[trainstopid] = [];
+		nearTrainstops[trainstopid] = [];
 		stopsarray.forEach(stopFunction);
 		function stopFunction(stop, index, array) {
 			//console.log(stop);
@@ -84,14 +86,23 @@
 			var distance = turf.distance(pt1, pt2);
 			if (distance < maxDistance) {
 				//console.log (distance, trainstoploc, stoploc);
-				nearFeatures[trainstopid].push(stopid);
+				nearTrainstops[trainstopid].push(stopid);
 				nearStops.push(stopid);
 			}
 		}
 	}
-	//console.log(nearFeatures);
+	//console.log(nearTrainstops);
+*/
+	var nearStops = [];
+	for (trainstopid in nearTrainstops) {
+		//console.log(trainstopid, nearTrainstops[trainstopid])
+		nearStops = nearStops.concat(nearTrainstops[trainstopid])
+	}
+	//console.log(nearStops)
 
-
+	var trainstopsarray = stopsWtpdperline.features;
+	//var stopsarray = gtfsStops.features;
+	
 	var map = L.map('map').setView([32.11057,34.83797], 13);
 
 	var grayscale = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -115,13 +126,13 @@
 	info.update = function (props) {
 		var displaystring = '';
 		if (props) {
-			//console.log(nearFeatures[props.trainstop_id]);
-			nearFeatures[props.trainstop_id].forEach(dispFunction);
+			//console.log(nearTrainstops[props.trainstop_id]);
+			nearTrainstops[props.trainstop_id].forEach(dispFunction);
 		}
 		this._div.innerHTML = '<h3>Stops Near TrainStop</h3>' 
 			+'<br>'+'number of stops near' + ' : ' + 'train stop' + '<br>'
 			+  (props ?
-				'<b>' + trainstopsName[props.trainstop_id] + ' ' + props.trainstop_id + ' : ' + nearFeatures[props.trainstop_id].length + '</b>' + 
+				'<b>' + trainstopsName[props.trainstop_id] + ' ' + props.trainstop_id + ' : ' + nearTrainstops[props.trainstop_id].length + '</b>' + 
 				'<br><br><u>stop id</u>' + 
 				displaystring
 				: 'Hover over a stop');
@@ -141,7 +152,7 @@
 		return div3;
 	};
 	savefilecontrol.addTo(map);
-	
+/*	
 	//var nearStopsText = nearStops.toString();
 	(function(view) {
 		"use strict";
@@ -160,7 +171,36 @@
 		}, false);
 
 	}(self));
+*/	
+
+	(function(view) {
+		"use strict";
+		var document = view.document;
+		var session = view.sessionStorage;
+		// only get URL when necessary in case Blob.js hasn't defined it yet
+		//var text = nearStopsText;
+		var text_options_form = document.getElementById("text-options");
+		var text_filename = 'stopsneartrainstop_post_edit_20180425.txt';
 	
+		text_options_form.addEventListener("submit", function(event) {
+			event.preventDefault();
+			
+			var textString = '';
+			var txtline = 'trainstop_id,stop_id\n';
+			textString += txtline;
+			for (trainstopid in nearTrainstops) {
+				//console.log(trainstopid, nearTrainstops[trainstopid])
+				var stopidarray = nearTrainstops[trainstopid]
+				stopidarray.forEach(function(stopid) {
+					txtline = String(trainstopid)+','+stopid+'\n'
+					textString += txtline;
+				});
+			}
+			var BB = view.Blob;
+			saveAs(new BB([textString], {type: "text/plain;charset=" + document.characterSet}), text_filename);
+		}, false);
+
+	}(self));
 	
 	var stopswtpdLayer;
 	var freezHighlight = false;
@@ -218,7 +258,7 @@
 			layer.setStyle({fillColor: nearStops.includes(layer.feature.properties.stop_id) ? "red" : "white"})
 		});
 		//console.log(nearStops);
-		// also toggle from nearFeature list of near stops per trainstop
+		// also toggle from nearTrainstops list of near stops per trainstop
 		// find nearest trainstop
 		//console.log(stopid, stoploc);
 		var minDistance = 1000; // km. initialize with big distance
@@ -240,17 +280,17 @@
 			}
 		}
 		//console.log(nearestTrainstop, minDistance);
-		//console.log(nearestTrainstop, nearFeatures[nearestTrainstop]);
-		// toggle stop: if in nearFeature[nearestTrainstop] list then remove, if not in then add
-		if (nearFeatures[nearestTrainstop].includes(stopid)) { 
-			var index = nearFeatures[nearestTrainstop].indexOf(stopid);
-			nearFeatures[nearestTrainstop].splice(index,1);
+		//console.log(nearestTrainstop, nearTrainstops[nearestTrainstop]);
+		// toggle stop: if in nearTrainstops[nearestTrainstop] list then remove, if not in then add
+		if (nearTrainstops[nearestTrainstop].includes(stopid)) { 
+			var index = nearTrainstops[nearestTrainstop].indexOf(stopid);
+			nearTrainstops[nearestTrainstop].splice(index,1);
 			//console.log('removed stop ',stopid);
 		} else {
-			nearFeatures[nearestTrainstop].push(stopid);
+			nearTrainstops[nearestTrainstop].push(stopid);
 			//console.log('added stop ',stopid);
 		}
-		//console.log(nearestTrainstop, nearFeatures[nearestTrainstop]);
+		//console.log(nearestTrainstop, nearTrainstops[nearestTrainstop]);
 	}
 	
 	
