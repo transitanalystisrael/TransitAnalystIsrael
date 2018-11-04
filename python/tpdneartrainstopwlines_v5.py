@@ -182,7 +182,6 @@ stopsforoutput_dict = {}
 for trainstop_id, stopsnearlist in stopsneartrainstop.iteritems():
 	print trainstopcount, trainstop_id
 	trainstopcount +=1
-
 # for stops w tpd per line near trainstop
 	trainstop_tpdperline_dict = {} # line_name:[totalopd,[tpd1,tpd2,tpd3...]]
 	stopneartrainstopcount = 0
@@ -218,6 +217,8 @@ for trainstop_id, stopsnearlist in stopsneartrainstop.iteritems():
 	train_tpd = 0
 	total_bus_tpd = 0
 	tpdperline_dict = {}
+	trainstop_lat = stops_dict[trainstop_id][0]
+	trainstop_lon = stops_dict[trainstop_id][1]
 	stopsforoutput_dict[trainstop_id] = [trainstop_lat, trainstop_lon, train_tpd, total_bus_tpd, tpdperline_dict] # collect trainstop location in stopsforoutput_dict and placeholders
 	#for line_name, [opd,tpdlist] in trainstop_tpdperline_dict.iteritems() :
 	for line_name, [opd,tpdlist] in sorted(trainstop_tpdperline_dict.iteritems(), reverse=True, key=lambda(k,v): (v[0]/len(v[1]))):
@@ -242,8 +243,8 @@ fileout.close()
 print 'closed file: ', trainstopwtpdperlinetxtfile
 
 #print stopsneartrainstop
-for ts_id, s_list in stopsneartrainstop.iteritems() : 
-	print ts_id, s_list
+#for ts_id, s_list in stopsneartrainstop.iteritems() : 
+	#print ts_id, s_list
 
 #
 #   output js file of stops with max and average trips per day and tpd per line (agency_id, route short name) -'trainstop_w_tpd_per_line'+'_'+servicedate+'.js'
