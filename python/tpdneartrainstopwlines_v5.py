@@ -15,6 +15,7 @@
 #   txt file with tpd per line (agency_id+route_short_name) near trainstop - 'trainstop_w_tpd_per_line'+'_'+servicedate+'.txt'
 #   js file of stops with max and average trips per day and tpd per line (agency_id, route short name) -'trainstop_w_tpd_per_line'+'_'+servicedate+'.js'
 #   stopsneartrainstop_pre_edit = 'stopsneartrainstop_pre_edit'+'_'+servicedate+'.js'
+#	stopswtrainstopids = 'stopswtrainstopids'+'_'+servicedate+'.js'
 #
 print '----------------- create txt file with tpd per line (agency_id+route_short_name) near trainstop --------------------------'
 print 'output txt file with tpd per line (agency_id+route_short_name) near trainstop'
@@ -39,6 +40,7 @@ stopsneartrainstop_post_edit = 'stopsneartrainstop_post_edit'+'_'+servicedate+'.
 trainstopwtpdperlinetxtfile = 'trainstop_w_tpd_per_line'+'_'+servicedate+'.txt'
 trainstopwtpdperlinejsfile = 'trainstop_w_tpd_per_line'+'_'+servicedate+'.js'
 stopsneartrainstop_pre_edit = 'stopsneartrainstop_pre_edit'+'_'+servicedate+'.js'
+stopswtrainstopids = 'stopswtrainstopids'+'_'+servicedate+'.js'
 
 gtfspathin = parent_path
 gtfspathout = parent_path
@@ -243,9 +245,15 @@ fileout.close()
 print 'closed file: ', trainstopwtpdperlinetxtfile
 
 #print stopsneartrainstop
-#for ts_id, s_list in stopsneartrainstop.iteritems() : 
+stopswtrainstopid_dict = {}
+for s_id, stopinfolist in stops_dict.iteritems():
+	stopswtrainstopid_dict[s_id] = "0" # init trainstop id with with "0" - no trainstop near this stop
+# now loop through all trainstops and stops near each trainstop to enter trainstop_ids
+for ts_id, s_list in stopsneartrainstop.iteritems() : 
 	#print ts_id, s_list
-
+	for s_id in s_list :
+		stopswtrainstopid_dict[s_id] = ts_id
+		
 #
 #   output js file of stops with max and average trips per day and tpd per line (agency_id, route short name) -'trainstop_w_tpd_per_line'+'_'+servicedate+'.js'
 #
@@ -283,3 +291,39 @@ nf.write(outstr)
 nf.close()
 print ("Saved file: " + jsfileout)
 
+#
+#   output js file of stops with location stop_id and trainstop_id of near trainstop ("0" if none)
+#
+
+jsfileout = stopswtrainstopids
+
+def getJSON(s_id, s_lat, s_lon):
+	return {
+		"type": "Feature",
+		"geometry": {
+			"type": "Point",
+			"coordinates": [float(s_lon),float(s_lat)]
+		},
+		"properties": { 
+			"s_id": s_id,
+			"ts_id": stopswtrainstopid_dict[s_id]
+		}
+	}
+
+# saveGeoJSON
+
+print ("Generating GeoJSON export.")
+geoj = {
+	"type": "FeatureCollection",
+	"features": [getJSON(stop_id, stop_lat, stop_lon) for stop_id, [stop_lat, stop_lon, maxtpdatstop, averagetpdatstop, maxdaytpdperline_dict] in stops_dict.iteritems()]
+}
+print ("Saving file: " + gtfspathout+jsfileout+ " ...")
+nf = open(gtfspathout+jsfileout, "w")
+jsonstr = json.dumps(geoj, separators=(',',':')) # smaller file for download
+outstr = jsonstr.replace('}},', '}},\n')
+nf.write('var stopsWtrainstopid =\n')
+nf.write(outstr)
+nf.close()
+print ("Saved file: " + jsfileout)
+
+print "Local current time :", time.asctime( time.localtime(time.time()) )
