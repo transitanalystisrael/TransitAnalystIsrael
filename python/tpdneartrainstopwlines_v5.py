@@ -297,7 +297,7 @@ print ("Saved file: " + jsfileout)
 
 jsfileout = stopswtrainstopids
 
-def getJSON(s_id, s_lat, s_lon):
+def getJSON(s_id, s_lat, s_lon, maxtpdatstop, averagetpdatstop, maxdaytpdperline_dict):
 	return {
 		"type": "Feature",
 		"geometry": {
@@ -306,7 +306,10 @@ def getJSON(s_id, s_lat, s_lon):
 		},
 		"properties": { 
 			"s_id": s_id,
-			"ts_id": stopswtrainstopid_dict[s_id]
+			"ts_id": stopswtrainstopid_dict[s_id],
+			"maxtpdatstop": maxtpdatstop, 
+			"averagetpdatstop": averagetpdatstop, 
+			"maxdaytpdperline_dict": maxdaytpdperline_dict
 		}
 	}
 
@@ -315,7 +318,8 @@ def getJSON(s_id, s_lat, s_lon):
 print ("Generating GeoJSON export.")
 geoj = {
 	"type": "FeatureCollection",
-	"features": [getJSON(stop_id, stop_lat, stop_lon) for stop_id, [stop_lat, stop_lon, maxtpdatstop, averagetpdatstop, maxdaytpdperline_dict] in stops_dict.iteritems()]
+	"features": [getJSON(stop_id, stop_lat, stop_lon, maxtpdatstop, averagetpdatstop, maxdaytpdperline_dict) 
+		for stop_id, [stop_lat, stop_lon, maxtpdatstop, averagetpdatstop, maxdaytpdperline_dict] in stops_dict.iteritems()]
 }
 print ("Saving file: " + gtfspathout+jsfileout+ " ...")
 nf = open(gtfspathout+jsfileout, "w")
