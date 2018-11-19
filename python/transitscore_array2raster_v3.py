@@ -114,12 +114,40 @@ print ("Saved file: " + tsfileout)
 import sys
 print '----------------------------------os.system("gdalinfo ts_unproj.tif ")'
 os.system("gdalinfo ts_unproj.tif ")
+#------------------------------------------------------------------------
+# translate in order to scale back to 0-100
+old_ds = gdal.Open('ts_unproj.tif')
+if old_ds is None:
+    print 'Unable to open INPUT.tif'
+    sys.exit(1)
+
+print "[ RASTER BAND COUNT old_ds]: ", old_ds.RasterCount
+for band in range( old_ds.RasterCount ):
+    band += 1
+    print "[ GETTING BAND ]: ", band
+    srcband = old_ds.GetRasterBand(band)
+    if srcband is None:
+        continue
+
+    stats = srcband.GetStatistics( True, True )
+    if stats is None:
+        continue
+
+    print "[ STATS ] =  Minimum=%.3f, Maximum=%.3f, Mean=%.3f, StdDev=%.3f" % ( \
+                stats[0], stats[1], stats[2], stats[3] )
+minvalue = str(int(stats[0]))
+maxvalue = str(int(stats[1]))
+old_ds = None
+
+print '----------------------------------os.system("gdal_translate ts_unproj.tif ts_scaled.tif -scale 0 88 0 100")'
+os.system("gdal_translate ts_unproj.tif ts_scaled.tif -scale "+minvalue+" "+maxvalue+" 0 100") #  scale 
+
 #----------------------------------------------------------------------------
-# project ts_unproj.tif to 3857 and create ts.tif
+# project ts_scaled.tif to 3857 and create ts.tif
 srs = osr.SpatialReference()
 #srs.SetWellKnownGeogCS('WGS84') # from sample in book
 srs.ImportFromEPSG(3857)
-old_ds = gdal.Open('ts_unproj.tif')
+old_ds = gdal.Open('ts_scaled.tif')
 if old_ds is None:
     print 'Unable to open INPUT.tif'
     sys.exit(1)
@@ -140,6 +168,7 @@ for band in range( old_ds.RasterCount ):
                 stats[0], stats[1], stats[2], stats[3] )
 
 vrt_ds = gdal.AutoCreateWarpedVRT(old_ds, None, srs.ExportToWkt(), gdal.GRA_Bilinear)
+#vrt_ds = gdal.AutoCreateWarpedVRT(old_ds, None, srs.ExportToWkt(), gdal.GRA_NearestNeighbour)
 
 print "[ RASTER BAND COUNT vrt_ds]: ", vrt_ds.RasterCount
 for band in range( vrt_ds.RasterCount ):
