@@ -99,9 +99,11 @@
 				d >= 80 ? 4 :
 				d >= 60 ? 2 :
 				1;
-	}	
+	}
+	var linesShownCount = 0;
 	function style(feature) {
 		var tpd = feature.properties.maxtpdperroute;
+		if (tpd >= slidervalue) {linesShownCount +=1};
 		return {
 			weight: getWeight(tpd),
 			opacity: 0.7,
@@ -203,12 +205,14 @@
 	map.attributionControl.addAttribution('Route Freq data &copy; <a href="http://miu.org.il/">Merhav</a>');
 
 	function sliderChange(x) {
+		linesShownCount = 0;
 		geojson.eachLayer(function (layer) { 
 			//layer.resetStyle;
 			layer.setStyle(
 				style(layer.feature)
 			);
 		});
+		console.log(linesShownCount, ' lines shown');
 		return x;
 	}
 
