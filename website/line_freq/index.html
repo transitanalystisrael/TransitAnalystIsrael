@@ -24,10 +24,10 @@
 	<style>
 		#map { width: 100%; height: 100%; }
 		
-		.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } 
+		.info { height: 800px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } 
 		.info h4 { margin: 0 0 5px; color: #777; }
 		
-		.legend { text-align: left; line-height: 18px; color: #555; } 
+		.legend { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
 		.legend i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 	</style>
 	
@@ -67,13 +67,11 @@
 		return this._div;
 	};
 
-	info.update = function (props) {
-		toscore = (props ? props.maxtpdperroute + 9 : 0);
+	info.update = function () {
 		this._div.innerHTML = '<h4>Route Frequency Israel</h4>' +
-			'<p>' + 'Trips per Day' + ' : ' + 'line number' + ' - ' + 'agency' + '</p>'
-			+  (props ?
-				'<b>' + props.maxtpdperroute + ' : ' + props.route_short_name + ' - ' + agencies[props.agency_id] + '</b>'
-				: 'Hover over a route');
+			'<p>' + linesShownCount +' lines with tpd >=' + slidervalue + '</p>' +
+			'<p>' + 'Trips per day' + ' : ' + 'line' + ' - ' + 'agency' + '</p>'
+			+ displaystring;
 	};
 
 	info.addTo(map);
@@ -101,9 +99,16 @@
 				1;
 	}
 	var linesShownCount = 0;
+	var displaystring = '';
+	var tpdperline = [];
 	function style(feature) {
 		var tpd = feature.properties.maxtpdperroute;
-		if (tpd >= slidervalue) {linesShownCount +=1};
+		if (tpd >= slidervalue) {
+			linesShownCount +=1;
+			var key = feature.properties.agency_id + '-' + feature.properties.route_short_name;
+			var value = feature.properties.maxtpdperroute;
+			tpdperline.push({line_name:key, tpd:value});
+		};
 		return {
 			weight: getWeight(tpd),
 			opacity: 0.7,
@@ -145,16 +150,36 @@
 	  if (intersectingFeatures.length) {
 		//console.log(intersectingFeatures[0].feature.properties.maxtpdperroute);
 		var totaltpd = 0;
+		
+		
+		
+		
+		
+		var linestring = ''
 		var tpdperlinearray = intersectingFeatures.map(function(o) {
-		  totaltpd += o.feature.properties.maxtpdperroute;
-		  return [o.feature.properties.maxtpdperroute, ' : ' + o.feature.properties.route_short_name + ' - ' + agencies[o.feature.properties.agency_id]]
+			totaltpd += o.feature.properties.maxtpdperroute;
+			return (o.feature.properties.maxtpdperroute >= slidervalue) ? 
+				[o.feature.properties.maxtpdperroute, ' : <b>' + o.feature.properties.route_short_name + ' - ' + agencies[o.feature.properties.agency_id]+'</b>']:
+				[o.feature.properties.maxtpdperroute, ' : ' + o.feature.properties.route_short_name + ' - ' + agencies[o.feature.properties.agency_id]];
+/*			return //{(o.feature.properties.maxtpdperroute >= slidervalue) ? 
+				//[o.feature.properties.maxtpdperroute, '<b>'+' : ' + o.feature.properties.route_short_name + ' - ' + agencies[o.feature.properties.agency_id]+'</b>'] :
+				[o.feature.properties.maxtpdperroute, ' : ' + o.feature.properties.route_short_name + ' - ' + agencies[o.feature.properties.agency_id]]
+			//};
+*/
 		})
+		
+		
+		
+		
+		
+		
 		//console.log(tpdperlinearray);
 
 		tpdperlinearray.sort(function(a, b){return b[0] - a[0]});
 		//console.log(tpdperlinearray);
 		var displayarray = tpdperlinearray.map(function(o) {return[String(o[0])+o[1]]});
-		var html = 'Trips per Day' + ' : ' + 'line number' + ' - ' + 'agency' + "<br/>" + displayarray.join('<br/>')+'<br/>total tpd:'+ totaltpd + '<br/>'+'<br/>average trips per hour per direction:'+ '<br/>' + Math.round(10*totaltpd/2/20)/10;
+		//console.log(displayarray);
+		var html = 'Trips per day' + ' : ' + 'line' + ' - ' + 'agency' + "<br/>" + displayarray.join('<br/>')+'<br/>total tpd:'+ totaltpd + '<br/>'+'<br/>average trips per hour per direction:'+ '<br/>' + Math.round(10*totaltpd/2/20)/10;
 
 		map.openPopup(html, e.latlng, {
 		  offset: L.point(0, 0)
@@ -174,14 +199,14 @@
 			layer.bringToFront();
 		}
 
-		info.update(layer.feature.properties);
+		//info.update(layer.feature.properties);
 	}
 
 	var geojson;
 
 	function resetHighlight(e) {
 		geojson.resetStyle(e.target);
-		info.update();
+		//info.update();
 	}
 
 //	function zoomToFeature(e) {
@@ -206,20 +231,36 @@
 
 	function sliderChange(x) {
 		linesShownCount = 0;
+		tpdperline =[];
 		geojson.eachLayer(function (layer) { 
 			//layer.resetStyle;
+			//console.log(layer.feature.properties);
 			layer.setStyle(
 				style(layer.feature)
 			);
 		});
-		console.log(linesShownCount, ' lines shown');
+
+		//console.log(tpdperline);
+		tpdperline.sort(function(a, b){return b.tpd - a.tpd});
+		//console.log(tpdperline);
+		displaystring = '';
+		tpdperline.forEach(dispFunction);
+		
+		function dispFunction(linetpd){
+			var agency_id = linetpd["line_name"].split('-')[0];
+			var route_short_name = linetpd["line_name"].split('-')[1];
+			var tpd = linetpd["tpd"]
+			displaystring += agencies[agency_id] + ' - ' + route_short_name + ' : ' + tpd + '<br>';
+		}	
+		info.update();
+		//console.log(linesShownCount, ' lines shown');
 		return x;
 	}
 
 	slider = L.control.slider(function(value) {
 			slidervalue = value;
 			slidervalue = sliderChange(value);	
-			console.log(slidervalue);
+			//console.log(slidervalue);
 		}, {
 		max: 240,
 		min: 60,
@@ -230,15 +271,16 @@
 		collapsed:false,
 		increment: true,
 		syncSlider: true,
+		position: 'topleft',
 		id: 'slider'			
 	}).addTo(map);
 	
 
-	var legend = L.control({position: 'bottomright'});
+	var legend = L.control({position: 'bottomleft'});
 
 	legend.onAdd = function (map) {
 
-		var div = L.DomUtil.create('div', 'info legend'),
+		var div = L.DomUtil.create('div', 'legend'),
 			grades = [60, 80, 120, 240],
 			labels = [],
 			from, to;
