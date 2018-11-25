@@ -27,6 +27,7 @@ import $ from 'jquery';
 window.jQuery = $;
 window.$ = $;
 import 'jquery-datetimepicker';
+import 'jquery-toggles';
 
 
 /** Map generation section**/
@@ -56,13 +57,15 @@ function createMap() {
         var marhav_location = [32.072728, 34.792708];
         map.setView(marhav_location, 14);
     });
+
+    //Fixing the grey tiles partial issue
+    $(window).on("resize", function () { $("#map").height($(window).height()); map.invalidateSize(); }).trigger("resize");
+
     return map;
 }
 
 
 function addHeatMapLayer(featureGroup) {
-    /*var div = $('<div/>');
-    div.addClass('leaflet');*/
     centerOnCurrentLocation();
     var bounds = featureGroup.addTo(map).getBounds();
     setTimeout(function() {
@@ -233,7 +236,14 @@ map.on('click', function(e){
     if (starting_point_marker !== undefined) {
         map.removeLayer(starting_point_marker);
     }
-    starting_point_marker = new L.marker(starting_location).addTo(map);
+    starting_point_marker = new L.marker(starting_location, { draggable: true });
+    //Making the marker lon & lat updated when dragging it
+    starting_point_marker.on('dragend', function(event){
+        var marker = event.target;
+        var position = marker.getLatLng();
+        marker.setLatLng(new L.LatLng(position.lat, position.lng),{draggable:'true'});
+    });
+    starting_point_marker.addTo(map);
 });
 
 var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";
@@ -241,17 +251,65 @@ var max_duration = "1800";
 var resolution = "5000"
 
 var date_time_picker = $('#datetimepicker').datetimepicker({
-    format:'d.m.Y H:i',
     formatDate: 'd.m.Y',
     formatTime: 'H:i',
     startDate: '21.10.2018',
     minDate:'21.10.2018',
     maxDate:'27.10.2018',
-    defaultTime:'08:00',
-    step: 30
+    showSecond: false,
+    step: 30,
+    defaultTime: '08:00'
 });
-date_time_picker.val('21.10.2018 08:00:00');
 
+date_time_picker.val('2018/10/21 08:00');
+
+/**Switch Button**/
+//Setting the switch button and attaching it's style to a var
+$('#switchButton').toggles({
+    click: true, // allow clicking on the toggle
+    text: {
+        on: 'FROM', // text for the ON position
+        off: 'TO' // and off
+    },
+    on:true,
+    type: 'select',
+    height: '30',
+    width: '60'
+});
+var switchButton = $('#switchButton').data('toggles');
+
+
+/**Transit Mode button and speed for overridin bike as walking with double speed**/
+function setTransitModeAsDefault() {
+    $('input:radio[name=transitMode]')[0].checked = true;
+}
+setTransitModeAsDefault();
+
+function getTransitMode(mode) {
+    return $('input:radio[name=transitMode]:checked').val();
+}
+function getTransitModeUrl() {
+    var mode = getTransitMode($('input:radio[name=transitMode]:checked').val());
+    //At alpha version we consider bike to be walking in 4.1 ms speed,
+    //so we set the frist and last walking modes to walking and we disallow use of transit (navitia hack).
+    if (mode ==="walking" || mode === "bike") {
+        return "&first_section_mode%5B%5D=walking&last_section_mode%5B%5D=walking" +
+            "&allowed_id[]=physical_mode:Bus&forbidden_uri[]=physical_mode:Bus"
+    }  else {
+        return "";
+    }
+}
+
+function getSpeed(mode) {
+    if (mode=="bike") {
+        return "&walking_speed=4.1";
+    } else if (mode==="walking") {
+        return "&walking_speed=1.2";
+    } else  {
+        return "";
+    }
+}
+/**RUN Button**/
 var runButton = $('#runButton');
 
 runButton.on("click", function () {
@@ -267,12 +325,29 @@ runButton.on("click", function () {
         ("0" + (dt.getHours())).slice(-2),
         ("0" + (dt.getMinutes())).slice(-2));
 
-    console.log(dateTimeString);
+    //Select from or to according to user's selection
+    var from_to = switchButton.active ? "&from=" : "&to=";
 
+    //Get mode, transit by default
+    var mode = getTransitMode()
+    //get Speed for simulating bike as walking in 4.1 mps
+    var speed = getSpeed(mode);
+
+    //TODO: REMOVE ME
+    console.log("mode " + mode);
+    console.log("speed " + speed);
     var heatMapJsonUrl = navitia_server_url+
         "?max_duration=" + max_duration +
-        "&from="+ starting_location.lng + "%3B" + starting_location.lat +
-        "&datetime=" + dateTimeString + "&resolution=" + resolution;
+        from_to + starting_location.lng +
+        "%3B" + starting_location.lat +
+        "&datetime=" + dateTimeString +
+        getTransitModeUrl() +
+        speed +
+        "&resolution=" + resolution;
+
+
+    //TODO: REMOVE ME
+    console.log(heatMapJsonUrl);
 
     //remove current heat map
     if (map.hasLayer(heatMapMarkersGroup)) {
@@ -281,5 +356,7 @@ runButton.on("click", function () {
 
     //add new heat map
     addHeatMap(heatMapJsonUrl);
-})
+});
+
+
 

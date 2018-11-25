@@ -7,3 +7,4 @@ import 'styles/index.scss';
 import 'leaflet/dist/leaflet.css'
 import 'jquery-datetimepicker/jquery.datetimepicker.css'
 import 'timeMap.js';
+import 'bootstrap';

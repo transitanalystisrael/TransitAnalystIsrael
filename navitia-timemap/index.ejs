@@ -6,8 +6,30 @@
     <title>Israel Time Map</title>
 </head>
 <body>
-    <div id="runButton">Run</div>
-    <input id="datetimepicker" type="text">
-    <div id="map"></div>
+<div class="button-container">
+    <div class="row">
+        <div class="col-sm">
+            <input id="datetimepicker" type="text">
+        </div>
+        <div class="col-sm">
+            <div id="runButton">Run</div>
+        </div>
+        <div class="col-sm">
+            <div id="switchButton" class="toggle toggle-light"></div>
+        </div>
+        <div class="col-sm">
+
+                <input class="modeButton" name="transitMode" id="transit" type="radio" value="transit">Transit</input>
+                <input class="modeButton"  name="transitMode" id="walk" type="radio" value="walking">Walking</input>
+                <input class="modeButton"  name="transitMode"  id="bike" type="radio" value="bike">Bike</input>
+
+        </div>
+
+
+    </div>
+</div>
+
+<div id="map"></div>
+
 </body>
 </html>

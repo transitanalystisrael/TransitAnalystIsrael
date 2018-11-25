@@ -1,0 +1,41 @@
+/**overriding bootstrap css**/
+$enable-grid-classes:       false;
+@import "~bootstrap/scss/bootstrap";
+@import "~jquery-toggles/css/toggles-full.css";
+
+html,
+body{
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.button-container {
+    @include make-container();
+    @include make-container-max-widths;
+    margin: 0px;
+
+    .row {
+        @include make-row();
+        .modeButton {
+
+        }
+    }
+
+    .col {
+        @include make-col-ready;
+    }
+
+    #runButton {
+        height: 60px;
+        width: 60px;
+        background-color: red;
+        color: black;
+    }
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+

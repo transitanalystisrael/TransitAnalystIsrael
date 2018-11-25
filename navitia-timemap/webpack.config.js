@@ -76,6 +76,16 @@ module.exports = {
                         }
                     },
                     {
+                        loader: 'postcss-loader', // Run post css actions
+                        options: {
+                            plugins: function () { // post css plugins, can be exported to postcss.config.js
+                                return [
+                                    require('autoprefixer')
+                                ];
+                            }
+                        }
+                    },
+                    {
                         loader: 'sass-loader',
                         options: {
                             sourceMap: IS_DEV,
