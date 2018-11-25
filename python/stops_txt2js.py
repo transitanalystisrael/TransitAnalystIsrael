@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# scan stops.txt to create stops list with stop_id, stop name and location (lat, lon)
+# scan stops.txt to create stops list with stop_id and location (lat, lon)
 # output stops_gtfsdate.js 
 #
 import time

@@ -10,8 +10,9 @@
 	
 	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
+	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
+	<script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
 	
 	<style>
 		html, body {
@@ -29,9 +30,7 @@
 		.legend { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
 		.legend i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 		
-		.stopStyle { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
-		.stopStyle i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
-		</style>
+	</style>
 	
 </head>
 <body>
@@ -53,7 +52,7 @@ onload = function(){
 <script type="text/javascript" src="trainstop_w_tpd_per_line_20180425.js"></script>
 <script type="text/javascript" src="agency_20180425.js"></script>
 <script type="text/javascript" src="train_stops_20180425.js"></script>
-<script type="text/javascript" src="stops_20180425.js"></script>
+<script type="text/javascript" src="stopswtrainstopids_20180425.js"></script>
 
 <script type="text/javascript">
 
@@ -76,18 +75,19 @@ onload = function(){
 		this.update();
 		return this._div;
 	};
-
+	var ts_tpdperline = [];
+	var s_tpdperline = [];
 	info.update = function (props) {
 		var displaystring = '';
-		var tpdperline = [];
+		ts_tpdperline = [];
 		if (props) {
 			Object.entries(props.tpdperline_dict).forEach(entry => 
 				{ let key = entry[0]; let value = entry[1];
-					tpdperline.push({line_name:key, tpd:value});
+					ts_tpdperline.push({line_name:key, tpd:value});
 				});
-			tpdperline.sort(function(a, b){return b.tpd - a.tpd});
-			//console.log(tpdperline);
-			tpdperline.forEach(dispFunction);
+			ts_tpdperline.sort(function(a, b){return b.tpd - a.tpd});
+			//console.log(ts_tpdperline);
+			ts_tpdperline.forEach(dispFunction);
 		}
 		this._div.innerHTML = '<h3>Trips per Day (tpd) Near TrainStop</h3>' 
 			+'<br>'+'total bus tpd' + ' , ' + 'train tpd' + ' : ' + 'train stop name' + '<br>'
@@ -164,31 +164,50 @@ onload = function(){
 	}
 	
 	var frozenLayer;
-	var stopStyleValue = 'walkingdistance';
-	
+	var both_tpdperline = [];
 	function clickHandler(e) {
 		freezHighlight = !freezHighlight; // toggle freezHighlight
-		if (freezHighlight) frozenLayer = e.target;
+		if (freezHighlight) {
+			frozenLayer = e.target;
+			//console.log(s_tpdperline, ts_tpdperline);
+			both_tpdperline = [];
+			ts_tpdperline.forEach(function(ts_tpdline) {
+				s_tpdperline.forEach(function(s_tpdline) {
+					if (ts_tpdline.line_name == s_tpdline.line_name) { 
+						both_tpdperline.push(s_tpdline.tpd < ts_tpdline.tpd ? s_tpdline : ts_tpdline);
+					}
+				});
+			});
+			//console.log(both_tpdperline);
+			
+			var totaltpd = 0;
+			var displaystring = '';
+			both_tpdperline.sort(function(a, b){return b.tpd - a.tpd});
+			both_tpdperline.forEach(dispFunction);
+			//var html = '<div style="height: 400px; overflow: auto;">tpd' + ' : ' + 'line' + ' - ' + 'agency' + "<br>" + displaystring + "<br><br>Total tpd: "+ totaltpd.toString()+'</div>';
+			var html = '<div>tpd' + ' : ' + 'line' + ' - ' + 'agency' + "<br>" + displaystring + "<br><br>Total tpd: "+ totaltpd.toString()+'</div>';
+
+			popup
+				.setLatLng(e.latlng)
+				//.setContent(e.latlng.toString()+'<br>'+html)
+				.setContent(html)
+				.openOn(map);
+		}
 		if (!freezHighlight) {
 			stopswtpdLayer.resetStyle(frozenLayer);
 			highlightFeature(e);
 		}
-	}
-	
-	function stopStyleChange(v) {
-		console.log(v);
-		stopStyleValue = v;
-		if (stopStyleValue == 'walkingdistance') {
-			stopswtpdLayer.eachLayer(function (layer) { 
-				layer.setRadius(500);
-			});
-		} else {
-			stopswtpdLayer.eachLayer(function (layer) { 
-				layer.setRadius(50);
-			});
+
+		function dispFunction(linetpd){
+			//console.log(linetpd);
+			var agency_id = linetpd["line_name"].split('-')[0];
+			var route_short_name = linetpd["line_name"].split('-')[1];
+			var tpd = linetpd["tpd"]
+			totaltpd += tpd;
+			displaystring += '<br>' + agencies[agency_id] + ' - ' + route_short_name + ' : ' + tpd;
 		}
 	}
-
+	
 	function onEachFeature(feature, layer) {
 		layer.on({
 			click: clickHandler,
@@ -201,7 +220,7 @@ onload = function(){
 		return {
 			pane: getPane(-1),
 			radius: 25,
-			fillColor: "white",
+			fillColor: feature.properties.ts_id != "0" ? "red" : "white",
 			color: "black",
 			weight: 0.5,
 			opacity: 0.5,
@@ -238,14 +257,97 @@ onload = function(){
 		onEachFeature: onEachFeature
 	}).addTo(map);
 	
-		allstopsLayer = L.geoJson(gtfsStops, {
+		allstopsLayer = L.geoJson(stopsWtrainstopid, {
 		pointToLayer: function (feature, latlng) {
 			return L.circle(latlng, allstopOptions(feature));
 		}
 	}).addTo(map);
 
 	map.attributionControl.addAttribution('TransitScore data &copy; <a href="http://miu.org.il/">Merhav</a>');
+	
+	var circle;
+	var popup = L.popup();
+	var neartrainstop = false;
+	function onMapClick(e) {
+		var maxDistance = 0.5 // Km
+		var point = e.latlng;
+		var pt1 = turf.point([point.lng,point.lat]);
+		//console.log(pt1);
+		//var circle;
+		//if (typeof circle !== 'undefined') {circle.removeFrom(map);}
+		var intersectingFeatures = [];
+		map.eachLayer(function(layer){
+			if (typeof layer.feature !== 'undefined') {
+				//console.log(stopswtpdLayer.hasLayer(layer), layer.feature.properties);
+				var stoploc = layer.feature.geometry.coordinates;
+				var pt2 = turf.point([stoploc[0],stoploc[1]]);
+				//console.log(pt1, pt2);
+				var distance = turf.distance(pt1, pt2);
+				//console.log(distance);
+				if (distance < maxDistance) { 
+					//console.log(layer.feature.properties, distance);
+					if (allstopsLayer.hasLayer(layer)) {intersectingFeatures.push(layer);} // collect only if near and stop feature not trainstop feature
+					if (stopswtpdLayer.hasLayer(layer)) {neartrainstop = true;}
+					//layer.setStyle({ weight: 6, color: '#666', opacity: 1 });
+				}
+			} 
+		});
+		if (!neartrainstop) {
+			if (typeof circle !== 'undefined') {circle.removeFrom(map);}
+			circle = L.circle([point.lat,point.lng], { color: 'red', fillOpacity: 0, radius: maxDistance * 1000 }).addTo(map); 
+			// if at least one feature found, show it
+			if (intersectingFeatures.length) {
+				//console.log(intersectingFeatures[0].feature.properties);
+				var totaltpd = 0;
+				var tpdperlinearray = intersectingFeatures.map(function(o) {
+				  totaltpd += o.feature.properties.maxtpdperroute;
+				  return o.feature.properties.maxdaytpdperline_dict
+				})
+				//console.log(tpdperlinearray);
+				// merge per stop tpdperline dict to one dict
+				var tpdperlinemergeddict = {}
+				//tpdperlinemergeddict = tpdperlinearray[0] // placeholder for testing without merge
+				tpdperlinearray.forEach(function(tpdperlinedict) {
+					if (typeof tpdperlinedict !== 'undefined') {
+						Object.entries(tpdperlinedict).forEach(entry => 
+							{ let key = entry[0]; let value = entry[1];
+								if (key in tpdperlinemergeddict) {
+									tpdperlinemergeddict[key] = Math.max(value, tpdperlinemergeddict[key]); // if line already in merged dict then just update tpd to max
+								} else {
+									tpdperlinemergeddict[key] = value; // // if line not in merged dict then just add it to merged dict
+								}
+							});
+					}
+				});
+				s_tpdperline = []
+				var displaystring = '';
+				Object.entries(tpdperlinemergeddict).forEach(entry => 
+					{ let key = entry[0]; let value = entry[1];
+						s_tpdperline.push({line_name:key, tpd:value});
+					});
+				//console.log(s_tpdperline);
+				s_tpdperline.sort(function(a, b){return b.tpd - a.tpd});
+				s_tpdperline.forEach(dispFunction);
+				var html = 'Trips per Day' + ' : ' + 'line' + ' - ' + 'agency' + "<br/>" + displaystring;
+			}
+			function dispFunction(linetpd){
+				//console.log(linetpd);
+				var agency_id = linetpd["line_name"].split('-')[0];
+				var route_short_name = linetpd["line_name"].split('-')[1];
+				var tpd = linetpd["tpd"]
+				displaystring += '<br>' + agencies[agency_id] + ' - ' + route_short_name + ' : ' + tpd;
+			}
+			popup
+				.setLatLng(e.latlng)
+				.setContent('<div style="height: 400px; overflow: auto;">'+e.latlng.toString()+'<br>'+html+'</div>')
+				.openOn(map);
+		}
+		neartrainstop = false;
+	}
 
+	map.on('click', onMapClick);
+
+	
 	var legend = L.control({position: 'bottomleft'});
 	legend.onAdd = function (map) {
 		var div = L.DomUtil.create('div', 'legend'),
@@ -263,18 +365,6 @@ onload = function(){
 		return div;
 	};
 	legend.addTo(map);
-
-	var stopStyle = L.control({position: 'bottomleft'});
-	stopStyle.onAdd = function (map) {
-		var div2 = L.DomUtil.create('div', 'stopStyle');
-		div2.innerHTML = '<h3>Train Station<br>Display Style Select</h3>'
-			+'<form onclick="stopStyleChange(stopstyle.value)">'
-				+'<input type="radio" name="stopstyle" value="walkingdistance" checked>500m Circle<br>'
-				+'<input type="radio" name="stopstyle" value="stop">Stop Marker'
-			+'</form>';
-		return div2;
-	};
-	stopStyle.addTo(map);
 
 </script>
 </body>
