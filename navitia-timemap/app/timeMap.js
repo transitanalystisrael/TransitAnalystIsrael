@@ -34,8 +34,9 @@ import 'jquery-toggles';
 var map;
 var heatMapMarkersGroup;
 var starting_point_marker;
-
-createMap();
+var default_starting_location = [32.073443, 34.790410];
+var starting_location;
+var default_starting_zoom = 12;
 
 function createMap() {
     var mapboxTiles = L
@@ -47,26 +48,44 @@ function createMap() {
                 token : 'pk.eyJ1Ijoic2hha2VkayIsImEiOiJjaWxjYzVxbzIwMDZud2dsejg3Zmw3dncyIn0.1mxg8ZqXNXzMZ2OkH9os5A'
             });
 
-    map = L.map('map', {renderer: new L.canvas()}).addLayer(mapboxTiles).locate(/*{setView: true, maxZoom: 20}*/);
-
-    map.on('locationfound', function(e) {
-        map.setView(e.latlng, 16);
-    });
-    map.on('locationerror', function(e) {
-        //If no location, setting on Merhav
-        var marhav_location = [32.072728, 34.792708];
-        map.setView(marhav_location, 14);
-    });
+    map = L.map('map', {renderer: new L.canvas()})
+        .setView(default_starting_location, default_starting_zoom)
+        .addLayer(mapboxTiles);
 
     //Fixing the grey tiles partial issue
     $(window).on("resize", function () { $("#map").height($(window).height()); map.invalidateSize(); }).trigger("resize");
 
+    // setting for default path of images used by leaflet - otherwise marker only appear after first click
+    L.Icon.Default.imagePath = '/node_modules/leaflet/dist/images/';
+
+    //Creating the default marker with location
+    starting_point_marker = new L.marker(default_starting_location, { draggable: true });
+    starting_location= starting_point_marker._latlng;
+
+    //Making the marker lon & lat updated when dragging it
+    starting_point_marker.on('dragend', function(event){
+        handleMarkerMove(event.target.getLatLng());
+    });
+    starting_point_marker.addTo(map);
     return map;
+}
+
+function handleMarkerMove(latLng) {
+    starting_location = latLng;
+    //remove former starting marker point
+    if (starting_point_marker !== undefined) {
+        map.removeLayer(starting_point_marker);
+    }
+    starting_point_marker = new L.marker(starting_location, {draggable: true});
+    //Making the marker lon & lat updated when dragging it
+    /*    starting_point_marker.on('dragend', function(event){
+            starting_location = event.target.latlng;
+        });*/
+    starting_point_marker.addTo(map);
 }
 
 
 function addHeatMapLayer(featureGroup) {
-    centerOnCurrentLocation();
     var bounds = featureGroup.addTo(map).getBounds();
     setTimeout(function() {
         /*if (bounds) { map.fitBounds(bounds); } else { map.fitWorld(); }*/
@@ -221,34 +240,11 @@ function durationToString (duration) {
     }
 };
 
-function centerOnCurrentLocation() {
-    map.on('locationfound', function(e) {
-            map.setView(e.latlng, 13);
-    });
-}
 
-/**User Interaction**/
-var starting_location;
-
-map.on('click', function(e){
-    starting_location = e.latlng;
-    //remove former starting marker point
-    if (starting_point_marker !== undefined) {
-        map.removeLayer(starting_point_marker);
-    }
-    starting_point_marker = new L.marker(starting_location, { draggable: true });
-    //Making the marker lon & lat updated when dragging it
-    starting_point_marker.on('dragend', function(event){
-        var marker = event.target;
-        var position = marker.getLatLng();
-        marker.setLatLng(new L.LatLng(position.lat, position.lng),{draggable:'true'});
-    });
-    starting_point_marker.addTo(map);
-});
 
 var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";
-var max_duration = "1800";
-var resolution = "5000"
+var max_duration = "3600";
+var resolution = "500"
 
 var date_time_picker = $('#datetimepicker').datetimepicker({
     formatDate: 'd.m.Y',
@@ -310,9 +306,9 @@ function getSpeed(mode) {
     }
 }
 /**RUN Button**/
-var runButton = $('#runButton');
+var runButton = $('#runButton').on("click", generateHeatMap);
 
-runButton.on("click", function () {
+function generateHeatMap() {
     if (starting_point_marker === undefined) {
         alert("Please select a starting point on the map");
         return;
@@ -333,10 +329,7 @@ runButton.on("click", function () {
     //get Speed for simulating bike as walking in 4.1 mps
     var speed = getSpeed(mode);
 
-    //TODO: REMOVE ME
-    console.log("mode " + mode);
-    console.log("speed " + speed);
-    var heatMapJsonUrl = navitia_server_url+
+    var heatMapJsonUrl = navitia_server_url +
         "?max_duration=" + max_duration +
         from_to + starting_location.lng +
         "%3B" + starting_location.lat +
@@ -356,7 +349,15 @@ runButton.on("click", function () {
 
     //add new heat map
     addHeatMap(heatMapJsonUrl);
+}
+
+createMap();
+map.on('click', function (e) {
+    handleMarkerMove(e.latlng);
 });
+
+//Crating the defautlt map
+generateHeatMap();
 
 
 
