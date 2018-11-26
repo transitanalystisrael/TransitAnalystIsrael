@@ -32,7 +32,7 @@ import 'jquery-toggles';
 
 /** Map generation section**/
 var map;
-var heatMapMarkersGroup;
+var heatMapLayerId;
 var starting_point_marker;
 var default_starting_location = [32.073443, 34.790410];
 var starting_location;
@@ -85,12 +85,15 @@ function handleMarkerMove(latLng) {
 }
 
 
-function addHeatMapLayer(featureGroup) {
-    var bounds = featureGroup.addTo(map).getBounds();
+function addHeatMapLayer(features) {
+    var heatMapLayer = new L.featureGroup(features);
+    heatMapLayerId = heatMapLayer;
+    heatMapLayer.addTo(map);
+/*    var bounds = featureGroup.addTo(map).getBounds();
     setTimeout(function() {
-        /*if (bounds) { map.fitBounds(bounds); } else { map.fitWorld(); }*/
-    }, 100);
-
+        /!*if (bounds) { map.fitBounds(bounds); } else { map.fitWorld(); }*!/
+    }, 100);*/
+    console.log("done");
 }
 
 function addHeatMap(url) {
@@ -174,6 +177,8 @@ function toCssColor (c, alpha) {
 
 function loadHeatMap(data) {
     var heatMatrix= data.heat_maps[0].heat_matrix;
+    data= [];
+    console.log("Start bulding at: " + new Date());
     var scale = 0;
     heatMatrix.lines.forEach(function(lines) {
         lines.duration.forEach(function(duration) {
@@ -183,7 +188,7 @@ function loadHeatMap(data) {
         });
     });
 
-    heatMapMarkersGroup = new L.FeatureGroup
+    var heatMapPixels = [];
     heatMatrix.lines.forEach(function(lines/*, i*/) {
         lines.duration.forEach(function(duration, j) {
             var color;
@@ -199,10 +204,12 @@ function loadHeatMap(data) {
                 [heatMatrix.line_headers[j].cell_lat.max_lat, lines.cell_lon.max_lon],
                 [heatMatrix.line_headers[j].cell_lat.min_lat, lines.cell_lon.min_lon]
             ];
-            heatMapMarkersGroup.addLayer(makePixel(rectangle, color, duration));
+            /*heatMapMarkersGroup.addLayer(makePixel(rectangle, color, duration));*/
+            heatMapPixels.push(makePixel(rectangle, color, duration));
         });
     });
-    addHeatMapLayer(heatMapMarkersGroup);
+    console.log("Finish bulding at: " + new Date());
+    addHeatMapLayer(heatMapPixels);
     ;
 }
 
@@ -243,8 +250,8 @@ function durationToString (duration) {
 
 
 var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";
-var max_duration = "3600";
-var resolution = "500"
+var max_duration = "5400";
+var resolution = "1000"
 
 var date_time_picker = $('#datetimepicker').datetimepicker({
     formatDate: 'd.m.Y',
@@ -343,12 +350,13 @@ function generateHeatMap() {
     console.log(heatMapJsonUrl);
 
     //remove current heat map
-    if (map.hasLayer(heatMapMarkersGroup)) {
-        map.removeLayer(heatMapMarkersGroup);
+    if (map.hasLayer(heatMapLayerId)) {
+        map.removeLayer(heatMapLayerId);
     }
 
     //add new heat map
-    addHeatMap(heatMapJsonUrl);
+    addHeatMap(heatMapJsonUrl)
+
 }
 
 createMap();
@@ -356,8 +364,11 @@ map.on('click', function (e) {
     handleMarkerMove(e.latlng);
 });
 
-//Crating the defautlt map
+//Crating the default map
 generateHeatMap();
+
+
+
 
 
 
