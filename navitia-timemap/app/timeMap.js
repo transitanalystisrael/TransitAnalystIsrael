@@ -59,45 +59,40 @@ function createMap() {
     L.Icon.Default.imagePath = '/node_modules/leaflet/dist/images/';
 
     //Creating the default marker with location
-    starting_point_marker = new L.marker(default_starting_location, { draggable: true });
+    starting_point_marker = createNewMarker(default_starting_location);
     starting_location= starting_point_marker._latlng;
-
-    //Making the marker lon & lat updated when dragging it
-    starting_point_marker.on('dragend', function(event){
-        handleMarkerMove(event.target.getLatLng());
-    });
-    starting_point_marker.addTo(map);
     return map;
 }
 
-function handleMarkerMove(latLng) {
+function createNewMarker(latLng) {
+    var marker = new L.marker(latLng, {draggable: true});
+    marker.on('dragend', function(event){
+        handleMarkerDrag(event.target.getLatLng());
+    });
+    marker.addTo(map);
+    return marker;
+}
+function handleMarkerDrag(latLng) {
     starting_location = latLng;
     //remove former starting marker point
     if (starting_point_marker !== undefined) {
         map.removeLayer(starting_point_marker);
     }
-    starting_point_marker = new L.marker(starting_location, {draggable: true});
-    //Making the marker lon & lat updated when dragging it
-    /*    starting_point_marker.on('dragend', function(event){
-            starting_location = event.target.latlng;
-        });*/
-    starting_point_marker.addTo(map);
+    starting_point_marker = createNewMarker(latLng);
 }
 
 
 function addHeatMapLayer(features) {
     var heatMapLayer = new L.featureGroup(features);
-    heatMapLayerId = heatMapLayer;
+    heatMapLayerId = heatMapLayer.getLayerId(heatMapLayer);
     heatMapLayer.addTo(map);
-/*    var bounds = featureGroup.addTo(map).getBounds();
-    setTimeout(function() {
-        /!*if (bounds) { map.fitBounds(bounds); } else { map.fitWorld(); }*!/
-    }, 100);*/
-    console.log("done");
 }
 
 function addHeatMap(url) {
+    var timeRequestSent = new Date();
     d3fetch.json(url).then(function (data) {
+        //TODO: REMOVE ME
+        console.log ("Got Data from server after: " + Math.abs(new Date() - timeRequestSent)/1000 + "sec");
         loadHeatMap(data)
     }).catch(function(error) { console.log(error); });
 }
@@ -107,63 +102,55 @@ function getColorFromDuration (duration) {
 };
 
 
+
+//time map boundries
+var boundry1 = 900;  //15min
+var boundry2 = 1800; //30min
+var boundry3 = 2700; //45min
+var boundry4=3600; //60min
+var boundry5=4500; //75min
+var boundry6=5400; //90min
+var maxboundry='maxboundry'; //90min
+
+//colors for the heat map
+var colorMap = new Map ([
+    [900 ,'rgb(199,199,199)'],
+    [1800, 'rgb(160,206,160)'],
+    [2700, 'rgb(163,163,207)'],
+    [3600, 'rgb(207,207,163)'],
+    [4500, 'rgb(206,160,160)'],
+    [5400, 'rgb(207,168,207)'],
+    [maxboundry,'rgb(132, 132,132)']
+]);
+
+
 function computeColorFromDuration (duration) {
-    var boundry1 = 900; //15min
-    var boundry2 = 1800;
-    var boundry3 = 2700;
-    var maxboundry=3600;
-    var r, g, b, ratioForLuminace, hslColor, rgb;
+    var r, g, b, ratioForLuminace, hslColor, selectedRange;
+    //select correct range
     if (duration < boundry1) {
-        r = 102;
-        g = 194;
-        b = 165;
-        rgb = '"rgb(' + r + ',' + g + ',' + b + ')"';
-        hslColor = new tinycolor(rgb);
-        ratioForLuminace = 50 - Math.round((duration / boundry1) * 50 );
-        hslColor.lighten(ratioForLuminace);
-        hslColor.toRgb();
-        r = Math.round(hslColor._r);
-        g = Math.round(hslColor._g);
-        b = Math.round(hslColor._b);
-    }
-    else if (duration >= boundry1 && duration < boundry2) {
-        r = 252;
-        g = 141;
-        b = 98;
-        rgb = '"rgb(' + r + ',' + g + ',' + b + ')"';
-        hslColor = new tinycolor(rgb);
-        ratioForLuminace = 50 - Math.round((duration / boundry2) * 50 );
-        hslColor.lighten((ratioForLuminace));
-        hslColor.toRgb();
-        r = Math.round(hslColor._r);
-        g = Math.round(hslColor._g);
-        b = Math.round(hslColor._b);
+        selectedRange = boundry1;
+    } else if (duration >= boundry1 && duration < boundry2) {
+        selectedRange = boundry2;
     } else if (duration >= boundry2 && duration < boundry3) {
-        r = 141;
-        g = 160;
-        b = 203;
-        rgb = '"rgb(' + r + ',' + g + ',' + b + ')"';
-        hslColor = new tinycolor(rgb);
-        ratioForLuminace = 50 - Math.round((duration / boundry3) * 50);
-        hslColor.lighten((ratioForLuminace));
-        hslColor.toRgb();
-        r = Math.round(hslColor._r);
-        g = Math.round(hslColor._g);
-        b = Math.round(hslColor._b);
+        selectedRange = boundry3;
+    } else if (duration >= boundry3 && duration < boundry4) {
+        selectedRange = boundry4;
+    } else if (duration >= boundry4 && duration < boundry5) {
+        selectedRange = boundry5;
+    } else if (duration >= boundry5 && duration < boundry6) {
+        selectedRange = boundry6;
+    } else {
+        selectedRange = maxboundry;
     }
-    else  {
-        r = 231;
-        g = 138;
-        b = 195;
-        rgb = '"rgb(' + r + ',' + g + ',' + b + ')"';
-        hslColor = new tinycolor(rgb);
-        ratioForLuminace = 50 - Math.round((duration / maxboundry) * 50 );
-        hslColor.lighten((ratioForLuminace));
-        hslColor.toRgb();
-        r = Math.round(hslColor._r);
-        g = Math.round(hslColor._g);
-        b = Math.round(hslColor._b);
-    }
+
+    //compute color
+    hslColor = new tinycolor(colorMap.get(selectedRange));
+    ratioForLuminace = 50 - Math.round((duration / selectedRange) * 50 );
+    hslColor.lighten(ratioForLuminace);
+    hslColor.toRgb();
+    r = Math.round(hslColor._r);
+    g = Math.round(hslColor._g);
+    b = Math.round(hslColor._b);
     return {red: r, green: g, blue: b};
 };
 
@@ -177,8 +164,8 @@ function toCssColor (c, alpha) {
 
 function loadHeatMap(data) {
     var heatMatrix= data.heat_maps[0].heat_matrix;
+    var startingProcessingJsonDate = new Date();
     data= [];
-    console.log("Start bulding at: " + new Date());
     var scale = 0;
     heatMatrix.lines.forEach(function(lines) {
         lines.duration.forEach(function(duration) {
@@ -208,9 +195,11 @@ function loadHeatMap(data) {
             heatMapPixels.push(makePixel(rectangle, color, duration));
         });
     });
-    console.log("Finish bulding at: " + new Date());
+    //TODO: REMOVE ME
+    console.log ("finished building heat map layer: " + Math.abs(new Date() - startingProcessingJsonDate)/1000  + " sec after strting layer build");
     addHeatMapLayer(heatMapPixels);
-    ;
+    //TODO: REMOVE ME
+    console.log ("finished adding heat map layer: " + Math.abs(new Date() - startingProcessingJsonDate)/1000 + " sec after strting layer build");
 }
 
 function makePixel (PolygonCoords, color, duration) {
@@ -349,10 +338,13 @@ function generateHeatMap() {
     //TODO: REMOVE ME
     console.log(heatMapJsonUrl);
 
-    //remove current heat map
-    if (map.hasLayer(heatMapLayerId)) {
-        map.removeLayer(heatMapLayerId);
-    }
+    //remove current heat map - Couldn't find how to get the layerId as a map method
+    // as long as we don't have many layers, this is ok
+    map.eachLayer(function(layer){
+        if (layer._leaflet_id === heatMapLayerId) {
+            map.removeLayer(layer);
+        }
+    });
 
     //add new heat map
     addHeatMap(heatMapJsonUrl)
@@ -361,7 +353,7 @@ function generateHeatMap() {
 
 createMap();
 map.on('click', function (e) {
-    handleMarkerMove(e.latlng);
+    handleMarkerDrag(e.latlng);
 });
 
 //Crating the default map
