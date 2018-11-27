@@ -14,7 +14,7 @@ print "Local current time :", time.asctime( time.localtime(time.time()) )
 # input:
 parent_path = 'C:\\transitanalyst\\gtfs\\'
 pathout = 'C:\\transitanalyst\\processed\\'
-gtfsdate = '20180425'
+gtfsdate = '20181021'
 gtfsdir = 'israel'+gtfsdate
 txtfilein = 'stops.txt'
 

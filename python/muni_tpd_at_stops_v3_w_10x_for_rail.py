@@ -44,8 +44,8 @@ print "Local current time :", time.asctime( time.localtime(time.time()) )
 # input:
 gtfspathin = 'C:\\transitanalyst\\gtfs\\'
 pathout = 'C:\\transitanalyst\\processed\\'
-sserviceweekstartdate = '20180425' # recommend to use gtfsdate (expect gtfs files to be most accurate for first week in service range)
-gtfsdate = '20180425'
+sserviceweekstartdate = '20181021' # recommend to use gtfsdate (expect gtfs files to be most accurate for first week in service range)
+gtfsdate = '20181021'
 gtfsdir = 'israel'+gtfsdate
 
 # output:

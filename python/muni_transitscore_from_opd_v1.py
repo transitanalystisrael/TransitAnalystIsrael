@@ -51,8 +51,8 @@ pathin = parent_path
 pathout = parent_path
 
 # input:
-gtfsdate = '20180425'
-sserviceweekstartdate = '20180425'
+gtfsdate = '20181021'
+sserviceweekstartdate = '20181021'
 cityfilein = 'israel_city_boarders.geojson'
 townfilein = 'israel_town_boarders.geojson' # moatzot mekomiyot
 muniinfofilein = 'muni_pop2016_built-area2013.csv'

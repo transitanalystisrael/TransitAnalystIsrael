@@ -6,7 +6,7 @@
 #
 # input:
 #   parent_path = 'C:\\transitanalyst\\processed\\'
-#   servicedate = '20180425'
+#   servicedate = '20181021'
 #   israel_city_boarders.geojson
 #   israel_town_boarders.geojson # moatzot mekomiyot
 #   geojson file of stops with max and average trips per day and tpd per line (agency_id+route_short_name) -'stops_w_tpd_per_line'+'_'+servicedate+'.geojson'
@@ -30,7 +30,7 @@ print "Local current time :", time.asctime( time.localtime(time.time()) )
 #
 # input:
 parent_path = 'C:\\transitanalyst\\processed\\'
-servicedate = '20180425'
+servicedate = '20181021'
 stopswtpdfile = 'stops_w_tpd_per_line'+'_'+servicedate+'.geojson'
 cityfilein = 'israel_city_boarders.geojson'
 townfilein = 'israel_town_boarders.geojson' # moatzot mekomiyot

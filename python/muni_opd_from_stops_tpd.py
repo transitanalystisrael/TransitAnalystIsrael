@@ -31,8 +31,8 @@ from shapely.geometry import shape, Point, Polygon, MultiPolygon
 
 
 # input:
-gtfsdate = '20180425'
-sserviceweekstartdate = '20180425'
+gtfsdate = '20181021'
+sserviceweekstartdate = '20181021'
 pathin = 'C:\\transitanalyst\\processed\\'
 pathout = 'C:\\transitanalyst\\processed\\'
 stopsfilein = 'stopswtpdand10xforrail'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # txt file with average tpd per stop and top location

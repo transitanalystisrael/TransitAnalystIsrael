@@ -4,13 +4,12 @@
 # in a GTFS file over the selected week of the service period starting at serviceweekstartdate
 # include breakdown of tpd per line (agency_id, route short name) at each stop
 #
-# input:
+# inputs:
 #   parent_path = 'C:\\transitanalyst\\gtfs\\'
 #   pathout = 'C:\\transitanalyst\\processed\\'
-#   sserviceweekstartdate = '20180425'
-#   gtfsdate = '20180425'
+#   sserviceweekstartdate = '20181021'
+#   gtfsdate = '20181021'
 #   gtfsdir = 'israel'+gtfsdate
-# inputs:
 #
 # outputs:
 #   output js file of stops with max and average trips per day and tpd per line (agency_id, route short name) -'stops_w_tpd_per_line'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.js'
@@ -51,8 +50,8 @@ print "Local current time :", time.asctime( time.localtime(time.time()) )
 # input:
 parent_path = 'C:\\transitanalyst\\gtfs\\'
 pathout = 'C:\\transitanalyst\\processed\\'
-sserviceweekstartdate = '20180425' # recommend to use gtfsdate (expect gtfs files to be most accurate for first week in service range)
-gtfsdate = '20180425'
+sserviceweekstartdate = '20181021' # recommend to use gtfsdate (expect gtfs files to be most accurate for first week in service range)
+gtfsdate = '20181021'
 gtfsdir = 'israel'+gtfsdate
 
 # output:

@@ -6,16 +6,17 @@
 #
 # inputs:
 #   parent_path = 'C:\\transitanalyst\\processed\\'
-#   gtfsdir = 'israel20180106_israel-arad'
+#   gtfsdir = 'israel20180106-tel-aviv-metro'
+#   region_name = 'telavivmetro'
 #   sstarttime = '00:00:00'
 #   sstoptime = '24:00:00'
-#   FREQUENT_TPD = 1 # e.g. 8 tpd for delta time from start to stop of 2 hours is average of 4 trips an hour 
-#   percent_common_stops > 25
+#   FREQUENT_TPD = 10 # e.g. 8 tpd for delta time from start to stop of 2 hours is average of 4 trips an hour 
+#   MIN_PERCENT_COMMON_STOPS = 10 # to be considered same line if also route short name (line number) is the same
 #
 # output to file of routes with tripcount and stops count - 'routeswtripcountperdayarad.txt'
 # output to file of unique routes - 'uniquerouteswtripcountat'+sstarttimename+sstoptimename+'arad.txt'
 # output geojson file of routes with name max trips per day and shape geometry - 
-#   'route_freq_at'+sstarttimename+sstoptimename+'_'+sstartservicedate+'arad.geojson'
+#   jsfileout = 'route_freq_at'+sstarttimename+sstoptimename+'_'+sstartservicedate+region_name+'.js'
 #
 print '----------------- count the number of trips per day for all routes --------------------------'
 print 'generate routeswtripcountperday.txt'
@@ -49,7 +50,8 @@ print "Local current time :", time.asctime( time.localtime(time.time()) )
 #_________________________________
 #
 parent_path = 'C:\\transitanalyst\\processed\\'
-gtfsdir = 'israel20180425-tel-aviv-metro'
+gtfsdir = 'israel20181021-tel-aviv-metro'
+region_name = 'telavivmetro'
 
 sstarttime = '00:00:00'
 sstoptime = '24:00:00'
@@ -57,6 +59,7 @@ sstarttimename = '_'+sstarttime[0:2]+sstarttime[3:5]
 sstoptimename = '-'+sstoptime[0:2]+sstoptime[3:5]
 
 FREQUENT_TPD = 10 # e.g. 8 tpd for delta time from start to stop of 2 hours is average of 4 trips an hour 
+MIN_PERCENT_COMMON_STOPS = 10 # to be considered same line if also route short name (line number) is the same
 
 gtfspathin = parent_path+gtfsdir+'\\'
 gtfspath = gtfspathin
@@ -64,6 +67,8 @@ gtfspathout = parent_path
 routeswithtripcountfile = 'routeswtripcountperdaytelavivmetro.txt'
 uniquerouteswithtripcountattimefile = 'uniquerouteswtripcountat'+sstarttimename+sstoptimename+'telavivmetro.txt'
 
+DAYSTOCOUNT = 7
+daysofservicetocount = DAYSTOCOUNT - DAYSTOCOUNT/7
 
 MAX_STOPS_COUNT = 50000
 MAX_STOP_TIMES_COUNT = 25000000
@@ -137,7 +142,7 @@ print 'startservicedate, endservicedate ', startservicedate, endservicedate
 #
 tripsperdaylist = []
 # print timedelta(days=1)
-if (endservicedate.toordinal()-startservicedate.toordinal()) > 14 :  endservicedate = startservicedate + timedelta(days=13)
+if (endservicedate.toordinal()-startservicedate.toordinal()) > DAYSTOCOUNT :  endservicedate = startservicedate + timedelta(days=DAYSTOCOUNT-1)
 print 'startservicedate, endservicedate ', startservicedate, endservicedate
 for ordservicedate in range (startservicedate.toordinal(), endservicedate.toordinal()+1):
     servicedate = date.fromordinal(ordservicedate)
@@ -549,7 +554,7 @@ same_stops = False
 used_route_id_set = set()
 fileout = open(gtfspathout+uniquerouteswithtripcountattimefile, 'w') # save results in file
 #postsline = 'route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,totaltripsperroute,'
-#postsline += 'day1,tpd1,day2,tpd2,day3,tpd3,day4,tpd4,day5,tpd5,day6,tpd6,day7,tpd7,day8,tpd8,day9,tpd9,day10,tpd10,day11,tpd11,day12,tpd12,day13,tpd13,day14,tpd14\n'
+#postsline += 'day1,tpd1,day2,tpd2,day3,tpd3,day4,tpd4,day5,tpd5,day6,tpd6,day7,tpd7\n'
 postsline = 'route_id,agency_id,route_short_name,totaltripsperroute,'
 postsline += 'maxtpdperroute,'
 postsline += 'shape_id'
@@ -565,7 +570,7 @@ for route_id, [agency_id,route_short_name,route_long_name,route_desc,route_type,
 			common_stop_set = stopset & stopset2
 			percent_common_stops = 100*len(common_stop_set)/max(len(stopset),len(stopset2))
 			same_stops = len(common_stop_set) == len(stopset) and len(stopset) == len(stopset2)
-			same_or_similar = same_stops or (percent_common_stops > 25 and route_short_name == route_short_name2 and agency_id != '2') # Not train!!!
+			same_or_similar = same_stops or (percent_common_stops > MIN_PERCENT_COMMON_STOPS and route_short_name == route_short_name2 and agency_id != '2') # Not train!!!
 			if same_or_similar and (route_id != route_id2) and (route_id2 not in used_route_id_set) : # same stops or (similar stops and same name) for both routes and not same route_id
 				# merge the two routes
 				merge_count += 1
@@ -587,11 +592,11 @@ for route_id, [agency_id,route_short_name,route_long_name,route_desc,route_type,
 		postsline += '\n'
 		fileout.write(postsline)
 		# append to list only if frequent route: FREQUENT_TPD or more trips from start time to stop time. filter out singular events during the two weeks like lag-ba-omer
-		if maxtpd >= FREQUENT_TPD and totaltpd > maxtpd*5: 
+		if maxtpd >= FREQUENT_TPD and totaltpd > maxtpd*daysofservicetocount/2: 
 			unique_route_id_list.append(out_route_list[0]) 
 			unique_route_dict[out_route_list[0]] = [out_route_list[1],out_route_list[2],out_route_list[7],maxtpd]
 
-		if maxtpd >= FREQUENT_TPD and totaltpd <= maxtpd*5: print "filtered out :", postsline
+		if maxtpd >= FREQUENT_TPD and totaltpd <= maxtpd*daysofservicetocount/2: print "filtered out :", postsline
 
 fileout.close()
 print gtfspathout+uniquerouteswithtripcountattimefile
@@ -641,6 +646,7 @@ def getJSON(r_id):
 	#print shapes_dict[routeswshape_dict[r_id][4]][:3]
 	if routeswshape_dict[r_id][4] == '' : # no shape defined
 		print '************************ no shape defined ****************************************************** using dummy'
+		print unique_route_dict[r_id]
 		return {
 			"type": "Feature",
 			"geometry": {
@@ -651,7 +657,7 @@ def getJSON(r_id):
 				"agency_id": unique_route_dict[r_id][0],
 				"agency_name": agency_dict[unique_route_dict[r_id][0]],
 				"route_short_name": unique_route_dict[r_id][1],
-				"totaltripsperroute": unique_route_dict[r_id][2],
+				"averagetpdperroute": unique_route_dict[r_id][2]/daysofservicetocount,
 				"maxtpdperroute": unique_route_dict[r_id][3]
 			}
 		}
@@ -666,20 +672,23 @@ def getJSON(r_id):
 				"agency_id": unique_route_dict[r_id][0],
 				"agency_name": agency_dict[unique_route_dict[r_id][0]],
 				"route_short_name": unique_route_dict[r_id][1],
-				"totaltripsperroute": unique_route_dict[r_id][2],
+				"averagetpdperroute": unique_route_dict[r_id][2]/daysofservicetocount,
 				"maxtpdperroute": unique_route_dict[r_id][3]
 			}
 		}
 
 # saveGeoJSON
-print ("Generating GeoJSON export.")
-geojson_file_name = 'route_freq_at'+sstarttimename+sstoptimename+'_'+sstartservicedate+'telavivmetro.geojson'
+print ("Generating GeoJSON js export.")
+jsfileout = 'route_freq_at'+sstarttimename+sstoptimename+'_'+sstartservicedate+region_name+'.js'
 geoj = {
 	"type": "FeatureCollection",
 	"features": [getJSON(route_id) for route_id in unique_route_id_list]
 }
-print ("Saving file: " + gtfspathout+geojson_file_name + " ...")
-nf = open(gtfspathout+geojson_file_name, "w")
-json.dump(geoj, nf, separators=(',',':'))
+print ("Saving file: " + gtfspathout+jsfileout + " ...")
+nf = open(gtfspathout+jsfileout, "w")
+jsonstr = json.dumps(geoj, separators=(',',':')) # smaller file for download
+outstr = jsonstr.replace('}},', '}},\n')
+nf.write('var freqRoutes =\n')
+nf.write(outstr)
 nf.close()
-print ("Saved file: " + geojson_file_name)
+print ("Saved file: " + jsfileout)

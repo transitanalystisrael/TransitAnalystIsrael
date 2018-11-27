@@ -16,7 +16,7 @@ print "Local current time :", time.asctime( time.localtime(time.time()) )
 
 parent_path = 'C:\\transitanalyst\\processed\\'
 
-tsfilein = 'transit_score_israel20180106.txt'
+tsfilein = 'transit_score_israel20181021.txt'
 tsfileout = 'ts_lookup.js'
 
 ilminlat = 29.490000 # Israel min lat

@@ -9,7 +9,7 @@
 # inputs:
 #   parent_path = 'C:\\transitanalyst\\processed\\'
 #   gtfs_parant_path = 'C:\\transitanalyst\\gtfs\\'
-#   gtfsdir = 'israel20180425'
+#   gtfsdir = 'israel20181021'
 #   sstarttime = '00:00:00'
 #   sstoptime = '24:00:00'
 #   FREQUENT_TPD = 60 # e.g. 8 tpd for delta time from start to stop of 2 hours is average of 4 trips an hour 
@@ -52,7 +52,7 @@ print "Local current time :", time.asctime( time.localtime(time.time()) )
 #
 parent_path = 'C:\\transitanalyst\\processed\\'
 gtfs_parent_path = 'C:\\transitanalyst\\gtfs\\'
-gtfsdir = 'israel20180425'
+gtfsdir = 'israel20181021'
 
 sstarttime = '00:00:00'
 sstoptime = '24:00:00'
