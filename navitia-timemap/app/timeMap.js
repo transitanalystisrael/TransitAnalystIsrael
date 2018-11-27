@@ -28,6 +28,7 @@ window.jQuery = $;
 window.$ = $;
 import 'jquery-datetimepicker';
 import 'jquery-toggles';
+import 'leaflet-providers';
 
 
 /** Map generation section**/
@@ -36,20 +37,14 @@ var heatMapLayerId;
 var starting_point_marker;
 var default_starting_location = [32.073443, 34.790410];
 var starting_location;
-var default_starting_zoom = 12;
+var default_starting_zoom = 13;
 
 function createMap() {
-    var mapboxTiles = L
-        .tileLayer(
-            'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token={token}',
-            {
-                attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-                mapId : 'mapbox-streets',
-                token : 'pk.eyJ1Ijoic2hha2VkayIsImEiOiJjaWxjYzVxbzIwMDZud2dsejg3Zmw3dncyIn0.1mxg8ZqXNXzMZ2OkH9os5A'
-            });
+    var mapboxTiles =
+        L.tileLayer.provider('Stamen.TonerLite');
 
     map = L.map('map', {renderer: new L.canvas()})
-        .setView(default_starting_location, default_starting_zoom)
+        .setView([32.07050190954199,34.8427963256836], default_starting_zoom)
         .addLayer(mapboxTiles);
 
     //Fixing the grey tiles partial issue
@@ -213,7 +208,7 @@ function makePixel (PolygonCoords, color, duration) {
         opacity: 0,
         weight: 0,
         fillColor: color,
-        fillOpacity: 0.5
+        fillOpacity: 0.7
     }).bindPopup(sum);
 };
 
@@ -239,20 +234,19 @@ function durationToString (duration) {
 
 
 var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";
-var max_duration = "5400";
-var resolution = "1000"
+var max_duration = "3600";
+var resolution = "750"
 
 var date_time_picker = $('#datetimepicker').datetimepicker({
     formatDate: 'd.m.Y',
     formatTime: 'H:i',
-    startDate: '21.10.2018',
     minDate:'21.10.2018',
     maxDate:'27.10.2018',
     showSecond: false,
     step: 30,
-    defaultTime: '08:00'
 });
 
+//Default time
 date_time_picker.val('2018/10/21 08:00');
 
 /**Switch Button**/
@@ -310,7 +304,7 @@ function generateHeatMap() {
         return;
     }
     //Getting the time from the Date & time picker
-    var dt = date_time_picker.datetimepicker('getValue');
+    var dt = new Date(date_time_picker.val());
     var dateTimeString = sprintf('%s%s%sT%s%s00', dt.getFullYear(),
         ("0" + (dt.getMonth() + 1)).slice(-2),
         ("0" + (dt.getDate())).slice(-2),

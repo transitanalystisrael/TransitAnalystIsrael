@@ -15,18 +15,14 @@ body{
     @include make-container();
     @include make-container-max-widths;
     margin: 0px;
+    height: 5%;
 
     .row {
         @include make-row();
-        .modeButton {
-
+        .col {
+            @include make-col-ready;
         }
     }
-
-    .col {
-        @include make-col-ready;
-    }
-
     #runButton {
         height: 60px;
         width: 60px;
@@ -35,8 +31,12 @@ body{
     }
 }
 
-#map {
-    height: 100%;
+
+.map-container {
+    height: 95%;
     width: 100%;
+    #map {
+        height: 100% !important;
+    }
 }
 
