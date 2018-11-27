@@ -37,8 +37,8 @@
 
 <div id='map'></div>
 
-<script type="text/javascript" src="route_freq_at_0000-2400_20180425telavivmetro.js"></script>
-<script type="text/javascript" src="agency_20180425.js"></script>
+<script type="text/javascript" src="route_freq_at_0000-2400_20181021telavivmetro.js"></script>
+<script type="text/javascript" src="agency_20181021.js"></script>
 
 <script type="text/javascript">
 
@@ -62,7 +62,7 @@
 	};
 
 	info.update = function (props) {
-		toscore = (props ? props.maxtpdperroute + 9 : 0);
+		//toscore = (props ? props.maxtpdperroute + 9 : 0);
 		this._div.innerHTML = '<h4>Route Frequency Israel</h4>' +
 			'<p>' + 'Trips per Day' + ' : ' + 'line number' + ' - ' + 'agency' + '</p>'
 			+  (props ?
@@ -188,9 +188,9 @@
 			click: clickHandler
 		});
 	}
-	//console.log(routeFreq.features[0].geometry.coordinates);
-	//console.log(routeFreq.features.length);
-	geojson = L.geoJson(routeFreq, {
+	//console.log(freqRoutes.features[0].geometry.coordinates);
+	//console.log(freqRoutes.features.length);
+	geojson = L.geoJson(freqRoutes, {
 		style: style,
 		onEachFeature: onEachFeature
 	}).addTo(map);

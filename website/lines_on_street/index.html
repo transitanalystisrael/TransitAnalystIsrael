@@ -113,21 +113,23 @@
 			setTimeout(function(){
 				switch(regionName) {
 					case 'israel-tel-aviv-metro':
-						console.log(regionName, 'israel-tel-aviv')
-						window.location.assign("route_freq_v3telavivmetro.html")
+						console.log(regionName, 'israel-tel-aviv');
+						window.location.assign("route_freq_v3telavivmetro.html");
 						break;
 					case 'israel-jerusalem':
-						console.log(regionName, 'israel-jerusalem')
+						console.log(regionName, 'israel-jerusalem');
+						window.location.assign("route_freq_v3jerusalem.html");
 						break;
 					case 'israel-north':
-						console.log(regionName, 'israel-north')
+						console.log(regionName, 'israel-north');
+						window.location.assign("route_freq_v3north.html");
 						break;
 					case 'israel-south':
-						console.log(regionName, 'israel-south')
-						window.location.assign("route_freq_v3south.html")
+						console.log(regionName, 'israel-south');
+						window.location.assign("route_freq_v3south.html");
 						break;
 					default:
-						console.log(regionName, 'no region selected')
+						console.log(regionName, 'no region selected');
 				}
 			}, 1500);
 		//});
