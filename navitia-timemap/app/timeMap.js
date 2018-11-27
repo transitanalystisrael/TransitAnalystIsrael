@@ -28,54 +28,66 @@ window.jQuery = $;
 window.$ = $;
 import 'jquery-datetimepicker';
 import 'jquery-toggles';
+import 'leaflet-providers';
 
 
 /** Map generation section**/
 var map;
-var heatMapMarkersGroup;
+var heatMapLayerId;
 var starting_point_marker;
-
-createMap();
+var default_starting_location = [32.073443, 34.790410];
+var starting_location;
+var default_starting_zoom = 13;
 
 function createMap() {
-    var mapboxTiles = L
-        .tileLayer(
-            'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token={token}',
-            {
-                attribution : 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-                mapId : 'mapbox-streets',
-                token : 'pk.eyJ1Ijoic2hha2VkayIsImEiOiJjaWxjYzVxbzIwMDZud2dsejg3Zmw3dncyIn0.1mxg8ZqXNXzMZ2OkH9os5A'
-            });
+    var mapboxTiles =
+        L.tileLayer.provider('Stamen.TonerLite');
 
-    map = L.map('map', {renderer: new L.canvas()}).addLayer(mapboxTiles).locate(/*{setView: true, maxZoom: 20}*/);
-
-    map.on('locationfound', function(e) {
-        map.setView(e.latlng, 16);
-    });
-    map.on('locationerror', function(e) {
-        //If no location, setting on Merhav
-        var marhav_location = [32.072728, 34.792708];
-        map.setView(marhav_location, 14);
-    });
+    map = L.map('map', {renderer: new L.canvas()})
+        .setView([32.07050190954199,34.8427963256836], default_starting_zoom)
+        .addLayer(mapboxTiles);
 
     //Fixing the grey tiles partial issue
     $(window).on("resize", function () { $("#map").height($(window).height()); map.invalidateSize(); }).trigger("resize");
 
+    // setting for default path of images used by leaflet - otherwise marker only appear after first click
+    L.Icon.Default.imagePath = '/node_modules/leaflet/dist/images/';
+
+    //Creating the default marker with location
+    starting_point_marker = createNewMarker(default_starting_location);
+    starting_location= starting_point_marker._latlng;
     return map;
 }
 
+function createNewMarker(latLng) {
+    var marker = new L.marker(latLng, {draggable: true});
+    marker.on('dragend', function(event){
+        handleMarkerDrag(event.target.getLatLng());
+    });
+    marker.addTo(map);
+    return marker;
+}
+function handleMarkerDrag(latLng) {
+    starting_location = latLng;
+    //remove former starting marker point
+    if (starting_point_marker !== undefined) {
+        map.removeLayer(starting_point_marker);
+    }
+    starting_point_marker = createNewMarker(latLng);
+}
 
-function addHeatMapLayer(featureGroup) {
-    centerOnCurrentLocation();
-    var bounds = featureGroup.addTo(map).getBounds();
-    setTimeout(function() {
-        /*if (bounds) { map.fitBounds(bounds); } else { map.fitWorld(); }*/
-    }, 100);
 
+function addHeatMapLayer(features) {
+    var heatMapLayer = new L.featureGroup(features);
+    heatMapLayerId = heatMapLayer.getLayerId(heatMapLayer);
+    heatMapLayer.addTo(map);
 }
 
 function addHeatMap(url) {
+    var timeRequestSent = new Date();
     d3fetch.json(url).then(function (data) {
+        //TODO: REMOVE ME
+        console.log ("Got Data from server after: " + Math.abs(new Date() - timeRequestSent)/1000 + "sec");
         loadHeatMap(data)
     }).catch(function(error) { console.log(error); });
 }
@@ -85,63 +97,55 @@ function getColorFromDuration (duration) {
 };
 
 
+
+//time map boundries
+var boundry1 = 900;  //15min
+var boundry2 = 1800; //30min
+var boundry3 = 2700; //45min
+var boundry4=3600; //60min
+var boundry5=4500; //75min
+var boundry6=5400; //90min
+var maxboundry='maxboundry'; //90min
+
+//colors for the heat map
+var colorMap = new Map ([
+    [900 ,'rgb(199,199,199)'],
+    [1800, 'rgb(160,206,160)'],
+    [2700, 'rgb(163,163,207)'],
+    [3600, 'rgb(207,207,163)'],
+    [4500, 'rgb(206,160,160)'],
+    [5400, 'rgb(207,168,207)'],
+    [maxboundry,'rgb(132, 132,132)']
+]);
+
+
 function computeColorFromDuration (duration) {
-    var boundry1 = 900; //15min
-    var boundry2 = 1800;
-    var boundry3 = 2700;
-    var maxboundry=3600;
-    var r, g, b, ratioForLuminace, hslColor, rgb;
+    var r, g, b, ratioForLuminace, hslColor, selectedRange;
+    //select correct range
     if (duration < boundry1) {
-        r = 102;
-        g = 194;
-        b = 165;
-        rgb = '"rgb(' + r + ',' + g + ',' + b + ')"';
-        hslColor = new tinycolor(rgb);
-        ratioForLuminace = 50 - Math.round((duration / boundry1) * 50 );
-        hslColor.lighten(ratioForLuminace);
-        hslColor.toRgb();
-        r = Math.round(hslColor._r);
-        g = Math.round(hslColor._g);
-        b = Math.round(hslColor._b);
-    }
-    else if (duration >= boundry1 && duration < boundry2) {
-        r = 252;
-        g = 141;
-        b = 98;
-        rgb = '"rgb(' + r + ',' + g + ',' + b + ')"';
-        hslColor = new tinycolor(rgb);
-        ratioForLuminace = 50 - Math.round((duration / boundry2) * 50 );
-        hslColor.lighten((ratioForLuminace));
-        hslColor.toRgb();
-        r = Math.round(hslColor._r);
-        g = Math.round(hslColor._g);
-        b = Math.round(hslColor._b);
+        selectedRange = boundry1;
+    } else if (duration >= boundry1 && duration < boundry2) {
+        selectedRange = boundry2;
     } else if (duration >= boundry2 && duration < boundry3) {
-        r = 141;
-        g = 160;
-        b = 203;
-        rgb = '"rgb(' + r + ',' + g + ',' + b + ')"';
-        hslColor = new tinycolor(rgb);
-        ratioForLuminace = 50 - Math.round((duration / boundry3) * 50);
-        hslColor.lighten((ratioForLuminace));
-        hslColor.toRgb();
-        r = Math.round(hslColor._r);
-        g = Math.round(hslColor._g);
-        b = Math.round(hslColor._b);
+        selectedRange = boundry3;
+    } else if (duration >= boundry3 && duration < boundry4) {
+        selectedRange = boundry4;
+    } else if (duration >= boundry4 && duration < boundry5) {
+        selectedRange = boundry5;
+    } else if (duration >= boundry5 && duration < boundry6) {
+        selectedRange = boundry6;
+    } else {
+        selectedRange = maxboundry;
     }
-    else  {
-        r = 231;
-        g = 138;
-        b = 195;
-        rgb = '"rgb(' + r + ',' + g + ',' + b + ')"';
-        hslColor = new tinycolor(rgb);
-        ratioForLuminace = 50 - Math.round((duration / maxboundry) * 50 );
-        hslColor.lighten((ratioForLuminace));
-        hslColor.toRgb();
-        r = Math.round(hslColor._r);
-        g = Math.round(hslColor._g);
-        b = Math.round(hslColor._b);
-    }
+
+    //compute color
+    hslColor = new tinycolor(colorMap.get(selectedRange));
+    ratioForLuminace = 50 - Math.round((duration / selectedRange) * 50 );
+    hslColor.lighten(ratioForLuminace);
+    hslColor.toRgb();
+    r = Math.round(hslColor._r);
+    g = Math.round(hslColor._g);
+    b = Math.round(hslColor._b);
     return {red: r, green: g, blue: b};
 };
 
@@ -155,6 +159,8 @@ function toCssColor (c, alpha) {
 
 function loadHeatMap(data) {
     var heatMatrix= data.heat_maps[0].heat_matrix;
+    var startingProcessingJsonDate = new Date();
+    data= [];
     var scale = 0;
     heatMatrix.lines.forEach(function(lines) {
         lines.duration.forEach(function(duration) {
@@ -164,7 +170,7 @@ function loadHeatMap(data) {
         });
     });
 
-    heatMapMarkersGroup = new L.FeatureGroup
+    var heatMapPixels = [];
     heatMatrix.lines.forEach(function(lines/*, i*/) {
         lines.duration.forEach(function(duration, j) {
             var color;
@@ -180,11 +186,15 @@ function loadHeatMap(data) {
                 [heatMatrix.line_headers[j].cell_lat.max_lat, lines.cell_lon.max_lon],
                 [heatMatrix.line_headers[j].cell_lat.min_lat, lines.cell_lon.min_lon]
             ];
-            heatMapMarkersGroup.addLayer(makePixel(rectangle, color, duration));
+            /*heatMapMarkersGroup.addLayer(makePixel(rectangle, color, duration));*/
+            heatMapPixels.push(makePixel(rectangle, color, duration));
         });
     });
-    addHeatMapLayer(heatMapMarkersGroup);
-    ;
+    //TODO: REMOVE ME
+    console.log ("finished building heat map layer: " + Math.abs(new Date() - startingProcessingJsonDate)/1000  + " sec after strting layer build");
+    addHeatMapLayer(heatMapPixels);
+    //TODO: REMOVE ME
+    console.log ("finished adding heat map layer: " + Math.abs(new Date() - startingProcessingJsonDate)/1000 + " sec after strting layer build");
 }
 
 function makePixel (PolygonCoords, color, duration) {
@@ -198,7 +208,7 @@ function makePixel (PolygonCoords, color, duration) {
         opacity: 0,
         weight: 0,
         fillColor: color,
-        fillOpacity: 0.5
+        fillOpacity: 0.7
     }).bindPopup(sum);
 };
 
@@ -221,46 +231,22 @@ function durationToString (duration) {
     }
 };
 
-function centerOnCurrentLocation() {
-    map.on('locationfound', function(e) {
-            map.setView(e.latlng, 13);
-    });
-}
 
-/**User Interaction**/
-var starting_location;
-
-map.on('click', function(e){
-    starting_location = e.latlng;
-    //remove former starting marker point
-    if (starting_point_marker !== undefined) {
-        map.removeLayer(starting_point_marker);
-    }
-    starting_point_marker = new L.marker(starting_location, { draggable: true });
-    //Making the marker lon & lat updated when dragging it
-    starting_point_marker.on('dragend', function(event){
-        var marker = event.target;
-        var position = marker.getLatLng();
-        marker.setLatLng(new L.LatLng(position.lat, position.lng),{draggable:'true'});
-    });
-    starting_point_marker.addTo(map);
-});
 
 var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";
-var max_duration = "1800";
-var resolution = "5000"
+var max_duration = "3600";
+var resolution = "750"
 
 var date_time_picker = $('#datetimepicker').datetimepicker({
     formatDate: 'd.m.Y',
     formatTime: 'H:i',
-    startDate: '21.10.2018',
     minDate:'21.10.2018',
     maxDate:'27.10.2018',
     showSecond: false,
     step: 30,
-    defaultTime: '08:00'
 });
 
+//Default time
 date_time_picker.val('2018/10/21 08:00');
 
 /**Switch Button**/
@@ -310,15 +296,15 @@ function getSpeed(mode) {
     }
 }
 /**RUN Button**/
-var runButton = $('#runButton');
+var runButton = $('#runButton').on("click", generateHeatMap);
 
-runButton.on("click", function () {
+function generateHeatMap() {
     if (starting_point_marker === undefined) {
         alert("Please select a starting point on the map");
         return;
     }
     //Getting the time from the Date & time picker
-    var dt = date_time_picker.datetimepicker('getValue');
+    var dt = new Date(date_time_picker.val());
     var dateTimeString = sprintf('%s%s%sT%s%s00', dt.getFullYear(),
         ("0" + (dt.getMonth() + 1)).slice(-2),
         ("0" + (dt.getDate())).slice(-2),
@@ -333,10 +319,7 @@ runButton.on("click", function () {
     //get Speed for simulating bike as walking in 4.1 mps
     var speed = getSpeed(mode);
 
-    //TODO: REMOVE ME
-    console.log("mode " + mode);
-    console.log("speed " + speed);
-    var heatMapJsonUrl = navitia_server_url+
+    var heatMapJsonUrl = navitia_server_url +
         "?max_duration=" + max_duration +
         from_to + starting_location.lng +
         "%3B" + starting_location.lat +
@@ -349,14 +332,29 @@ runButton.on("click", function () {
     //TODO: REMOVE ME
     console.log(heatMapJsonUrl);
 
-    //remove current heat map
-    if (map.hasLayer(heatMapMarkersGroup)) {
-        map.removeLayer(heatMapMarkersGroup);
-    }
+    //remove current heat map - Couldn't find how to get the layerId as a map method
+    // as long as we don't have many layers, this is ok
+    map.eachLayer(function(layer){
+        if (layer._leaflet_id === heatMapLayerId) {
+            map.removeLayer(layer);
+        }
+    });
 
     //add new heat map
-    addHeatMap(heatMapJsonUrl);
+    addHeatMap(heatMapJsonUrl)
+
+}
+
+createMap();
+map.on('click', function (e) {
+    handleMarkerDrag(e.latlng);
 });
+
+//Crating the default map
+generateHeatMap();
+
+
+
 
 
 
