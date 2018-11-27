@@ -32,7 +32,7 @@ print "Local current time :", time.asctime( time.localtime(time.time()) )
 #
 # input:
 parent_path = 'C:\\transitanalyst\\processed\\'
-servicedate = '20180425'
+servicedate = '20181021'
 stopswtpdfile = 'stops_w_tpd_per_line'+'_'+servicedate+'.geojson'
 trainstopsfilein = 'train_stops'+'_'+servicedate+'.txt'
 stopsneartrainstop_post_edit = 'stopsneartrainstop_post_edit'+'_'+servicedate+'.txt'
