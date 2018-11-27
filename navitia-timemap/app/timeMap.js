@@ -39,6 +39,11 @@ var default_starting_location = [32.073443, 34.790410];
 var starting_location;
 var default_starting_zoom = 13;
 
+//TODO: remove me
+var dateCounter;
+var nextDateCounter;
+var time_passed;
+
 function createMap() {
     var mapboxTiles =
         L.tileLayer.provider('Stamen.TonerLite');
@@ -74,6 +79,9 @@ function handleMarkerDrag(latLng) {
         map.removeLayer(starting_point_marker);
     }
     starting_point_marker = createNewMarker(latLng);
+    //Change the run styling
+    console.log($('#runButton').html())
+    $('#runButton').text("Re-run");
 }
 
 
@@ -84,10 +92,15 @@ function addHeatMapLayer(features) {
 }
 
 function addHeatMap(url) {
-    var timeRequestSent = new Date();
+    //TODO: REMOVE ME
+    dateCounter = new Date();
     d3fetch.json(url).then(function (data) {
         //TODO: REMOVE ME
-        console.log ("Got Data from server after: " + Math.abs(new Date() - timeRequestSent)/1000 + "sec");
+        nextDateCounter = new Date()
+        time_passed = Math.abs(nextDateCounter - dateCounter)/1000;
+        dateCounter = nextDateCounter;
+
+        console.log ("Got Data from server after: " + time_passed + "sec from sending request");
         loadHeatMap(data)
     }).catch(function(error) { console.log(error); });
 }
@@ -105,7 +118,7 @@ var boundry3 = 2700; //45min
 var boundry4=3600; //60min
 var boundry5=4500; //75min
 var boundry6=5400; //90min
-var maxboundry='maxboundry'; //90min
+var boundry7=7200; //120min
 
 //colors for the heat map
 var colorMap = new Map ([
@@ -115,7 +128,7 @@ var colorMap = new Map ([
     [3600, 'rgb(207,207,163)'],
     [4500, 'rgb(206,160,160)'],
     [5400, 'rgb(207,168,207)'],
-    [maxboundry,'rgb(132, 132,132)']
+    [7200,'rgb(132, 132,132)']
 ]);
 
 
@@ -135,7 +148,7 @@ function computeColorFromDuration (duration) {
     } else if (duration >= boundry5 && duration < boundry6) {
         selectedRange = boundry6;
     } else {
-        selectedRange = maxboundry;
+        selectedRange = boundry7;
     }
 
     //compute color
@@ -191,10 +204,16 @@ function loadHeatMap(data) {
         });
     });
     //TODO: REMOVE ME
-    console.log ("finished building heat map layer: " + Math.abs(new Date() - startingProcessingJsonDate)/1000  + " sec after strting layer build");
+    nextDateCounter = new Date()
+    time_passed = time_passed + Math.abs(nextDateCounter - dateCounter)/1000;
+    dateCounter = nextDateCounter;
+    console.log ("finished building heat map layer: " + time_passed  + "sec from sending request");
     addHeatMapLayer(heatMapPixels);
     //TODO: REMOVE ME
-    console.log ("finished adding heat map layer: " + Math.abs(new Date() - startingProcessingJsonDate)/1000 + " sec after strting layer build");
+    nextDateCounter = new Date()
+    time_passed = time_passed + Math.abs(nextDateCounter - dateCounter)/1000;
+    console.log ("finished adding heat map layer: " + time_passed + "sec from sending request");
+    dateCounter = nextDateCounter;
 }
 
 function makePixel (PolygonCoords, color, duration) {
@@ -299,6 +318,7 @@ function getSpeed(mode) {
 var runButton = $('#runButton').on("click", generateHeatMap);
 
 function generateHeatMap() {
+    $('#runButton').text("Run");
     if (starting_point_marker === undefined) {
         alert("Please select a starting point on the map");
         return;
@@ -353,7 +373,26 @@ map.on('click', function (e) {
 //Crating the default map
 generateHeatMap();
 
+//Legend
+var legend = L.control({position: 'bottomright'});
 
+legend.onAdd = function (map) {
+
+    var div = L.DomUtil.create('div', 'legend'),
+        time_intervals  = [0, 15, 30, 45, 60, 75, 90, 120],
+        labels = [];
+    div.innerHTML = "<p>Minutes to arrive</p>"
+    // loop through our time intervals and generate a label with a colored square for each interval
+    for (var i = 0; i < time_intervals.length-1; i++) {
+        div.innerHTML +=
+            '<i style="background:' + colorMap.get(time_intervals[i+1]*60) + '"></i> ' +
+            time_intervals[i] + (time_intervals[i + 2] ? '&ndash;' + time_intervals[i + 1] + '<br>' : '+');
+    }
+
+    return div;
+};
+
+legend.addTo(map);
 
 
 
