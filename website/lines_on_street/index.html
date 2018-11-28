@@ -3,7 +3,7 @@
 <html>
 <head>
 	
-	<title>Lines on Street</title>
+	<title>Buses per day on street</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,8 +29,34 @@
 
 	</style>
 	
+	<link rel="stylesheet" href="../css/topnav.css"/>
 </head>
 <body>
+<script>
+	var showAbout = true;
+	//console.log(showAbout);
+	function displayAbout(){
+		//console.log(showAbout);
+		if (showAbout) {
+			document.getElementById('about').style.display='block';
+			showAbout = false;
+		} else {
+			document.getElementById('about').style.display='none';
+			showAbout = true;
+		};
+	}
+</script>
+
+<div class="topnav">
+  <a class="active" href="index.html"><b style="font-size: 20px;">Buses per day on street</b></a>
+  <a href="../index.html">Home</a>
+  <button type="button" onclick="displayAbout()">About</button>
+</div>
+
+<div id="about" style="display: none;">
+	<p><b>Buses per day on street</b><br>A list of all the lines and their frequency on the street segment selected on a map.<br>The list is sorted by frequency and includes the total number of buses that pass through the selected street segment in a day.<br>Useful to analyze the potential benefit of a dedicated bus lane on a street.<br>Select a region to start.</p>
+	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+</div>
 
 <div id='map'></div>
 

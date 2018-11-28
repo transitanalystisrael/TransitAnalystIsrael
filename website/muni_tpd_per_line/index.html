@@ -3,7 +3,7 @@
 <html>
 <head>
 	
-	<title> Muni TransitScore with tpd per line</title>
+	<title>Municipal trips per day (tpd) per line</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,8 +31,34 @@
 		.legend i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 	</style>
 	
+	<link rel="stylesheet" href="../css/topnav.css"/>
 </head>
 <body>
+<script>
+	var showAbout = true;
+	//console.log(showAbout);
+	function displayAbout(){
+		//console.log(showAbout);
+		if (showAbout) {
+			document.getElementById('about').style.display='block';
+			showAbout = false;
+		} else {
+			document.getElementById('about').style.display='none';
+			showAbout = true;
+		};
+	}
+</script>
+
+<div class="topnav">
+  <a class="active" href="index.html"><b style="font-size: 20px;">Municipal trips per day (tpd) per line</b></a>
+  <a href="../index.html">Home</a>
+  <button type="button" onclick="displayAbout()">About</button>
+</div>
+
+<div id="about" style="display: none;">
+	<p><b>Municipal trips per day (tpd) per line</b><br>Display the trips per day (tpd) for each transit line that serves a selected city or town.<br>Displayed as interactive map. Click on municipality to get list of lines and tpd sorted by line frequency.<br>Useful for analyzing in detail the transit service in a city / town and for recommending improvements.</p>
+	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+</div>
 
 <div id='map'></div>
 

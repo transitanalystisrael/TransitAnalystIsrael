@@ -18,13 +18,43 @@
 		.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } 
 		.info h4 { margin: 0 0 5px; color: #777; }
 	</style>
-	
-	
+
 	<script src="ts_lookup.js"></script>
 	<script src="israel_city_boarders.js"></script>
 	<script src="israel_town_boarders.js"></script>
+	
+	<link rel="stylesheet" href="../css/topnav.css"/>
 </head>
 <body>
+<script>
+	var showAbout = true;
+	//console.log(showAbout);
+	function displayAbout(){
+		//console.log(showAbout);
+		if (showAbout) {
+			document.getElementById('about').style.display='block';
+			showAbout = false;
+		} else {
+			document.getElementById('about').style.display='none';
+			showAbout = true;
+		};
+	}
+</script>
+
+<div class="topnav">
+  <a class="active" href="index.html"><b style="font-size: 20px;">TransitScore Israel</b></a>
+  <a href="../index.html">Home</a>
+  <button type="button" onclick="displayAbout()">About</button>
+</div>
+
+<div id="about" style="display: none;">
+	<p><b>TransitScore Israel</b><br>The relative intensity of the transit service in Israel by location.  
+	<br>Scores are normalized to 0-100. Displayed as interactive map. 
+	<br>Click on heatmap to get score for location. 
+	<br>Useful for comparing transit service level between locations / neighborhoods within a city or town.</p>
+	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+</div>
+
 
 <div id="mapid" ></div>
 <script>

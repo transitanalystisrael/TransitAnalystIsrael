@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Muni Fair Share Score</title>
+<title>Municipal Transit Ranking</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -186,15 +186,39 @@ input:focus {
 }
 
 </style>
+
+	<link rel="stylesheet" href="../css/topnav.css"/>
 </head>
 <body>
+<script>
+	var showAbout = true;
+	//console.log(showAbout);
+	function displayAbout(){
+		//console.log(showAbout);
+		if (showAbout) {
+			document.getElementById('about').style.display='block';
+			showAbout = false;
+		} else {
+			document.getElementById('about').style.display='none';
+			showAbout = true;
+		};
+	}
+</script>
+
+<div class="topnav">
+  <a class="active" href="index.html"><b style="font-size: 20px;">Municipal Transit Ranking</b></a>
+  <a href="../index.html">Home</a>
+  <button type="button" onclick="displayAbout()">About</button>
+</div>
+
+<div id="about" style="display: none;">
+	<p><b>Municipal Transit Ranking</b><br>Municipal ranking by TransitScore, FairShareScore and BuiltDensityScore displayed as charts and lists.<br>Search and sort lists by city / town name or score.<br>Use slider to zoom in on different areas of the chart.<br>Click on name or chart to highlight city / town.<br>Useful for comparing scores between cities / towns.</p>
+	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 
 <script type="text/javascript" src=muni_fairsharescore_xy.js></script>
-
-<div class="header">
-	<h1>Muni Scores</h1>
-</div>
 
 <div class="topnav">
 	<a href="indexts.html">TransitScore</a>
@@ -255,7 +279,7 @@ input:focus {
 			var fairsharescoreData = {
 				labels: chartx.slice(xlow, xhigh),
 				datasets: [{
-					label: 'Muni FairShareScore',
+					label: 'Muni FairShareScore Ranking',
 					data: charty.slice(xlow, xhigh),
 					backgroundColor: barColor.slice(xlow, xhigh),
 					borderColor: barColor.slice(xlow, xhigh),

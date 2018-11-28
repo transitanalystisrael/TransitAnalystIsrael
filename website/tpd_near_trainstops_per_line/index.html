@@ -3,7 +3,7 @@
 <html>
 <head>
 	
-	<title>Stops with tpd per line</title>
+	<title>Accessible level of service to and at train stations</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,8 +32,35 @@
 		
 	</style>
 	
+	<link rel="stylesheet" href="../css/topnav.css"/>
 </head>
 <body>
+<script>
+	var showAbout = true;
+	//console.log(showAbout);
+	function displayAbout(){
+		//console.log(showAbout);
+		if (showAbout) {
+			document.getElementById('about').style.display='block';
+			showAbout = false;
+		} else {
+			document.getElementById('about').style.display='none';
+			showAbout = true;
+		};
+	}
+</script>
+
+<div class="topnav">
+  <a class="active" href="index.html"><b style="font-size: 20px;">Accessible level of service to and at train stations</b></a>
+  <a href="../index.html">Home</a>
+  <button type="button" onclick="displayAbout()">About</button>
+</div>
+
+<div id="about" style="display: none;">
+	<p><b>Accessible level of service to and at train stations</b><br>The level of service on feeder buses near train stations and the level of service of trains at stations.<br>Also show level of transit service at any point of interest (PoI) and the level of service from this PoI to train stations.<br>Useful for analyzing the balance of feeder buses per train at train stations.<br>Also useful for analyzing the accessibility by transit of train service to neighborhoods and other locations of interest like job centers, hospitals, universities, etc…</p>
+	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+</div>
+	
 <!--
 <script type="text/javascript">
 onload = function(){
@@ -89,13 +116,13 @@ onload = function(){
 			//console.log(ts_tpdperline);
 			ts_tpdperline.forEach(dispFunction);
 		}
-		this._div.innerHTML = '<h3>Trips per Day (tpd) Near TrainStop</h3>' 
-			+'<br>'+'total bus tpd' + ' , ' + 'train tpd' + ' : ' + 'train stop name' + '<br>'
+		this._div.innerHTML = '<h3>Trips per Day (tpd) Near Train Station</h3>' 
+			+'<br>'+'total bus tpd' + ' , ' + 'train tpd' + ' : ' + 'train station name' + '<br>'
 			+  (props ?
 				'<b>' + trainstopsName[props.trainstop_id] + ' : ' + props.train_tpd + ' , ' + props.total_bus_tpd + '</b>' + 
 				'<br><br>tpd : line-agency' + 
 				displaystring
-				: 'Hover over a stop');
+				: 'Hover over a station');
 
 		function dispFunction(linetpd){
 			var agency_id = linetpd["line_name"].split('-')[0];

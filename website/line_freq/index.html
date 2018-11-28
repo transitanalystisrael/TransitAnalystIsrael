@@ -3,7 +3,7 @@
 <html>
 <head>
 	
-	<title>Route Frequency Map</title>
+	<title>Frequent Service Lines</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,8 +33,34 @@
 	
 	<link rel="stylesheet" href="leaflet-slider-master/dist/leaflet-slider.css"/>
 	
+	<link rel="stylesheet" href="../css/topnav.css"/>
 </head>
 <body>
+<script>
+	var showAbout = true;
+	//console.log(showAbout);
+	function displayAbout(){
+		//console.log(showAbout);
+		if (showAbout) {
+			document.getElementById('about').style.display='block';
+			showAbout = false;
+		} else {
+			document.getElementById('about').style.display='none';
+			showAbout = true;
+		};
+	}
+</script>
+
+<div class="topnav">
+  <a class="active" href="index.html"><b style="font-size: 20px;">Frequent Service Lines</b></a>
+  <a href="../index.html">Home</a>
+  <button type="button" onclick="displayAbout()">About</button>
+</div>
+
+<div id="about" style="display: none;">
+	<p><b>Frequent Service Lines</b><br>Frequent service lines displayed on an interactive map.<br>Use slider to set level of service to display from 60+ trips per day (tpd) to 240+ tpd.<br>Click on map shows list of frequent lines in the area sorted by frequency.<br>Useful for analyzing what neighborhoods or cities or towns are served by high frequency service and which are not.</p>
+	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+</div>
 
 <script src="leaflet-slider-master/dist/leaflet-slider.js"></script>	
 

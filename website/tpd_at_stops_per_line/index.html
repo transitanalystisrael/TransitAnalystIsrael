@@ -3,7 +3,7 @@
 <html>
 <head>
 	
-	<title>Stops with tpd per line</title>
+	<title>Accessible level of service at stops</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,8 +34,36 @@
 		</style>
 
 		<link rel="stylesheet" href="leaflet-slider-master/dist/leaflet-slider.css"/>
+
+	<link rel="stylesheet" href="../css/topnav.css"/>
 </head>
 <body>
+<script>
+	var showAbout = true;
+	//console.log(showAbout);
+	function displayAbout(){
+		//console.log(showAbout);
+		if (showAbout) {
+			document.getElementById('about').style.display='block';
+			showAbout = false;
+		} else {
+			document.getElementById('about').style.display='none';
+			showAbout = true;
+		};
+	}
+</script>
+
+<div class="topnav">
+  <a class="active" href="index.html"><b style="font-size: 20px;">Accessible level of service at stops</b></a>
+  <a href="../index.html">Home</a>
+  <button type="button" onclick="displayAbout()">About</button>
+</div>
+
+<div id="about" style="display: none;">
+	<p><b>Accessible level of service at stops</b><br>Level of transit service accessible within walking distance from any location.<br>Displays the total number of transit opportunities per day at all stops.<br>Click on a stop to get a breakdown of all the lines at that stop sorted by their frequency.<br>Useful for analyzing what areas in a city or town do not have access to a reasonable level of service and what needs to be improved.</p>
+	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+</div>
+		
 <!--
 <script type="text/javascript">
 onload = function(){
