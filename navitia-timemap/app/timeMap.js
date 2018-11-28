@@ -235,7 +235,7 @@ function durationToString (duration) {
 
 var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";
 var max_duration = "3600";
-var resolution = "750"
+var resolution = "1000"
 
 var date_time_picker = $('#datetimepicker').datetimepicker({
     formatDate: 'd.m.Y',
