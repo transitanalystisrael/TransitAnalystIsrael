@@ -10,8 +10,8 @@
 	
 	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
+    <link rel="stylesheet" href="../dist/leaflet.css" />
+    <script src="../dist/leaflet.js" ></script>
 	
 	<style>
 		html, body {
@@ -60,7 +60,7 @@
 </div>
 
 <div id="about" style="display: none;">
-	<p><b>Accessible level of service at stops</b><br>Level of transit service accessible within walking distance from any location.<br>Displays the total number of transit opportunities per day at all stops.<br>Click on a stop to get a breakdown of all the lines at that stop sorted by their frequency.<br>Useful for analyzing what areas in a city or town do not have access to a reasonable level of service and what needs to be improved.</p>
+	<p><b>Accessible level of service at stops</b><br>Level of transit service accessible within walking distance from any location.<br>Displays the total number of transit opportunities per day at all stops.<br>Click on a stop to get a breakdown of all the lines at that stop sorted by their frequency.<br>Useful for analyzing what areas in a city or town do not have access to a reasonable level of service and what needs to be improved.<br>Service period analyzed: 21 Oct 2018 - 27 Oct 2018.</p>
 	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
 </div>
 		
@@ -93,12 +93,12 @@ onload = function(){
 	var initslidervalue = 5;
 	var slidervalue = tpdLevels[initslidervalue];
 
-	var grayscale = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+	var Stamen_TonerLite = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
+		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+		subdomains: 'abcd',
+		minZoom: 0,
 		maxZoom: 18,
-		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-		id: 'mapbox.light'
+		ext: 'png'
 	}).addTo(map);
 	
 

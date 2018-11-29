@@ -10,8 +10,8 @@
 	
 	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
 
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
-	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
+    <link rel="stylesheet" href="../dist/leaflet.css" />
+    <script src="../dist/leaflet.js" ></script>
 	<script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
 	
 	<style>
@@ -57,7 +57,7 @@
 </div>
 
 <div id="about" style="display: none;">
-	<p><b>Accessible level of service to and at train stations</b><br>The level of service on feeder buses near train stations and the level of service of trains at stations.<br>Also show level of transit service at any point of interest (PoI) and the level of service from this PoI to train stations.<br>Useful for analyzing the balance of feeder buses per train at train stations.<br>Also useful for analyzing the accessibility by transit of train service to neighborhoods and other locations of interest like job centers, hospitals, universities, etc…</p>
+	<p><b>Accessible level of service to and at train stations</b><br>The level of service on feeder buses near train stations and the level of service of trains at stations.<br>Also show level of transit service at any point of interest (PoI) and the level of service from this PoI to train stations.<br>Useful for analyzing the balance of feeder buses per train at train stations.<br>Also useful for analyzing the accessibility by transit of train service to neighborhoods and other locations of interest like job centers, hospitals, universities, etc…<br>Service period analyzed: 21 Oct 2018 - 27 Oct 2018.</p>
 	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
 </div>
 	
@@ -85,6 +85,7 @@ onload = function(){
 
 	var map = L.map('map').setView([32.11057,34.83797], 13);
 
+/*
 	var grayscale = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 		maxZoom: 18,
 		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
@@ -92,7 +93,15 @@ onload = function(){
 			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
 		id: 'mapbox.streets'
 	}).addTo(map);
-	
+*/
+
+	var Stamen_TonerLite = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
+		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+		subdomains: 'abcd',
+		minZoom: 0,
+		maxZoom: 18,
+		ext: 'png'
+	}).addTo(map);
 
 	// control that shows state info on hover
 	var info = L.control();
@@ -265,7 +274,7 @@ onload = function(){
 			color: "black",
 			weight: 0.5,
 			opacity: 0.5,
-			fillOpacity: 0.4
+			fillOpacity: 0.6
 		};
 	}
 	
