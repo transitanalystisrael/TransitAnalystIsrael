@@ -30,7 +30,6 @@ import 'jquery-datetimepicker';
 import 'jquery-toggles';
 import 'leaflet-providers';
 
-
 /** Map generation section**/
 var map;
 var heatMapLayerId;
@@ -56,7 +55,13 @@ function createMap() {
     $(window).on("resize", function () { $("#map").height($(window).height()); map.invalidateSize(); }).trigger("resize");
 
     // setting for default path of images used by leaflet - otherwise marker only appear after first click
-    L.Icon.Default.imagePath = '/node_modules/leaflet/dist/images/';
+    delete L.Icon.Default.prototype._getIconUrl;
+
+    L.Icon.Default.mergeOptions({
+        iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+        iconUrl: require('leaflet/dist/images/marker-icon.png'),
+        shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+    });
 
     //Creating the default marker with location
     starting_point_marker = createNewMarker(default_starting_location);
