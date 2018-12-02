@@ -12,7 +12,7 @@
 
     <link rel="stylesheet" href="../dist/leaflet.css" />
     <script src="../dist/leaflet.js" ></script>
-	
+	<script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
 
 	<style>
 		html, body {
@@ -48,8 +48,8 @@
 <script type="text/javascript" src="stops_20181021.js"></script>
 <script type="text/javascript" src="stopsneartrainstop_pre_edit_20181021.js"></script>
 
-<script src="dist/Blob.js"></script>
-<script src="dist/FileSaver.min.js"></script>
+<script src="../dist/Blob.js"></script>
+<script src="../dist/FileSaver.min.js"></script>
 
 <script type="text/javascript">
 /*
@@ -151,26 +151,6 @@
 		return div3;
 	};
 	savefilecontrol.addTo(map);
-/*	
-	//var nearStopsText = nearStops.toString();
-	(function(view) {
-		"use strict";
-		var document = view.document;
-		var session = view.sessionStorage;
-		// only get URL when necessary in case Blob.js hasn't defined it yet
-		//var text = nearStopsText;
-		var text_options_form = document.getElementById("text-options");
-		var text_filename = 'near_stops.txt';
-	
-		text_options_form.addEventListener("submit", function(event) {
-			event.preventDefault();
-			var textString = nearStops.toString()
-			var BB = view.Blob;
-			saveAs(new BB([textString], {type: "text/plain;charset=" + document.characterSet}), text_filename);
-		}, false);
-
-	}(self));
-*/	
 
 	(function(view) {
 		"use strict";

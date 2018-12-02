@@ -31,6 +31,9 @@
 		
 		.stopStyle { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
 		.stopStyle i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
+		
+		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
+		.savefilecontrol i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 		</style>
 
 		<link rel="stylesheet" href="leaflet-slider-master/dist/leaflet-slider.css"/>
@@ -84,6 +87,9 @@ onload = function(){
 <script type="text/javascript" src="stops_w_tpd_per_line_20181021_20181021.js"></script>
 <script type="text/javascript" src="agency_20181021.js"></script>
 
+<script src="../dist/Blob.js"></script>
+<script src="../dist/FileSaver.min.js"></script>
+
 <script type="text/javascript">
 
 	var map = L.map('map').setView([32.11057,34.83797], 11);
@@ -111,8 +117,15 @@ onload = function(){
 		return this._div;
 	};
 
+	var displaystring = '';
+	var display_stop_id = '';
+	var display_averagetpdatstop = '';
+	var display_maxtpdatstop = '';
 	info.update = function (props) {
-		var displaystring = '';
+		displaystring = '';
+		display_stop_id = '';
+		display_averagetpdatstop = '';
+		display_maxtpdatstop = '';
 		var tpdperline = [];
 		if (props) {
 			Object.entries(props.maxdaytpdperline_dict).forEach(entry => 
@@ -122,6 +135,9 @@ onload = function(){
 			tpdperline.sort(function(a, b){return b.tpd - a.tpd});
 			//console.log(tpdperline);
 			tpdperline.forEach(dispFunction);
+			display_stop_id = props.stop_id;
+			display_averagetpdatstop = props.averagetpdatstop;
+			display_maxtpdatstop = props.maxtpdatstop;
 		}
 		this._div.innerHTML = '<h3>Trips per Day (tpd) at Stop</h3>' 
 			+'<br>'+'stop id' + ' : ' + 'average tpd' + ' , ' + 'max tpd' + '<br>'
@@ -140,6 +156,44 @@ onload = function(){
 	};
 
 	info.addTo(map);
+	
+	var savefilecontrol = L.control({position: 'bottomright'});
+	savefilecontrol.onAdd = function (map) {
+		var div3 = L.DomUtil.create('div', 'savefilecontrol');
+		div3.innerHTML = ''
+			+ '<form id="text-options"><input type="submit" value="Save"></input></form>'
+		return div3;
+	};
+	savefilecontrol.addTo(map);
+
+	(function(view) {
+		"use strict";
+		var document = view.document;
+		var session = view.sessionStorage;
+		// only get URL when necessary in case Blob.js hasn't defined it yet
+		//var text = nearStopsText;
+		var text_options_form = document.getElementById("text-options");
+		var text_filename = 'tpd_at_stop_20181021.txt';
+	
+		text_options_form.addEventListener("submit", function(event) {
+			event.preventDefault();
+			//console.log(info._div.innerHTML)
+			var textString = '';
+			var txtline = '';
+			txtline = 'Trips per Day (tpd) at Stop\n' 
+				+'stop id : average tpd , max tpd\n';
+			textString += txtline;
+			txtline = display_stop_id + ' : ' + display_averagetpdatstop + ', ' + display_maxtpdatstop + '\n';
+			textString += txtline;
+			txtline = 'tpd : line-agency';
+			textString += txtline;
+			txtline = displaystring.replace(/<br>/g, '\n');
+			textString += txtline;
+			var BB = view.Blob;
+			saveAs(new BB([textString], {type: "text/plain;charset=" + document.characterSet}), text_filename);
+		}, false);
+
+	}(self));
 
 	// get color depending on value
 	function getColor(d) {
