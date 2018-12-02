@@ -99,6 +99,8 @@ function addHeatMapLayer(features) {
 function addHeatMap(url) {
     //TODO: REMOVE ME
     dateCounter = new Date();
+    //With the AWS API, the response is automatically gzipped. If a different deployment is used, make sure this
+    //still works
     d3fetch.json(url).then(function (data) {
         //TODO: REMOVE ME
         nextDateCounter = new Date()
