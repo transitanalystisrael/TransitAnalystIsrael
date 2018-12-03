@@ -23,12 +23,12 @@ import * as L from "leaflet";
 import * as d3fetch from "d3-fetch";
 import * as tinycolor from "tinycolor2";
 import * as sprintf from "sprintf";
-import $ from 'jquery';
-window.jQuery = $;
-window.$ = $;
+import 'jquery';
+import 'jquery-ui/ui/widgets/slider';
 import 'jquery-datetimepicker';
 import 'jquery-toggles';
 import 'leaflet-providers';
+
 
 /** Map generation section**/
 var map;
@@ -260,6 +260,7 @@ function durationToString (duration) {
 
 
 var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";
+/*var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/heat_maps";*/
 var max_duration = "3600";
 var resolution = "750"
 
@@ -321,8 +322,31 @@ function getSpeed(mode) {
         return "";
     }
 }
-/**RUN Button**/
+/**
+ * RUN Button
+ * **/
 var runButton = $('#runButton').on("click", generateHeatMap);
+
+/**
+ * Time slider
+ */
+
+var handle = $( "#custom-handle" );
+var timeSlider = $('#timeSlider').slider({
+    step: 15,
+    min: 15,
+    max: 120,
+    create: function() {
+        handle.text( $( this ).slider( "value" ) );
+    },
+    slide: function( event, ui ) {
+        handle.text( ui.value );
+    }
+});
+
+console.log(timeSlider.slider("value"));
+var selectedTimeRange = $('#selectedTimeRange').val(timeSlider.slider("value"));
+
 
 function generateHeatMap() {
     $('#runButton').text("Run");

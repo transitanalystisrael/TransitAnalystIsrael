@@ -6,30 +6,33 @@
     <title>Israel Time Map</title>
 </head>
 <body>
+<div class="container">
     <div class="button-container">
-        <div class="row">
-            <div class="col-sm">
-                <input id="datetimepicker" type="text">
+        <input id="datetimepicker" type="text">
+        <div id="runButton">Run</div>
+        <div id="switchButton" class="toggle toggle-light"></div>
+        <div class="mode-container">
+                <input class="modeButton" name="transitMode" id="transit" type="radio" value="transit">Transit</input>
+                <input class="modeButton"  name="transitMode" id="walk" type="radio" value="walking">Walking</input>
+                <input class="modeButton"  name="transitMode"  id="bike" type="radio" value="bike">Bike</input>
+        </div>
+        <div class="time-slider-with-label-container">
+            <div class="time-slider-container">
+                <div id="timeSlider">
+                    <div id="custom-handle" class="ui-slider-handle"></div>
+                </div>
             </div>
-            <div class="col-sm">
-                <div id="runButton">Run</div>
-            </div>
-            <div class="col-sm">
-                <div id="switchButton" class="toggle toggle-light"></div>
-            </div>
-            <div class="col-sm">
-
-                    <input class="modeButton" name="transitMode" id="transit" type="radio" value="transit">Transit</input>
-                    <input class="modeButton"  name="transitMode" id="walk" type="radio" value="walking">Walking</input>
-                    <input class="modeButton"  name="transitMode"  id="bike" type="radio" value="bike">Bike</input>
-
+            <div class="time-slider-label">
+                <label>Minutes</label>
             </div>
         </div>
     </div>
-
-<div class="map-container">
-    <div id="map"></div>
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
 </div>
 
+
+</div>
 </body>
 </html>

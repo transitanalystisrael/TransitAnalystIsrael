@@ -26,7 +26,7 @@ module.exports = {
             dirNode,
             dirApp,
             dirAssets
-        ]
+        ],
     },
     plugins: [
         new webpack.DefinePlugin({
@@ -36,6 +36,12 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.join(__dirname, 'index.ejs'),
             title: appHtmlTitle
+        }),
+
+        new webpack.ProvidePlugin({
+            "$":"jquery",
+            "jQuery":"jquery",
+            "window.jQuery":"jquery"
         })
     ],
     module: {
