@@ -221,7 +221,7 @@ onload = function(){
 			both_tpdperline.sort(function(a, b){return b.tpd - a.tpd});
 			both_tpdperline.forEach(dispFunction);
 			//var html = '<div style="height: 400px; overflow: auto;">tpd' + ' : ' + 'line' + ' - ' + 'agency' + "<br>" + displaystring + "<br><br>Total tpd: "+ totaltpd.toString()+'</div>';
-			var html = '<div>tpd' + ' : ' + 'line' + ' - ' + 'agency' + "<br>" + displaystring + "<br><br>Total tpd: "+ totaltpd.toString()+'</div>';
+			var html = '<h3>Trips Between<br>PoI and<br>Train Station</h3>'+'<div>tpd' + ' : ' + 'line' + ' - ' + 'agency' + "<br>" + displaystring + "<br><br>Total tpd: "+ totaltpd.toString()+'</div>';
 
 			popup
 				.setLatLng(e.latlng)
@@ -364,7 +364,7 @@ onload = function(){
 				//console.log(s_tpdperline);
 				s_tpdperline.sort(function(a, b){return b.tpd - a.tpd});
 				s_tpdperline.forEach(dispFunction);
-				var html = 'Trips per Day' + ' : ' + 'line' + ' - ' + 'agency' + "<br/>" + displaystring;
+				var html = '<h3>Trips Near<br>Point of Interest<br>(PoI)</h3>'+'Trips per Day' + ' : ' + 'line' + ' - ' + 'agency' + "<br/>" + displaystring;
 			}
 			function dispFunction(linetpd){
 				//console.log(linetpd);
