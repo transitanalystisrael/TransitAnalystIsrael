@@ -52,46 +52,7 @@
 <script src="../dist/FileSaver.min.js"></script>
 
 <script type="text/javascript">
-/*
-	var nearTrainstops = {};
-	var trainstopsarray = stopsWtpdperline.features;
-	var nearStops =[];
-	var stopsarray = gtfsStops.features;
-	trainstopsarray.forEach(trainstopFunction);
-	function trainstopFunction(trainstop, index, array) {
-		//console.log(trainstop);
-		var trainstoploc = trainstop.geometry.coordinates;
-		var trainstopid = trainstop.properties.trainstop_id;
-		var trainstopname = trainstopsName[trainstopid];
-		//console.log(trainstopid, trainstopname, trainstoploc);
-		nearTrainstops[trainstopid] = [];
-		stopsarray.forEach(stopFunction);
-		function stopFunction(stop, index, array) {
-			//console.log(stop);
-			var stoploc = stop.geometry.coordinates;
-			var stopid = stop.properties.stop_id;
-			//if (index < 4) {
-			//	console.log(trainstopid, trainstopname, trainstoploc);
-			//	console.log(stopid, stoploc);
-			//}
-			//var from = turf.point([-75.343, 39.984]);
-			//var to = turf.point([-75.534, 39.123]);
-			//var options = {units: 'kilometers'};
-			//var distance = turf.distance(from, to, options);
-			//console.log(distance);
-			var maxDistance = 0.5 // Km
-			var pt1 = turf.point([trainstoploc[1],trainstoploc[0]]);
-			var pt2 = turf.point([stoploc[1],stoploc[0]]);
-			var distance = turf.distance(pt1, pt2);
-			if (distance < maxDistance) {
-				//console.log (distance, trainstoploc, stoploc);
-				nearTrainstops[trainstopid].push(stopid);
-				nearStops.push(stopid);
-			}
-		}
-	}
-	//console.log(nearTrainstops);
-*/
+
 	var nearStops = [];
 	for (trainstopid in nearTrainstops) {
 		//console.log(trainstopid, nearTrainstops[trainstopid])
@@ -104,6 +65,11 @@
 	
 	var map = L.map('map').setView([32.11057,34.83797], 13);
 
+	var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+/*
 	var Stamen_TonerLite = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
 		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 		subdomains: 'abcd',
@@ -111,7 +77,7 @@
 		maxZoom: 18,
 		ext: 'png'
 	}).addTo(map);
-	
+*/
 
 	// control that shows state info on hover
 	var info = L.control();
