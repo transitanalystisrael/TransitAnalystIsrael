@@ -38,6 +38,15 @@ var default_starting_location = [32.073443, 34.790410];
 var starting_location;
 var default_starting_zoom = 13;
 
+//Creating the grey icon
+var geryIcon = new L.Icon({
+    iconUrl: 'assets/images/marker-icon-grey.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
+
 //TODO: remove me
 var dateCounter;
 var nextDateCounter;
@@ -64,16 +73,29 @@ function createMap() {
     });
 
     //Creating the default marker with location
-    starting_point_marker = createNewMarker(default_starting_location);
-    starting_location= starting_point_marker._latlng;
+    starting_point_marker = createNewMarker(starting_point_marker, default_starting_location, false);
     return map;
 }
 
-function createNewMarker(latLng) {
-    var marker = new L.marker(latLng, {draggable: true});
+function createNewMarker(marker, latLng, isDragged) {
+    //Remove old marker from the map
+    if (starting_point_marker) {
+        starting_point_marker.removeFrom(map);
+    }
+    if (isDragged) {
+        marker = new L.marker(latLng, {
+            draggable: true,
+            icon: geryIcon
+        });
+    } else {
+        marker = new L.marker(latLng, {
+            draggable: true,
+        });
+    }
     marker.on('dragend', function(event){
         handleMarkerDrag(event.target.getLatLng());
     });
+    starting_location= marker._latlng;
     marker.addTo(map);
     return marker;
 }
@@ -83,13 +105,13 @@ function handleMarkerDrag(latLng) {
     if (starting_point_marker !== undefined) {
         map.removeLayer(starting_point_marker);
     }
-    starting_point_marker = createNewMarker(latLng);
-    //Change the run styling
-    console.log($('#runButton').html())
-    $('#runButton').text("Re-run");
+    starting_point_marker = createNewMarker(starting_point_marker, starting_location, true);
+    invalidateRunButton();
 }
 
-
+function invalidateRunButton() {
+    runButton.text("Re-run");
+}
 function addHeatMapLayer(features) {
     var heatMapLayer = new L.featureGroup(features);
     heatMapLayerId = heatMapLayer.getLayerId(heatMapLayer);
@@ -261,8 +283,7 @@ function durationToString (duration) {
 
 var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";
 /*var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/heat_maps";*/
-var max_duration = "3600";
-var resolution = "750"
+var resolution = "750";
 
 var date_time_picker = $('#datetimepicker').datetimepicker({
     formatDate: 'd.m.Y',
@@ -290,13 +311,15 @@ $('#switchButton').toggles({
     width: '60'
 });
 var switchButton = $('#switchButton').data('toggles');
+$('#switchButton').on("toggle", invalidateRunButton);
 
-
-/**Transit Mode button and speed for overridin bike as walking with double speed**/
+/**Transit Mode button and speed for overriding bike as walking with double speed**/
 function setTransitModeAsDefault() {
     $('input:radio[name=transitMode]')[0].checked = true;
 }
 setTransitModeAsDefault();
+//Invalidating the run button in case of change
+$('input:radio').on("click",invalidateRunButton);
 
 function getTransitMode(mode) {
     return $('input:radio[name=transitMode]:checked').val();
@@ -332,28 +355,39 @@ var runButton = $('#runButton').on("click", generateHeatMap);
  */
 
 var handle = $( "#custom-handle" );
+var selectedTimeRange;
 var timeSlider = $('#timeSlider').slider({
     step: 15,
     min: 15,
     max: 120,
+    value: 60,
     create: function() {
-        handle.text( $( this ).slider( "value" ) );
+        var value = $( this ).slider( "value" );
+        handle.text(value);
+        selectedTimeRange = parseInt(value);
     },
     slide: function( event, ui ) {
-        handle.text( ui.value );
+        var value = ui.value;
+        handle.text( value);
+        selectedTimeRange = parseInt(value);
+        invalidateRunButton();
     }
 });
 
-console.log(timeSlider.slider("value"));
-var selectedTimeRange = $('#selectedTimeRange').val(timeSlider.slider("value"));
 
 
 function generateHeatMap() {
-    $('#runButton').text("Run");
+    runButton.text("Run");
     if (starting_point_marker === undefined) {
         alert("Please select a starting point on the map");
         return;
     }
+
+    //resetting the marker to blue
+    if (starting_point_marker) {
+        starting_point_marker = createNewMarker(starting_point_marker, starting_location, false);
+    }
+
     //Getting the time from the Date & time picker
     var dt = new Date(date_time_picker.val());
     var dateTimeString = sprintf('%s%s%sT%s%s00', dt.getFullYear(),
@@ -367,8 +401,12 @@ function generateHeatMap() {
 
     //Get mode, transit by default
     var mode = getTransitMode()
+
     //get Speed for simulating bike as walking in 4.1 mps
     var speed = getSpeed(mode);
+
+    //calcualte max duration in seconds
+    var max_duration = selectedTimeRange*60;
 
     var heatMapJsonUrl = navitia_server_url +
         "?max_duration=" + max_duration +
@@ -382,6 +420,7 @@ function generateHeatMap() {
 
     //TODO: REMOVE ME
     console.log(heatMapJsonUrl);
+
 
     //remove current heat map - Couldn't find how to get the layerId as a map method
     // as long as we don't have many layers, this is ok
