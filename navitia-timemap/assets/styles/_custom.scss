@@ -21,14 +21,38 @@ body{
         display: grid;
         grid-template-columns: 2fr 1fr 2fr 4fr 1fr;
         align-items: center;
-        #runButton {
-        justify-self: center;
-        height: 2em;
-        width: 4em;
-        background-color: red;
-        color: black;
-    }
+        .run-button-container {
+            display: flex;
+            border: 1px red solid;
+            #spinner{
+                display: none;
+                border: 0.5em solid #f3f3f3;
+                border-radius: 50%;
+                border-top: 0.5em solid #3498db;
+                width: 1em;
+                height: 1em;
+                -webkit-animation: spin 2s linear infinite; /* Safari */
+                animation: spin 2s linear infinite;
 
+                /* Safari */
+                @-webkit-keyframes spin {
+                    0% { -webkit-transform: rotate(0deg); }
+                    100% { -webkit-transform: rotate(360deg); }
+                }
+
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            }
+            #runButton {
+                justify-self: center;
+                border: 1px red solid;
+                height: 2em;
+                width: 2em;
+                color: black;
+            }
+        }
     #datetimepicker {
         justify-self: center;
     }

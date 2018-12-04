@@ -281,6 +281,8 @@ function loadHeatMap(heatMatrix) {
     dateCounter = nextDateCounter;
     console.log ("finished building heat map layer: " + time_passed  + "sec from sending request");
     addHeatMapLayer(heatMapPixels);
+    //Remove spinner
+    $('#spinner').hide();
     //TODO: REMOVE ME
     nextDateCounter = new Date()
     time_passed = time_passed + Math.abs(nextDateCounter - dateCounter)/1000;
@@ -423,6 +425,8 @@ var timeSlider = $('#timeSlider').slider({
 
 function generateHeatMap() {
     runButton.text("Run");
+    //Add spinner
+    $('#spinner').show();
     if (starting_point_marker === undefined) {
         alert("Please select a starting point on the map");
         return;
