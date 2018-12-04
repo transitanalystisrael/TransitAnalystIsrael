@@ -63,22 +63,14 @@
 </div>
 
 <div id="about" style="display: none;">
-	<p><b>Accessible level of service at stops</b><br>Level of transit service accessible within walking distance from any location.<br>Displays the total number of transit opportunities per day at all stops.<br>Click on a stop to get a breakdown of all the lines at that stop sorted by their frequency.<br>Useful for analyzing what areas in a city or town do not have access to a reasonable level of service and what needs to be improved.<br>Service period analyzed: 21 Oct 2018 - 27 Oct 2018.</p>
-	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+	<table style="width:100%">
+	  <tr>
+		<th id="aboutE" style="width:50%; text-align: left; font-weight: normal;">***</th>
+		<th id="aboutH" style="width:50%; text-align: right; font-weight: normal; direction: rtl;">***</th> 
+	  </tr>
+	</table>
 </div>
 		
-<!--
-<script type="text/javascript">
-onload = function(){
-	var gtfsdate = "20181021";
-	var stops_w_tpd_per_line = "stops_w_tpd_per_line_"+gtfsdate+"_"+gtfsdate+".js";
-	var agency = "agency_"+gtfsdate+".js";
-	console.log(stops_w_tpd_per_line, agency);
-	document.write('<scripttext/javascript" src="'+stops_w_tpd_per_line+'"><\/script>')
-	document.write('<scripttext/javascript" src="'+agency+'"><\/script>')
-}
-	</script>
--->
 
 <script src="leaflet-slider-master/dist/leaflet-slider.js"></script>
 
@@ -386,5 +378,14 @@ onload = function(){
 	stopStyle.addTo(map);
 
 </script>
+
+<script src="../docs/tool_descriptions_e.js" ></script>
+<script src="../docs/tool_descriptions_h.js" ></script>
+<script>
+	document.getElementById("aboutE").innerHTML = descEtool8 + servicePeriodE + logos;
+	//console.log(document.getElementById("aboutE").innerHTML)
+	document.getElementById("aboutH").innerHTML = descHtool8 + servicePeriodH + logos;
+</script>
+
 </body>
 </html>

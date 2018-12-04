@@ -56,8 +56,12 @@
 </div>
 
 <div id="about" style="display: none;">
-	<p><b>Municipal trips per day (tpd) per line</b><br>Display the trips per day (tpd) for each transit line that serves a selected city or town.<br>Displayed as interactive map. Click on municipality to get list of lines and tpd sorted by line frequency.<br>Useful for analyzing in detail the transit service in a city / town and for recommending improvements.<br>Service period analyzed: 21 Oct 2018 - 27 Oct 2018.</p>
-	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+	<table style="width:100%">
+	  <tr>
+		<th id="aboutE" style="width:50%; text-align: left; font-weight: normal;">***</th>
+		<th id="aboutH" style="width:50%; text-align: right; font-weight: normal; direction: rtl;">***</th> 
+	  </tr>
+	</table>
 </div>
 
 <div id='map'></div>
@@ -237,6 +241,14 @@
 	};
 	legend.addTo(map);
 
+</script>
+
+<script src="../docs/tool_descriptions_e.js" ></script>
+<script src="../docs/tool_descriptions_h.js" ></script>
+<script>
+	document.getElementById("aboutE").innerHTML = descEtool5 + servicePeriodE + logos;
+	//console.log(document.getElementById("aboutE").innerHTML)
+	document.getElementById("aboutH").innerHTML = descHtool5 + servicePeriodH + logos;
 </script>
 
 </body>

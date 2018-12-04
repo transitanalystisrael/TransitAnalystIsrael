@@ -57,8 +57,12 @@
 </div>
 
 <div id="about" style="display: none;">
-	<p><b>Accessible level of service to and at train stations</b><br>The level of service on feeder buses near train stations and the level of service of trains at stations.<br>Also show level of transit service at any point of interest (PoI) and the level of service from this PoI to train stations.<br>Useful for analyzing the balance of feeder buses per train at train stations.<br>Also useful for analyzing the accessibility by transit of train service to neighborhoods and other locations of interest like job centers, hospitals, universities, etc…<br>Service period analyzed: 21 Oct 2018 - 27 Oct 2018.</p>
-	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+	<table style="width:100%">
+	  <tr>
+		<th id="aboutE" style="width:50%; text-align: left; font-weight: normal;">***</th>
+		<th id="aboutH" style="width:50%; text-align: right; font-weight: normal; direction: rtl;">***</th> 
+	  </tr>
+	</table>
 </div>
 	
 <!--
@@ -403,5 +407,14 @@ onload = function(){
 	legend.addTo(map);
 
 </script>
+
+<script src="../docs/tool_descriptions_e.js" ></script>
+<script src="../docs/tool_descriptions_h.js" ></script>
+<script>
+	document.getElementById("aboutE").innerHTML = descEtool9 + servicePeriodE + logos;
+	//console.log(document.getElementById("aboutE").innerHTML)
+	document.getElementById("aboutH").innerHTML = descHtool9 + servicePeriodH + logos;
+</script>
+
 </body>
 </html>

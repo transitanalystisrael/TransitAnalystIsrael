@@ -212,8 +212,12 @@ input:focus {
 </div>
 
 <div id="about" style="display: none;">
-	<p><b>Municipal Transit Ranking</b><br>Municipal ranking by TransitScore, FairShareScore and BuiltDensityScore displayed as charts and lists.<br>Search and sort lists by city / town name or score.<br>Use slider to zoom in on different areas of the chart.<br>Click on name or chart to highlight city / town.<br>Useful for comparing scores between cities / towns.<br>Service period analyzed: 21 Oct 2018 - 27 Oct 2018.</p>
-	<img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+	<table style="width:100%">
+	  <tr>
+		<th id="aboutE" style="width:50%; text-align: left; font-weight: normal;">***</th>
+		<th id="aboutH" style="width:50%; text-align: right; font-weight: normal; direction: rtl;">***</th> 
+	  </tr>
+	</table>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
@@ -455,8 +459,15 @@ input:focus {
 		});
 	}
 	//console.log(userList);
-	
-	
+
+</script>
+
+<script src="../docs/tool_descriptions_e.js" ></script>
+<script src="../docs/tool_descriptions_h.js" ></script>
+<script>
+	document.getElementById("aboutE").innerHTML = descEtool4 + servicePeriodE + logos;
+	//console.log(document.getElementById("aboutE").innerHTML)
+	document.getElementById("aboutH").innerHTML = descHtool4 + servicePeriodH + logos;
 </script>
 
 </body>
