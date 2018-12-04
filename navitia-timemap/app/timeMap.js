@@ -112,10 +112,37 @@ function handleMarkerDrag(latLng) {
 function invalidateRunButton() {
     runButton.text("Re-run");
 }
+
+
+/**
+ * Recenter button when results are loaded
+ */
+var goToHeatLayerButton = L.control({position: 'bottomleft'});
+goToHeatLayerButton.onAdd = function (map) {
+    var goToHeatLayerButtonDiv = L.DomUtil.create('input', 'go-to-button');
+    goToHeatLayerButtonDiv.type="button";
+    goToHeatLayerButtonDiv.value="There are new results \n Click here to re-center map"
+    goToHeatLayerButtonDiv.onclick = function(e){
+        map.eachLayer(function(layer){
+            if (layer._leaflet_id === heatMapLayerId) {
+                map.panTo(starting_location);
+            }
+        });
+        map.removeControl(goToHeatLayerButtonDiv);
+        L.DomEvent.stopPropagation(e);
+    }
+    return goToHeatLayerButtonDiv;
+};
+
+
 function addHeatMapLayer(features) {
     var heatMapLayer = new L.featureGroup(features);
     heatMapLayerId = heatMapLayer.getLayerId(heatMapLayer);
     heatMapLayer.addTo(map);
+    //Add goToHeatLayerButton if the viewport is outside of the heat layer
+    if (!heatMapLayer.getBounds().contains(map.getCenter())) {
+        goToHeatLayerButton.addTo(map);
+    }
 }
 
 function addHeatMap(url) {
@@ -130,8 +157,12 @@ function addHeatMap(url) {
         dateCounter = nextDateCounter;
 
         console.log ("Got Data from server after: " + time_passed + "sec from sending request");
-        loadHeatMap(data)
-    }).catch(function(error) { console.log(error); });
+        var heatMatrix= data.heat_maps[0].heat_matrix;
+        loadHeatMap(heatMatrix);
+    }).catch(function(error) {
+        //If user selects a location that isn't applicable as origin or destination
+        alert("The selected location isn't a valid origin or destination");
+    });
 }
 
 function getColorFromDuration (duration) {
@@ -199,10 +230,22 @@ function toCssColor (c, alpha) {
     }
 };
 
-function loadHeatMap(data) {
-    var heatMatrix= data.heat_maps[0].heat_matrix;
+function loadHeatMap(heatMatrix) {
+    //remove current heat map - Couldn't find how to get the layerId as a map method
+    // as long as we don't have many layers, this is ok
+    map.eachLayer(function(layer){
+        if (layer._leaflet_id === heatMapLayerId) {
+            map.removeLayer(layer);
+        }
+    });
+
+    //resetting the marker to blue (only on successful response)
+    if (starting_point_marker) {
+        starting_point_marker = createNewMarker(starting_point_marker, starting_location, false);
+    }
+
     var startingProcessingJsonDate = new Date();
-    data= [];
+    var data= [];
     var scale = 0;
     heatMatrix.lines.forEach(function(lines) {
         lines.duration.forEach(function(duration) {
@@ -376,16 +419,13 @@ var timeSlider = $('#timeSlider').slider({
 
 
 
+
+
 function generateHeatMap() {
     runButton.text("Run");
     if (starting_point_marker === undefined) {
         alert("Please select a starting point on the map");
         return;
-    }
-
-    //resetting the marker to blue
-    if (starting_point_marker) {
-        starting_point_marker = createNewMarker(starting_point_marker, starting_location, false);
     }
 
     //Getting the time from the Date & time picker
@@ -416,20 +456,8 @@ function generateHeatMap() {
         getTransitModeUrl() +
         speed +
         "&resolution=" + resolution;
-
-
     //TODO: REMOVE ME
     console.log(heatMapJsonUrl);
-
-
-    //remove current heat map - Couldn't find how to get the layerId as a map method
-    // as long as we don't have many layers, this is ok
-    map.eachLayer(function(layer){
-        if (layer._leaflet_id === heatMapLayerId) {
-            map.removeLayer(layer);
-        }
-    });
-
     //add new heat map
     addHeatMap(heatMapJsonUrl)
 
