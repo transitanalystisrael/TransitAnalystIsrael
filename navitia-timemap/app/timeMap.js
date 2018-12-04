@@ -37,6 +37,7 @@ var starting_point_marker;
 var default_starting_location = [32.073443, 34.790410];
 var starting_location;
 var default_starting_zoom = 13;
+var goToHeatLayerButtonDiv;
 
 //Creating the grey icon
 var geryIcon = new L.Icon({
@@ -59,6 +60,9 @@ function createMap() {
     map = L.map('map', {renderer: new L.canvas()})
         .setView([32.07050190954199,34.8427963256836], default_starting_zoom)
         .addLayer(mapboxTiles);
+
+    //Add scale
+    L.control.scale().addTo(map);
 
     //Fixing the grey tiles partial issue
     $(window).on("resize", function () { $("#map").height($(window).height()); map.invalidateSize(); }).trigger("resize");
@@ -119,7 +123,7 @@ function invalidateRunButton() {
  */
 var goToHeatLayerButton = L.control({position: 'bottomleft'});
 goToHeatLayerButton.onAdd = function (map) {
-    var goToHeatLayerButtonDiv = L.DomUtil.create('input', 'go-to-button');
+    goToHeatLayerButtonDiv = L.DomUtil.create('input', 'go-to-button');
     goToHeatLayerButtonDiv.type="button";
     goToHeatLayerButtonDiv.value="There are new results \n Click here to re-center map"
     goToHeatLayerButtonDiv.onclick = function(e){
@@ -160,8 +164,16 @@ function addHeatMap(url) {
         var heatMatrix= data.heat_maps[0].heat_matrix;
         loadHeatMap(heatMatrix);
     }).catch(function(error) {
+        //Remove spinner
+        $('#spinner').hide();
         //If user selects a location that isn't applicable as origin or destination
-        alert("The selected location isn't a valid origin or destination");
+        if (error.message.includes("404")) {
+            alert("The selected location isn't a valid origin or destination");
+        }
+        if (error.message === "Failed to fetch") {
+            alert("Server seems to be busy, please try again in several seconds. If this repeates, kindly contact %%%%%");
+        }
+
     });
 }
 
@@ -326,8 +338,8 @@ function durationToString (duration) {
 
 
 
-var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";
-/*var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/heat_maps";*/
+/*var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";*/
+var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/heat_maps";
 var resolution = "750";
 
 var date_time_picker = $('#datetimepicker').datetimepicker({
@@ -425,8 +437,12 @@ var timeSlider = $('#timeSlider').slider({
 
 function generateHeatMap() {
     runButton.text("Run");
-    //Add spinner
+    //Show spinner
     $('#spinner').show();
+    //Remove the "Take me to the heat map" button
+    if (goToHeatLayerButtonDiv) {
+        map.removeControl(goToHeatLayerButtonDiv);
+    }
     if (starting_point_marker === undefined) {
         alert("Please select a starting point on the map");
         return;
@@ -474,6 +490,19 @@ map.on('click', function (e) {
 
 //Crating the default map
 generateHeatMap();
+
+//About
+var showAbout = true;
+$('#aboutBtn').on("click", function(){
+    if (showAbout) {
+        $('#about').show();
+        showAbout = false;
+    } else {
+        $('#about').hide();
+        showAbout = true;
+    };
+});
+
 
 //Legend
 var legend = L.control({position: 'bottomright'});
