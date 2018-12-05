@@ -53,12 +53,22 @@ var nextDateCounter;
 var time_passed;
 
 function createMap() {
-    var mapboxTiles =
-        L.tileLayer.provider('Stamen.TonerLite');
+/*    var mapboxTiles =
+        L.tileLayer.provider('Stamen.TonerLite', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>,' +
+                        ' <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy;' +
+                        ' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' +
+                        '<br>' +
+                        'Transit data provided by <a href="http://miu.org.il/">Merhav</a>' +
+                        ' and processed by <a href="https://github.com/CanalTP/navitia">Navitia</a> '
+        });*/
 
     map = L.map('map', {renderer: new L.canvas()})
         .setView([32.07050190954199,34.8427963256836], default_starting_zoom)
-        .addLayer(mapboxTiles);
+
+    var tileLayers = makeTileLayers();
+    tileLayers[getDefaultLayerName()].addTo(map);
+    L.control.layers(tileLayers).addTo(map);
 
     //Add scale
     L.control.scale().addTo(map);
@@ -79,6 +89,42 @@ function createMap() {
     starting_point_marker = createNewMarker(starting_point_marker, default_starting_location, false);
     return map;
 }
+
+
+function getDefaultLayerName() {
+    return 'Stamen Toner Light';
+};
+
+function makeTileLayers() {
+    return {
+        'Stamen Toner Light':
+            L.tileLayer.provider('Stamen.TonerLite', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>,' +
+                ' <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy;' +
+                ' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' +
+                '<br>' +
+                'Transit data provided by <a href="http://miu.org.il/">Merhav</a>' +
+                ' and processed by <a href="https://github.com/CanalTP/navitia">Navitia</a> '
+        }),
+        'OpenStreetMap Mapnik':
+            L.tileLayer.provider('OpenStreetMap.Mapnik', {
+                attribution: 'Map tiles & data  &copy;' +
+                    ' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' +
+                    '<br>' +
+                    'Transit data provided by <a href="http://miu.org.il/">Merhav</a>' +
+                    ' and processed by <a href="https://github.com/CanalTP/navitia">Navitia</a> '
+            }),
+        'OpenStreetMap BlackAndWhite':
+            L.tileLayer.provider('OpenStreetMap.BlackAndWhite', {
+                attribution: 'Map tiles & data  &copy;' +
+                    ' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' +
+                    '<br>' +
+                    'Transit data provided by <a href="http://miu.org.il/">Merhav</a>' +
+                    ' and processed by <a href="https://github.com/CanalTP/navitia">Navitia</a> '
+            }),
+    };
+};
+
 
 function createNewMarker(marker, latLng, isDragged) {
     //Remove old marker from the map
@@ -167,10 +213,11 @@ function addHeatMap(url) {
         $('#spinner').hide();
         //If user selects a location that isn't applicable as origin or destination
         if (error.message.includes("404")) {
-            alert("The selected location isn't a valid origin or destination");
+            alert("The selected location isn't a valid origin or destination.");
         }
         if (error.message === "Failed to fetch") {
-            alert("Server seems to be busy, please try again in several seconds. If this repeates, kindly contact %%%%%");
+            alert("Server seems to be busy, please try again in several moments.\n" +
+                "If this persists, kindly see homepage for support details.");
         }
 
     });
@@ -242,6 +289,7 @@ function toCssColor (c, alpha) {
 };
 
 function loadHeatMap(heatMatrix) {
+
     //remove current heat map - Couldn't find how to get the layerId as a map method
     // as long as we don't have many layers, this is ok
     map.eachLayer(function(layer){
@@ -249,7 +297,11 @@ function loadHeatMap(heatMatrix) {
             map.removeLayer(layer);
         }
     });
-
+    //TODO: REMOVE ME
+    nextDateCounter = new Date()
+    time_passed = time_passed + Math.abs(nextDateCounter - dateCounter)/1000;
+    dateCounter = nextDateCounter;
+    console.log ("removed previous heat map layer: " + time_passed  + "sec from sending request");
     //resetting the marker to blue (only on successful response)
     if (starting_point_marker) {
         starting_point_marker = createNewMarker(starting_point_marker, starting_location, false);
@@ -282,7 +334,6 @@ function loadHeatMap(heatMatrix) {
                 [heatMatrix.line_headers[j].cell_lat.max_lat, lines.cell_lon.max_lon],
                 [heatMatrix.line_headers[j].cell_lat.min_lat, lines.cell_lon.min_lon]
             ];
-            /*heatMapMarkersGroup.addLayer(makePixel(rectangle, color, duration));*/
             heatMapPixels.push(makePixel(rectangle, color, duration));
         });
     });
@@ -301,19 +352,33 @@ function loadHeatMap(heatMatrix) {
     dateCounter = nextDateCounter;
 }
 
-function makePixel (PolygonCoords, color, duration) {
-    var sum = 'not accessible';
+
+function makePixel (polygonCoords, color, duration) {
+    var rect;
+    var popup_container = $('<div />');
+    var popup_text = 'Location not accessible';
     if (duration !== null) {
-        sum = sprintf('duration: %s', durationToString(duration));
+        popup_text = sprintf('Duration: %s', durationToString(duration));
     }
-    return L.rectangle(PolygonCoords, {
+    // Delegate all event handling for the container itself and its contents to the container
+    popup_container.on('click', '.popup_link', function(e) {
+        handleMarkerDrag(rect.getCenter());
+        map.closePopup();
+    });
+
+// Insert whatever you want into the container, using whichever approach you prefer
+    popup_container.html(popup_text + "<br><a href='#' class='popup_link'>Click to set the starting point marker here</a>");
+
+    rect =  L.rectangle(polygonCoords, {
         smoothFactor: 0,
         color:  '#555555',
         opacity: 0,
         weight: 0,
         fillColor: color,
         fillOpacity: 0.7
-    }).bindPopup(sum);
+    }).bindPopup(popup_container[0]);
+
+    return rect;
 };
 
 function durationToString (duration) {
@@ -323,10 +388,10 @@ function durationToString (duration) {
     var hours = Math.floor(duration / (60 * 60)) % 24;
     var days = Math.floor(duration / (24 * 60 * 60));
 
-    if (days !== 0) { res += sprintf('%sd', days); }
-    if (hours !== 0) { res += sprintf('%sh', hours); }
-    if (minutes !== 0) { res += sprintf('%smin', minutes); }
-    if (seconds !== 0) { res += sprintf('%ss', seconds); }
+    if (days !== 0) { res += sprintf('%s days, ', days); }
+    if (hours !== 0) { res += sprintf('%s hrs,  ', hours); }
+    if (minutes !== 0) { res += sprintf('%s min. ', minutes); }
+    if (seconds !== 0) { res += sprintf('and %s sec.', seconds); }
 
     if (! res) {
         return '0s';
@@ -386,7 +451,7 @@ function getTransitModeUrl() {
     //so we set the frist and last walking modes to walking and we disallow use of transit (navitia hack).
     if (mode ==="walking" || mode === "bike") {
         return "&first_section_mode%5B%5D=walking&last_section_mode%5B%5D=walking" +
-            "&allowed_id[]=physical_mode:Bus&forbidden_uri[]=physical_mode:Bus"
+            "&allowed_id[]=physical_mode:Bus&forbidden_uris[]=physical_mode:Bus"
     }  else {
         return "";
     }
