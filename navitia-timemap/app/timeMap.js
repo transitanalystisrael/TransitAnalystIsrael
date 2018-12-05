@@ -29,7 +29,6 @@ import 'jquery-datetimepicker';
 import 'jquery-toggles';
 import 'leaflet-providers';
 
-
 /** Map generation section**/
 var map;
 var heatMapLayerId;
@@ -491,7 +490,12 @@ map.on('click', function (e) {
 //Crating the default map
 generateHeatMap();
 
-//About
+//About - getting from the outer JS. Should be changed to module
+//Overridingthe logos injection
+var logos = '<br><br><img src="https://s3.eu-central-1.amazonaws.com/israeltimemap/Time+Map/assets/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="https://s3.eu-central-1.amazonaws.com/israeltimemap/Time+Map/assets/images/YEE_logo.jpg" alt="YEE logo" height="60px">';
+document.getElementById("aboutE").innerHTML = descEtool10 + servicePeriodE + logos;
+document.getElementById("aboutH").innerHTML = descHtool10 + servicePeriodH + logos;
+
 var showAbout = true;
 $('#aboutBtn').on("click", function(){
     if (showAbout) {

@@ -1,5 +1,7 @@
 <!doctype html>
 <html lang="en">
+<script type="text/javascript" src="https://s3.eu-central-1.amazonaws.com/transitanalystisrael/docs/tool_descriptions_e.js"></script>
+<script type="text/javascript" src="https://s3.eu-central-1.amazonaws.com/transitanalystisrael/docs/tool_descriptions_h.js"></script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
@@ -17,11 +19,12 @@
                 <button id="aboutBtn" type="button">About</button>
             </div>
             <div id="about" style="display: none;">
-                <p><b>TransitScore Israel</b><br>The relative intensity of the transit service in Israel by location.
-                    <br>Scores are normalized to 0-100. Displayed as interactive map.
-                    <br>Click on heatmap to get score for location.
-                    <br>Useful for comparing transit service level between locations / neighborhoods within a city or town.<br>Service period analyzed: 21 Oct 2018 - 27 Oct 2018.</p>
-                <img src="../assets/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../assets/images/YEE_logo.jpg" alt="YEE logo" height="60px">
+                <table id="aboutTable" style="width:100%">
+                    <tr>
+                        <th id="aboutE" style="width:50%; text-align: left; font-weight: normal;"></th>
+                        <th id="aboutH" style="width:50%; text-align: right; font-weight: normal; direction: rtl;"></th>
+                    </tr>
+                </table>
             </div>
         </div>
         <div class="button-container">

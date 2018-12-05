@@ -49,7 +49,6 @@ module.exports = {
             { from: './assets/images', to: 'assets/images' },
         ])
     ],
-
     module: {
         rules: [
             // BABEL
