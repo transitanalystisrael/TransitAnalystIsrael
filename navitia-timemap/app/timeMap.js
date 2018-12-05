@@ -1,24 +1,3 @@
-
-// Copyright (c) 2016 CanalTP
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
 import * as L from "leaflet";
 import * as d3fetch from "d3-fetch";
 import * as tinycolor from "tinycolor2";
@@ -53,16 +32,6 @@ var nextDateCounter;
 var time_passed;
 
 function createMap() {
-/*    var mapboxTiles =
-        L.tileLayer.provider('Stamen.TonerLite', {
-            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>,' +
-                        ' <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy;' +
-                        ' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' +
-                        '<br>' +
-                        'Transit data provided by <a href="http://miu.org.il/">Merhav</a>' +
-                        ' and processed by <a href="https://github.com/CanalTP/navitia">Navitia</a> '
-        });*/
-
     map = L.map('map', {renderer: new L.canvas()})
         .setView([32.07050190954199,34.8427963256836], default_starting_zoom)
 
@@ -353,33 +322,21 @@ function loadHeatMap(heatMatrix) {
 }
 
 
-function makePixel (polygonCoords, color, duration) {
-    var rect;
-    var popup_container = $('<div />');
-    var popup_text = 'Location not accessible';
+function makePixel (PolygonCoords, color, duration) {
+    var Duration = 'not accessible';
     if (duration !== null) {
-        popup_text = sprintf('Duration: %s', durationToString(duration));
+        Duration = sprintf('Duration: %s', durationToString(duration));
     }
-    // Delegate all event handling for the container itself and its contents to the container
-    popup_container.on('click', '.popup_link', function(e) {
-        handleMarkerDrag(rect.getCenter());
-        map.closePopup();
-    });
-
-// Insert whatever you want into the container, using whichever approach you prefer
-    popup_container.html(popup_text + "<br><a href='#' class='popup_link'>Click to set the starting point marker here</a>");
-
-    rect =  L.rectangle(polygonCoords, {
+    return L.rectangle(PolygonCoords, {
         smoothFactor: 0,
         color:  '#555555',
         opacity: 0,
         weight: 0,
         fillColor: color,
         fillOpacity: 0.7
-    }).bindPopup(popup_container[0]);
-
-    return rect;
+    }).bindPopup(Duration);
 };
+
 
 function durationToString (duration) {
     var res = '';
