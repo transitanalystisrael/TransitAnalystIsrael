@@ -152,6 +152,12 @@ body{
             background-color: red;
             white-space:pre-wrap;
         }
+
+        .popup-link {
+            cursor:pointer;
+            color:blue;
+            text-decoration:underline;
+        }
     }
 
     .grid > * {

@@ -323,9 +323,10 @@ function loadHeatMap(heatMatrix) {
 
 
 function makePixel (PolygonCoords, color, duration) {
-    var Duration = 'not accessible';
+    var summary = 'not accessible';
     if (duration !== null) {
-        Duration = sprintf('Duration: %s', durationToString(duration));
+        summary = sprintf('Duration: %s <br/> <p class="popup-link">Click to set the starting location marker ' +
+            'here</p>', durationToString(duration));
     }
     return L.rectangle(PolygonCoords, {
         smoothFactor: 0,
@@ -334,9 +335,8 @@ function makePixel (PolygonCoords, color, duration) {
         weight: 0,
         fillColor: color,
         fillOpacity: 0.7
-    }).bindPopup(Duration);
-};
-
+    }).bindPopup(summary);
+}
 
 function durationToString (duration) {
     var res = '';
@@ -507,6 +507,20 @@ function generateHeatMap() {
 createMap();
 map.on('click', function (e) {
     handleMarkerDrag(e.latlng);
+});
+
+//Adding the option to set the marker using the popup
+map.on('popupopen', function(e) {
+    $('.popup-link').click(function (e) {
+        var latLng;
+        map.eachLayer(function(layer){
+            if (layer._leaflet_id === heatMapLayerId) {
+                latLng = layer._map._popup._latlng
+            }
+        });
+        map.closePopup();
+        handleMarkerDrag(latLng);
+    });
 });
 
 //Crating the default map
