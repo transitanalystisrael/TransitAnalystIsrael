@@ -4,6 +4,7 @@ import * as tinycolor from "tinycolor2";
 import * as sprintf from "sprintf";
 import 'jquery';
 import 'jquery-ui/ui/widgets/slider';
+import 'jquery-ui/ui/widgets/tooltip';
 import 'jquery-datetimepicker';
 import 'jquery-toggles';
 import 'leaflet-providers';
@@ -128,7 +129,8 @@ function handleMarkerDrag(latLng) {
 }
 
 function invalidateRunButton() {
-    runButton.text("Re-run");
+    $('#runButton').addClass("invalidated");
+    runButton.text("Run");
 }
 
 
@@ -180,6 +182,7 @@ function addHeatMap(url) {
     }).catch(function(error) {
         //Remove spinner
         $('#spinner').hide();
+        invalidateRunButton();
         //If user selects a location that isn't applicable as origin or destination
         if (error.message.includes("404")) {
             alert("The selected location isn't a valid origin or destination.");
@@ -188,7 +191,6 @@ function addHeatMap(url) {
             alert("Server seems to be busy, please try again in several moments.\n" +
                 "If this persists, kindly see homepage for support details.");
         }
-
     });
 }
 
@@ -314,6 +316,7 @@ function loadHeatMap(heatMatrix) {
     addHeatMapLayer(heatMapPixels);
     //Remove spinner
     $('#spinner').hide();
+    invalidateRunButton();
     //TODO: REMOVE ME
     nextDateCounter = new Date()
     time_passed = time_passed + Math.abs(nextDateCounter - dateCounter)/1000;
@@ -385,7 +388,7 @@ $('#switchButton').toggles({
     },
     on:true,
     type: 'select',
-    height: '30',
+    height: '20',
     width: '60'
 });
 var switchButton = $('#switchButton').data('toggles');
@@ -398,6 +401,8 @@ function setTransitModeAsDefault() {
 setTransitModeAsDefault();
 //Invalidating the run button in case of change
 $('input:radio').on("click",invalidateRunButton);
+//Add tooltip to the mode buttons
+$(".mode-button-container").tooltip();
 
 function getTransitMode(mode) {
     return $('input:radio[name=transitMode]:checked').val();
@@ -457,7 +462,9 @@ var timeSlider = $('#timeSlider').slider({
 
 
 function generateHeatMap() {
-    runButton.text("Run");
+    //Mark button as running
+    runButton.removeClass("invalidated");
+    runButton.text("Running...");
     //Show spinner
     $('#spinner').show();
     //Remove the "Take me to the heat map" button
@@ -535,14 +542,21 @@ document.getElementById("aboutH").innerHTML = descHtool10 + servicePeriodH + log
 var showAbout = true;
 $('#aboutBtn').on("click", function(){
     if (showAbout) {
-        $('#about').show();
+        $('.about-container').show();
         showAbout = false;
     } else {
-        $('#about').hide();
+        $('.about-container').hide();
         showAbout = true;
     };
 });
 
+$('#homeBtn').on("click", function(){
+    window.location.href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael/index.html";
+});
+
+$('#selfBtn').on("click", function(){
+    window.location.href="index.html";
+});
 
 //Legend
 var legend = L.control({position: 'bottomright'});

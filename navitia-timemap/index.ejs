@@ -11,14 +11,18 @@
 </head>
 <body>
 <div class="container">
-    <div class="nav-buttons-container">
+    <div class="controls-container">
         <div class="nav-container">
-            <div class="nav">
-                <a class="active" href="index.html"><b style="font-size: 20px;">Israel Time Map</b></a>
-                <a href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael/index.html">Home</a>
-                <button id="aboutBtn" type="button">About</button>
+            <div class="nav-button-container ">
+                    <button class="nav-button main-button" id="selfBtn">Israel Time Map</button>
+                <div class="home-about-container">
+                    <button class="nav-button" id="homeBtn">Home</button>
+                    <button class="nav-button" id="aboutBtn" type="button">About</button>
+                </div>
             </div>
-            <div id="about" style="display: none;">
+        </div>
+        <div class="about-container" style="display: none;">
+            <div id="about">
                 <table id="aboutTable" style="width:100%">
                     <tr>
                         <th id="aboutE" style="width:50%; text-align: left; font-weight: normal;"></th>
@@ -27,27 +31,41 @@
                 </table>
             </div>
         </div>
-        <div class="button-container">
-            <input id="datetimepicker" type="text">
-            <div id="switchButton" class="toggle toggle-light"></div>
-            <div class="mode-container">
-                    <input class="modeButton" name="transitMode" id="transit" type="radio" value="transit">Transit</input>
-                    <input class="modeButton"  name="transitMode" id="walk" type="radio" value="walking">Walking</input>
-                    <input class="modeButton"  name="transitMode"  id="bike" type="radio" value="bike">Bike</input>
+        <div class="buttons-container">
+            <div class="button-container">
+                <label class="button-label" type="label">Date & Time</label>
+                <input id="datetimepicker" type="text"></input>
             </div>
-            <div class="time-slider-with-label-container">
+            <div class="button-container">
+                <label class="button-label" type="label">Direction</label>
+                <div id="switchButton" class="toggle toggle-light"></div>
+            </div>
+            <div class="button-container">
+                <label class="button-label" type="label">Transport Mode</label>
+                <div class="mode-container">
+                    <label class="mode-button-container transit" title="Starting and finishing the journey by walking.
+                    Journey may include several PT means.">
+                        <input class="modeButton" name="transitMode" id="transit" type="radio" value="transit">Public Transit</input>
+                    </label>
+                    <label class="mode-button-container walking" title="Journey includes walking only.">
+                        <input class="modeButton"  name="transitMode" id="walk" type="radio" value="walking">Walking</input>
+                    </label>
+                    <label class="mode-button-container bike" title="Journey includes cycling only.">
+                        <input class="modeButton"  name="transitMode" id="bike" type="radio" value="bike">Bike</input>
+                    </label>
+                </div>
+            </div>
+            <div class="button-container slider">
+                <label class="button-label minutes" type="label">Minutes</label>
                 <div class="time-slider-container">
                     <div id="timeSlider">
                         <div id="custom-handle" class="ui-slider-handle"></div>
                     </div>
                 </div>
-                <div class="time-slider-label">
-                    <label>Minutes</label>
-                </div>
             </div>
             <div class="run-button-container">
-                <div id="runButton">Run</div>
-                <div id="spinner"></div>
+                <button id="runButton">Run</button>
+                <div id="spinner" style="display: none"></div>
             </div>
         </div>
     </div>
@@ -56,6 +74,5 @@
     </div>
 </div>
 
-</div>
 </body>
 </html>
