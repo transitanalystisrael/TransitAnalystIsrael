@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130620396-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130620396-1');
+</script>
 	
 	<title>TransitScore Israel</title>
 
@@ -14,7 +23,7 @@
 
 	<style>
 		html, body { height: 100%; margin: 0; }
-		#mapid { width: 100%; height: 100%; }
+		#mapid { width: 100%; height: 95%; }
 		.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } 
 		.info h4 { margin: 0 0 5px; color: #777; }
 	</style>
@@ -44,7 +53,7 @@
 <div class="topnav">
   <a class="active" href="index.html"><b style="font-size: 20px;">TransitScore Israel</b></a>
   <a href="../index.html">Home</a>
-  <button type="button" onclick="displayAbout()">About</button>
+  <button type="button" onclick="displayAbout()">About - אודות</button>
 </div>
 
 <div id="about" style="display: none;">
@@ -59,7 +68,7 @@
 <div id="mapid" ></div>
 <script>
 
-	var mymap = L.map('mapid').setView([32.079, 34.780], 13);
+	var map = L.map('mapid').setView([32.079, 34.780], 13);
 
 	var Stamen_TonerLite = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
 		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -67,12 +76,30 @@
 		minZoom: 0,
 		maxZoom: 18,
 		ext: 'png'
-	}).addTo(mymap);
+	}).addTo(map);
+	
+	var OpenStreetMap_BlackAndWhite = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+		maxZoom: 18,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	});
+	
+	var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	});
+	
+	var baseMaps = {
+		"Stamen_TonerLite": Stamen_TonerLite,
+		"OSM_B&W": OpenStreetMap_BlackAndWhite,
+		"OSM": OpenStreetMap_Mapnik
+	};
+	
+	L.control.layers(baseMaps).addTo(map);
 	
 	// control that shows muni info on hover
 	var info = L.control();
 
-	info.onAdd = function (mymap) {
+	info.onAdd = function (map) {
 		this._div = L.DomUtil.create('div', 'info');
 		this.update();
 		return this._div;
@@ -85,7 +112,7 @@
 			: 'click for TransitScore');
 	};
 
-	info.addTo(mymap);
+	info.addTo(map);
 
 	//var imageUrl = 'http://miu.org.il/miu/MIU_v4/docs_activities/transportation/transitscore_all_israel_fromJSON2.png',
 	var imageUrl = 'ts_rendered.png', 
@@ -93,7 +120,7 @@
 	//var imageUrl = 'ts_3857_template2.png',
  
 	imageBounds = [[29.49000, 34.28000], [33.28620, 35.8438400]];
-	L.imageOverlay(imageUrl, imageBounds, {opacity: 0.5}).addTo(mymap);
+	L.imageOverlay(imageUrl, imageBounds, {opacity: 0.5}).addTo(map);
 	
 	ilminlat = 29.490000; // Israel min lat
 	ilminlon = 34.280000; // Israel min lon
@@ -108,10 +135,10 @@
 	function grid_id(lat, lon) {
 		return [Math.floor((lat-gridorglat)/lat100), Math.floor((lon-gridorglon)/lon100)];
 	}
-	console.log('minlatlon  ', ilminlat, ilminlon);
-	console.log('minlatlon grid_id ', grid_id(ilminlat, ilminlon));
-	console.log('minlatlon+500 grid_id ', grid_id(ilminlat+500.5*lat100, ilminlon+500.5*lon100));
-	console.log('transitScore[0] ', transitScore[0] );
+	//console.log('minlatlon  ', ilminlat, ilminlon);
+	//console.log('minlatlon grid_id ', grid_id(ilminlat, ilminlon));
+	//console.log('minlatlon+500 grid_id ', grid_id(ilminlat+500.5*lat100, ilminlon+500.5*lon100));
+	//console.log('transitScore[0] ', transitScore[0] );
 
 	var popup = L.popup();
 
@@ -119,10 +146,10 @@
 		popup
 			.setLatLng(e.latlng)
 			.setContent(e.latlng.toString()+'<br>TransitScore '+transitScore[10000*grid_id(e.latlng.lat,e.latlng.lng)[0]+grid_id(e.latlng.lat,e.latlng.lng)[1]])
-			.openOn(mymap);
+			.openOn(map);
 	}
 
-	mymap.on('click', onMapClick);
+	map.on('click', onMapClick);
 	
 	var cityGeojson
 	var townGeojson
@@ -171,11 +198,11 @@
 	cityGeojson = L.geoJson(cityBoarders, {
 			style: munistyle,
 			onEachFeature: onEachFeature
-		}).addTo(mymap);
+		}).addTo(map);
 	townGeojson = L.geoJson(townBoarders, {
 			style: munistyle,
 			onEachFeature: onEachFeature
-		}).addTo(mymap);	
+		}).addTo(map);	
 </script>
 
 <script src="../docs/tool_descriptions_e.js" ></script>
