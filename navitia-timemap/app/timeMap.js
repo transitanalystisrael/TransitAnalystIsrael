@@ -27,10 +27,6 @@ var geryIcon = new L.Icon({
     shadowSize: [41, 41]
 });
 
-//TODO: remove me
-var dateCounter;
-var nextDateCounter;
-var time_passed;
 
 function createMap() {
     map = L.map('map', {renderer: new L.canvas()})
@@ -166,17 +162,9 @@ function addHeatMapLayer(features) {
 }
 
 function addHeatMap(url) {
-    //TODO: REMOVE ME
-    dateCounter = new Date();
     //With the AWS API, the response is automatically gzipped. If a different deployment is used, make sure this
     //still works
     d3fetch.json(url).then(function (data) {
-        //TODO: REMOVE ME
-        nextDateCounter = new Date()
-        time_passed = Math.abs(nextDateCounter - dateCounter)/1000;
-        dateCounter = nextDateCounter;
-
-        console.log ("Got Data from server after: " + time_passed + "sec from sending request");
         var heatMatrix= data.heat_maps[0].heat_matrix;
         loadHeatMap(heatMatrix);
     }).catch(function(error) {
@@ -268,11 +256,6 @@ function loadHeatMap(heatMatrix) {
             map.removeLayer(layer);
         }
     });
-    //TODO: REMOVE ME
-    nextDateCounter = new Date()
-    time_passed = time_passed + Math.abs(nextDateCounter - dateCounter)/1000;
-    dateCounter = nextDateCounter;
-    console.log ("removed previous heat map layer: " + time_passed  + "sec from sending request");
     //resetting the marker to blue (only on successful response)
     if (starting_point_marker) {
         starting_point_marker = createNewMarker(starting_point_marker, starting_location, false);
@@ -308,20 +291,10 @@ function loadHeatMap(heatMatrix) {
             heatMapPixels.push(makePixel(rectangle, color, duration));
         });
     });
-    //TODO: REMOVE ME
-    nextDateCounter = new Date()
-    time_passed = time_passed + Math.abs(nextDateCounter - dateCounter)/1000;
-    dateCounter = nextDateCounter;
-    console.log ("finished building heat map layer: " + time_passed  + "sec from sending request");
     addHeatMapLayer(heatMapPixels);
     //Remove spinner
     $('#spinner').hide();
     invalidateRunButton();
-    //TODO: REMOVE ME
-    nextDateCounter = new Date()
-    time_passed = time_passed + Math.abs(nextDateCounter - dateCounter)/1000;
-    console.log ("finished adding heat map layer: " + time_passed + "sec from sending request");
-    dateCounter = nextDateCounter;
 }
 
 
@@ -504,8 +477,6 @@ function generateHeatMap() {
         getTransitModeUrl() +
         speed +
         "&resolution=" + resolution;
-    //TODO: REMOVE ME
-    console.log(heatMapJsonUrl);
     //add new heat map
     addHeatMap(heatMapJsonUrl)
 
