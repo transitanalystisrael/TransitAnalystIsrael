@@ -32,6 +32,7 @@
 	header {
 		background-color: #666;
 		width: 100%;
+		height: 5%; 
 		padding: 0px;
 		text-align: left;
 		font-size: 24px;
@@ -42,7 +43,7 @@
 	nav {
 		float: left;
 		width: 172px;
-		/*height: 160px; /* only for demonstration, should be removed */
+		height: 19%; /*height: 160px; /* only for demonstration, should be removed */
 		background: #ccc;
 		padding: 6px;
 	}
@@ -58,7 +59,7 @@
 		padding: 6px;
 		width: 600px;
 		background-color: #f1f1f1;
-		/*height: 160px; /* only for demonstration, should be removed */
+		height: 19%; /*height: 160px; /* only for demonstration, should be removed */
 	}
 
 	/* Clear floats after the columns */
@@ -84,18 +85,18 @@
 		}
 	}
 	</style>
+	<link rel="stylesheet" href="css/topnav.css"/>
 </head>
 
 <body>
 
-<header>
-  <table style="width:100%; padding: 0px;">
-	  <tr>
-		<th style="width:50%; text-align: left; "><h3>TransitAnalystIsrael</h3></th>
-		<th style="width:50%; text-align: right; direction: rtl; "><a href="indexh.html" style="color: white; font-size: 14px; padding: 12px">עברית</a></th> 
-	  </tr>
-	</table>
-</header>
+<div class="topnav">
+	<a class="active" href="index.html"><b style="font-size: 20px;">Transit Analyst Israel</b></a>
+	<a href="docs/credits.html" target="_blank">credits</a>
+	<a href="docs/faqs.html" target="_blank">FAQs</a>
+	<a href="mailto:transitanalystisrael@gmail.com?Subject=Contact%20from%20website">contact-us</a>
+	<a href="indexh.html" >עברית</a>
+</div>
 
 <section>
   <nav>

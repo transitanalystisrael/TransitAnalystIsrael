@@ -32,6 +32,7 @@
 	header {
 		background-color: #666;
 		width: 100%;
+		height: 5%; 
 		padding: 0px;
 		text-align: left;
 		font-size: 24px;
@@ -42,7 +43,7 @@
 	nav {
 		float: right;
 		width: 172px;
-		/*height: 160px; /* only for demonstration, should be removed */
+		height: 19%; /*height: 160px; /* only for demonstration, should be removed */
 		background: #ccc;
 		padding: 6px;
 	}
@@ -60,7 +61,7 @@
 		padding: 6px;
 		width: 600px;
 		background-color: #f1f1f1;
-		/*height: 160px; /* only for demonstration, should be removed */
+		height: 19%; /*height: 160px; /* only for demonstration, should be removed */
 	}
 
 	/* Clear floats after the columns */
@@ -86,18 +87,18 @@
 		}
 	}
 	</style>
+	<link rel="stylesheet" href="css/topnav.css"/>
 </head>
 
 <body>
 
-<header style="text-align: right; direction: rtl; ">
-  <table style="width:100%; padding: 0px;">
-	  <tr>
-		<th style="width:50%; text-align: right; direction: rtl; "><h3>נתח תחבורה לישראל</h3></th>
-		<th style="width:50%; text-align: left; "><a href="indexe.html" style="color: white; font-size: 14px; padding: 12px">English</a></th> 
-	  </tr>
-	</table>
-</header>
+<div class="topnavh">
+	<a class="active" href="index.html"><b style="font-size: 20px;">מנתח תחבורה לישראל</b></a>
+	<a href="docs/faqsh.html" target="_blank">שאלות נפוצות</a>
+	<a href="mailto:transitanalystisrael@gmail.com?Subject=Contact%20from%20website">צור קשר</a>
+	<a href="docs/credits.html" target="_blank">תודות</a>
+	<a href="indexe.html" >English</a>
+</div>
 
 <section>
   <nav>
