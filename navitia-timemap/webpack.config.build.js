@@ -14,6 +14,6 @@ module.exports = merge(webpackConfig, {
 
     plugins: [
         new CleanWebpackPlugin(['dist'])
-    ]
+    ],
 
 });
