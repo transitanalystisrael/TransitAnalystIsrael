@@ -29,7 +29,7 @@ d. Install docker and docker-compose tools (or as detailed here: https://gist.gi
 	$ sudo chkconfig docker on
 e. Copy the OSM and GTFS files to the worker container so the graph will be genreated:	
 	Open Bash terminal session where the .pem file is lcoated and use the following commands to copy the GTFS and OSM files to the EC2 instance
-	scp -i <pem-key-file-name>.pem israel-and-palestine-latest.osm.pbf ec2-user@<e;astic-ip-of-ec2-instance>
+	scp -i <pem-key-file-name>.pem israel-and-palestine-latest.osm.pbf ec2-user@<public-dns-of-ec2-instance, e.g. ec2-52-28-9-228.eu-central-1.compute.amazonaws.com>:/<destiantion directory>
 f. change dir to the git repo and run:
 	$docker-compose up
 After 40-60 minutes the graph will be generated and if you go to http://<elastic-ip>:9191/v1/coverage/default you should see info about Israel coverage
