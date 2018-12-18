@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# collect a set of trip_id s at all stops
-# in a GTFS file over the selected week of the service period starting at serviceweekstartdate
+# collect a set of trip_id s at all stops in a GTFS file over the selected week of the service period starting at serviceweekstartdate
+# filter stops near trainstations based on input txt file - stopsneartrainstop_post_edit
+# merge sets of trips at stops near each trainstation to count trips per hour and per day
 #
 # inputs:
 #   parent_path = 'C:\\transitanalyst\\gtfs\\'
@@ -12,9 +13,9 @@
 #   stopsneartrainstop_post_edit = 'stopsneartrainstop_post_edit'+'_'+servicedate+'.txt'
 #
 # outputs:
-#   output txt file of stops with trip_id s -'stops_w_trip_ids'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
-#   output txt file of stops with trips per hour in day summed over one week -'stops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
+#   output txtfileout4 of trainstops with tpd per line (agency_id+route_short_name) near trainstop - 'trainstop_w_tpd_per_line'+'_'+servicedate+'.txt'
 #   output txtfileout3 of trainstops with trips per hour in day summed over one week -'trainstops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
+#   output jsfileout of trainstops with location and tpd per line (agency_id+route_short_name) near trainstop - 'trainstop_w_tpd_per_line_'+sserviceweekstartdate+'.js'
 #
 print '----------------- collect a set of trip_id s at all stops --------------------------'
 print 'output txt file of stops with trip_id s'
@@ -36,8 +37,9 @@ servicedate = sserviceweekstartdate
 stopsneartrainstop_post_edit = 'stopsneartrainstop_post_edit'+'_'+servicedate+'.txt'
 
 # output:
-txtfileout1 = 'stops_w_trip_ids'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
-txtfileout2 = 'stops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' #  stops with trips per hour in day summed over one week 
+txtfileout4 = 'trainstop_w_tpd_per_line'+'_'+servicedate+'.txt'
+#txtfileout1 = 'stops_w_trip_ids'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # commented out - generates very big file
+#txtfileout2 = 'stops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' #  stops with trips per hour in day summed over one week 
 txtfileout3 = 'trainstops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # trainstops with trips per hour in day summed over one week 
 jsfileout = 'trainstop_w_tpd_per_line_'+sserviceweekstartdate+'.js'
 
@@ -730,4 +732,15 @@ nf.write(outstr)
 nf.close()
 print ("Saved file: " + jsfileout)
 
-
+#
+#   output txt file with tpd per line (agency_id+route_short_name) near trainstop - 'trainstop_w_tpd_per_line'+'_'+servicedate+'.txt'
+#
+fileout = open(gtfspathout+txtfileout4, 'w') # open file to save results 
+postsline = 'trainstop_id,tpwatstop,train_tpw,train_tpd,total_bus_tpd,line_name_i,maxdaylinetpd\n'
+fileout.write(postsline)
+for trainstop_id, [stop_lat, stop_lon, tpwatstop, maxdaytpdatstop, averagetpdatstop, maxdaytpdperline_dict, train_maxdaytpd, train_tpw] in stopsforoutput_dict.iteritems():
+	for line_name_i, maxdaylinetpd in sorted(maxdaytpdperline_dict.iteritems(), reverse=True, key=lambda(k,v):(v)):
+		postsline = trainstop_id+','+str(tpwatstop)+','+str(train_tpw)+','+str(train_maxdaytpd)+','+str(maxdaytpdatstop-train_maxdaytpd)+','+line_name_i+','+str(maxdaylinetpd)+'\n'
+		fileout.write(postsline)
+fileout.close()
+print gtfspathout+txtfileout4
