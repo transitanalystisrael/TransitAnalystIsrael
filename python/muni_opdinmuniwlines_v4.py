@@ -12,8 +12,8 @@
 #   geojson file of stops with max and average trips per day and tpd per line (agency_id+route_short_name) -'stops_w_tpd_per_line'+'_'+servicedate+'.geojson'
 #
 # output:
-#   txt file with tpd per line (agency_id+route_short_name) in muni - 'muni_w_tpd_per_line'+'_'+servicedate+'.txt'
-#   js file with tpd per line (agency_id+route_short_name) in muni - 'muni_w_tpd_per_line'+'_'+servicedate+'.js'
+#   txt file with tpd per line (agency_id+route_short_name) in muni - 'muni_w_opd_per_line'+'_'+servicedate+'.txt'
+#   js file with opd per line (agency_id+route_short_name) in muni - 'muni_w_opd_per_line'+'_'+servicedate+'.js'
 #   txt file with stop_id and muni_id if stop in muni - stopstxtfileout = 'stopsinmuni'+'_'+servicedate+'.txt'
 #
 print '----------------- create txt and js files with opd per line (agency_id+route_short_name) in muni --------------------------'
@@ -35,8 +35,8 @@ stopswtpdfile = 'stops_w_tpd_per_line'+'_'+servicedate+'.geojson'
 cityfilein = 'israel_city_boarders.geojson'
 townfilein = 'israel_town_boarders.geojson' # moatzot mekomiyot
 # output:
-txtfileout = 'muni_w_tpd_per_line'+'_'+servicedate+'.txt'
-jsfileout = 'muni_w_tpd_per_line'+'_'+servicedate+'.js'
+txtfileout = 'muni_w_opd_per_line'+'_'+servicedate+'.txt'
+jsfileout = 'muni_w_opd_per_line'+'_'+servicedate+'.js'
 stopstxtfileout = 'stopsinmuni'+'_'+servicedate+'.txt'
 
 gtfspathin = parent_path
