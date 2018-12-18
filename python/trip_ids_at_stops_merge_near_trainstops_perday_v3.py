@@ -744,3 +744,5 @@ for trainstop_id, [stop_lat, stop_lon, tpwatstop, maxdaytpdatstop, averagetpdats
 		fileout.write(postsline)
 fileout.close()
 print gtfspathout+txtfileout4
+
+print "Local current time :", time.asctime( time.localtime(time.time()) )
