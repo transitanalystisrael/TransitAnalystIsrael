@@ -579,14 +579,13 @@ fileout.write(postsline)
 for muni_id, tripswxinweekandminmaxtimes_dict in tripswxinweekandminmaxtimesinmuni_dict.iteritems() :
 	tphlist24 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	tpwinmuni = 0
-	tpwmuni = 0
 	count1x = 0
 	for trip_id, [xinweek, mintimetripatstop, maxtimetripatstop, deltatimetripatstop, agency_id] in tripswxinweekandminmaxtimes_dict.iteritems() :
 		tpwinmuni += xinweek * 1
 		count1x +=1
 		hour_i = int(mintimetripatstop/60)%24
 		tphlist24[hour_i] +=xinweek
-	print muni_id, tphlist24, tpwinmuni, tpwmuni, count1x
+	print muni_id, tphlist24, tpwinmuni, count1x
 	stph24 = ''
 	for i in range(24) : stph24 +=','+str(tphlist24[i])
 	postsline = muni_id+stph24+'\n'
