@@ -1,0 +1,154 @@
+Steps to Deploy Israel transit Analyst Alpha Version on AWS
+===========================================================
+1. The 9 static-website are to be hosted using an AWS S3 account.
+   The assests shuold be made public for other users to access.
+2. Transit Map requires a server to run the docker containers that run Navitia server.
+
+
+
+Trnaist Map Deployment - Steps:
+1. Launch EC2 instance and run the docker container:
+====================================================
+a. Start a new Linux EC2 instance with at leat 4 GB RAM and 10GB EBS storage - Acquire the needed ssh .pem key and save it!
+	The following ports should be exposed for 
+		inbound traffic: TCP 80 (http), TCP 22 (ftp), TCP 9191 (navitia)
+		outbound traffic: all
+	Work with a Putty terminal to SSH into the instance using the keys: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html
+	We used this tutorial https://www.ybrikman.com/writing/2015/11/11/running-docker-aws-ground-up/) for instiating an EC2 isntance for Docker
+   
+b. Install Git on the EC2 instance: 
+	$sudo yum install -y git
+c. Pull Navitia docker project (adjusted to our needs) from: https://github.com/shakedk/navitia-docker-compose
+d. Install docker and docker-compose tools (or as detailed here: https://gist.github.com/benfogel/041e3c4b8b856cdcdfd8d9d5aa0a7f73):
+	$ sudo yum update
+	$ sudo yum install -y docker
+	$ sudo usermod -a -G docker ec2-user
+	$ sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-`uname -s`-`uname -m` | sudo tee /usr/local/bin/docker-compose > /dev/null
+	$ sudo chmod +x /usr/local/bin/docker-compose
+	$ sudo service docker start
+	$ sudo chkconfig docker on
+e. Copy the OSM and GTFS files to the worker container so the graph will be genreated:	
+	Open Bash terminal session where the .pem file is lcoated and use the following commands to copy the GTFS and OSM files to the EC2 instance
+	scp -i <pem-key-file-name>.pem israel-and-palestine-latest.osm.pbf ec2-user@<public-dns-of-ec2-instance, e.g. ec2-52-28-9-228.eu-central-1.compute.amazonaws.com>:/<destiantion directory>
+f. change dir to the git repo and run:
+	$docker-compose up
+After 40-60 minutes the graph will be generated and if you go to http://<elastic-ip>:9191/v1/coverage/default you should see info about Israel coverage
+g. Delete the OSM and GTFS files from the Linux host (they are automatically delete from the docker containers, so no worries about that) to save space
+
+2. Assign an Elastic IP to teh isntance:
+========================================
+EC2 Instances recieve a new IP after each re-start. This can be avioded by attaching a static IP to the instance, in AWS it's called "Elastic IP".
+go to the elastic IP console, careate and attach it to the EC2 isnatnce as instructed by the online wiazrd: https://eu-central-1.console.aws.amazon.com/ec2/v2/home?region=eu-central-1#Addresses:sort=PublicIp
+
+3. Configure AWS Gateway API service to serve Secure content
+============================================================
+Navitia server on the instance serves HTTP only content via port 9191. Brwosers such as Chrome block this kind of data so we need to use AWS for serving secure content.
+a. Access the API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
+b. Create new API Get Request
+	Integration Type: HTTP
+	Endpoint URL: http://${stageVariables.NavitiaServerIP}:9191/v1/coverage/default 
+	content Handling: Passthrough
+c. Click on the Created Get Method and Create a new Resource so you can pass the parameters (https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html):
+	Check the "proxy resource" checkbox and the details will be filled automatically (Name: proxy ; Path: /{proxy+}
+	Check the "Enable API Gateway CORS" checkbox so if the request comes from another domain (and it will) the server will allow it
+	Go to the "Intergratio request" section of the proxy resouece and set the HTTP method to Any
+d. Enable Gzip servering - this will compress all responses from AWS and save data trasnfer costs (browsers know to deal with this automatically):
+	Go to settings -> check the "Content Encoding enabled" checkbox -> Enter 100000 Bytes for "Minimum body size required for compression"
+e. Deploy the API
+	Go to Stages -> create new Staging named "Navitia Time Map"
+	Go to Stage Varaiables -> Create new varaible "NavitiaServerIP" with the elastic IP of the EC2 instance 
+	Go back to "Resources" -> Actions -> Deploy API
+	Click on "Get" -> Test the API to see you get a response from the docker using the elastic IP.
+	You should get Response code 200 and details about the coverage, such as regions, links, etc.
+	
+4. Upload the Bundled JS and HTML file to S3
+============================================
+a. git clone the navitia-timemap project to your host (not EC2): https://github.com/shakedk/TransitAnalystIsrael/tree/master/navitia-timemap - follow the commands in the git repo for initial install
+b. Opem timeMap.js and change the server_url to work with the elastic ip
+c. run "npm run build" to generate the static files in the "build" folder
+d. upload the entire contents of the build folder to S3 and server and make them public.
+e. If you run access index.html via the S3 link, you should be able to see a heat map loaded.
+
+	
+	
+
+	
+
+
+
+
+Exploring the size of docker logs:
+docker ps -qa | xargs docker inspect --format='{{.LogPath}}' | xargs sudo du -hl
+
+12/12
+=====
+56K     /var/lib/docker/containers/182ce81b44e06b29f93109f855ef36ca93f0f70e492a7b64003809f4ecc7b4f5/182ce81b44e06b29f93109f855ef36ca93f0f70e492a7b64003809f4ecc7b4f5-json.log
+63M     /var/lib/docker/containers/df900aa7038234bb7b9d8e756810652970956857dfb52281fb3929b108a6c29f/df900aa7038234bb7b9d8e756810652970956857dfb52281fb3929b108a6c29f-json.log
+4.1M    /var/lib/docker/containers/89d6e5c96594f3df62d75d7565d298656c6106bc7ed6fa71424b8329d1143b76/89d6e5c96594f3df62d75d7565d298656c6106bc7ed6fa71424b8329d1143b76-json.log
+504K    /var/lib/docker/containers/4839bd1f0234937d98a5d485cf4cfd1eb424c7d255f4ba0ddd1867c9990e5cba/4839bd1f0234937d98a5d485cf4cfd1eb424c7d255f4ba0ddd1867c9990e5cba-json.log
+20K     /var/lib/docker/containers/b67a0c2b49e2ba76a447f939af5a3298d59a58f19ffe4e3eddc6f1c946993f9f/b67a0c2b49e2ba76a447f939af5a3298d59a58f19ffe4e3eddc6f1c946993f9f-json.log
+456K    /var/lib/docker/containers/fe5180b1386cfefe9c4a18840c0c47f8d001507af3950a2fec57f1ffd0dfdf82/fe5180b1386cfefe9c4a18840c0c47f8d001507af3950a2fec57f1ffd0dfdf82-json.log
+30M     /var/lib/docker/containers/55c27cd34d963897fb71224883280bedac499d3ec698c75467c993965d4f7d2a/55c27cd34d963897fb71224883280bedac499d3ec698c75467c993965d4f7d2a-json.log
+16K     /var/lib/docker/containers/cf00ac041201dfdca6623e4a9ba7af92821eafa8e0997e24dc5083f1faf12583/cf00ac041201dfdca6623e4a9ba7af92821eafa8e0997e24dc5083f1faf12583-json.log
+28M     /var/lib/docker/containers/aa3ff4d992a946f2567932297506326ab746865eee6a2d7a71d80c410520bc38/aa3ff4d992a946f2567932297506326ab746865eee6a2d7a71d80c410520bc38-json.log
+
+ 
+ Exploring size of biggest fodlers in a certain folder:
+ sudo du -sh /var/lib/docker/* | sort -nr | head -n 20
+
+ 
+ 
+ 
+ 06/12:
+=======
+[ec2-user@ip-172-31-3-142 var]$ sudo du -sh /var/lib/docker/* | sort -nr | head -n 20
+392K    /var/lib/docker/containerd
+123M    /var/lib/docker/swarm
+96K     /var/lib/docker/network
+56K     /var/lib/docker/buildkit
+25M     /var/lib/docker/containers
+16K     /var/lib/docker/builder
+8.7M    /var/lib/docker/image
+6.1G    /var/lib/docker/overlay2
+5.4G    /var/lib/docker/volumes
+0       /var/lib/docker/trust
+0       /var/lib/docker/tmp
+0       /var/lib/docker/runtimes
+0       /var/lib/docker/plugins
+
+ 12/12
+ ======
+ [ec2-user@ip-172-31-3-142 ~]$ sudo du -sh /var/lib/docker/* | sort -nr | head -n 20
+392K    /var/lib/docker/containerd
+136M    /var/lib/docker/containers
+123M    /var/lib/docker/swarm
+96K     /var/lib/docker/network
+56K     /var/lib/docker/buildkit
+16K     /var/lib/docker/builder
+8.7M    /var/lib/docker/image
+6.1G    /var/lib/docker/overlay2
+5.4G    /var/lib/docker/volumes
+0       /var/lib/docker/trust
+0       /var/lib/docker/tmp
+0       /var/lib/docker/runtimes
+0       /var/lib/docker/plugins
+
+ 
+ Exploring the docker use level reports:
+ docker system df
+ 
+ 
+ 06/12:
+ ======
+ TYPE                TOTAL               ACTIVE              SIZE                RECLAIMABLE
+Images              10                  8                   2.345GB             797.1MB (33%)
+Containers          9                   9                   329MB               0B (0%)
+Local Volumes       8                   6                   5.7GB               0B (0%)
+Build Cache         0                   0                   0B                  0B
+
+
+13/12
+======
+Amazon Elastic Compute Cloud	30 GB of Amazon Elastic Block Storage in any combination of General Purpose (SSD) or Magnetic	
+35.48%
+(10.65/30 GB-Mo)
