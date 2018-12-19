@@ -80,9 +80,24 @@ e. If you run access index.html via the S3 link, you should be able to see a hea
 Exploring the size of docker logs:
 docker ps -qa | xargs docker inspect --format='{{.LogPath}}' | xargs sudo du -hl
 
-Exploring size of biggest fodlers in a certain folder:
+12/12
+=====
+56K     /var/lib/docker/containers/182ce81b44e06b29f93109f855ef36ca93f0f70e492a7b64003809f4ecc7b4f5/182ce81b44e06b29f93109f855ef36ca93f0f70e492a7b64003809f4ecc7b4f5-json.log
+63M     /var/lib/docker/containers/df900aa7038234bb7b9d8e756810652970956857dfb52281fb3929b108a6c29f/df900aa7038234bb7b9d8e756810652970956857dfb52281fb3929b108a6c29f-json.log
+4.1M    /var/lib/docker/containers/89d6e5c96594f3df62d75d7565d298656c6106bc7ed6fa71424b8329d1143b76/89d6e5c96594f3df62d75d7565d298656c6106bc7ed6fa71424b8329d1143b76-json.log
+504K    /var/lib/docker/containers/4839bd1f0234937d98a5d485cf4cfd1eb424c7d255f4ba0ddd1867c9990e5cba/4839bd1f0234937d98a5d485cf4cfd1eb424c7d255f4ba0ddd1867c9990e5cba-json.log
+20K     /var/lib/docker/containers/b67a0c2b49e2ba76a447f939af5a3298d59a58f19ffe4e3eddc6f1c946993f9f/b67a0c2b49e2ba76a447f939af5a3298d59a58f19ffe4e3eddc6f1c946993f9f-json.log
+456K    /var/lib/docker/containers/fe5180b1386cfefe9c4a18840c0c47f8d001507af3950a2fec57f1ffd0dfdf82/fe5180b1386cfefe9c4a18840c0c47f8d001507af3950a2fec57f1ffd0dfdf82-json.log
+30M     /var/lib/docker/containers/55c27cd34d963897fb71224883280bedac499d3ec698c75467c993965d4f7d2a/55c27cd34d963897fb71224883280bedac499d3ec698c75467c993965d4f7d2a-json.log
+16K     /var/lib/docker/containers/cf00ac041201dfdca6623e4a9ba7af92821eafa8e0997e24dc5083f1faf12583/cf00ac041201dfdca6623e4a9ba7af92821eafa8e0997e24dc5083f1faf12583-json.log
+28M     /var/lib/docker/containers/aa3ff4d992a946f2567932297506326ab746865eee6a2d7a71d80c410520bc38/aa3ff4d992a946f2567932297506326ab746865eee6a2d7a71d80c410520bc38-json.log
+
+ 
+ Exploring size of biggest fodlers in a certain folder:
  sudo du -sh /var/lib/docker/* | sort -nr | head -n 20
 
+ 
+ 
  
  06/12:
 =======
@@ -101,7 +116,23 @@ Exploring size of biggest fodlers in a certain folder:
 0       /var/lib/docker/runtimes
 0       /var/lib/docker/plugins
 
- 
+ 12/12
+ ======
+ [ec2-user@ip-172-31-3-142 ~]$ sudo du -sh /var/lib/docker/* | sort -nr | head -n 20
+392K    /var/lib/docker/containerd
+136M    /var/lib/docker/containers
+123M    /var/lib/docker/swarm
+96K     /var/lib/docker/network
+56K     /var/lib/docker/buildkit
+16K     /var/lib/docker/builder
+8.7M    /var/lib/docker/image
+6.1G    /var/lib/docker/overlay2
+5.4G    /var/lib/docker/volumes
+0       /var/lib/docker/trust
+0       /var/lib/docker/tmp
+0       /var/lib/docker/runtimes
+0       /var/lib/docker/plugins
+
  
  Exploring the docker use level reports:
  docker system df
@@ -115,3 +146,9 @@ Containers          9                   9                   329MB               
 Local Volumes       8                   6                   5.7GB               0B (0%)
 Build Cache         0                   0                   0B                  0B
 
+
+13/12
+======
+Amazon Elastic Compute Cloud	30 GB of Amazon Elastic Block Storage in any combination of General Purpose (SSD) or Magnetic	
+35.48%
+(10.65/30 GB-Mo)
