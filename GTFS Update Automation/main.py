@@ -7,17 +7,21 @@
 # 6. Restart the docker
 # At the end: The default coverage shows the new GTFS & OSM and the previous default is now secondary_custom_coverage_name
 
-import sys, os
-import platform
-import requests
-import ftplib
 import docker
-import subprocess
+import ftplib
 import json
-import time
-from dateutil import parser
+import os
+import platform
 import progressbar
+import requests
+import subprocess
+import sys
+import time
+import zipfile
+import tarfile
+from io import BytesIO
 
+from dateutil import parser
 
 DEVNULL = open('/dev/null', 'w')
 
@@ -29,9 +33,10 @@ def get_file_from_url_http(url):
     pbar = createProgressBar(size)
     # Download
     size_iterator = 0
-    for chunk in r.iter_content():
-        file_write(chunk, file, pbar, size_iterator )
-        size_iterator += 1
+    for chunk in r.iter_content(chunk_size=1024):
+        if chunk:
+            file_write(chunk, file, pbar, size_iterator)
+            size_iterator += 1
     file.close()
     pbar.finish()
     print("Finished loading latest OSM to: ", local_file_name)
@@ -44,6 +49,7 @@ def createProgressBar(file_size):
     pbar.start()
     return pbar
 
+
 def file_write(data, dest_file, pbar, size_iterator):
     """
     Call back for writing the downlaoed data from FTP while updating the progress bar
@@ -52,7 +58,6 @@ def file_write(data, dest_file, pbar, size_iterator):
     pbar.update(size_iterator)
 
 def get_file_from_url_ftp(url, file_name_on_server):
-
     try:
         # Connect to FTP
         ftp = ftplib.FTP(url)
@@ -87,6 +92,7 @@ def get_file_from_url_ftp(url, file_name_on_server):
         sys.stdout.flush()
 
         print("Finished loading latest GTFS to: ", local_file_name)
+        return local_file
 
     except ftplib.all_errors as err:
         error_code = err.args[0]
@@ -100,8 +106,27 @@ def get_file_from_url_ftp(url, file_name_on_server):
 def start_navitia_with_default_and_custom_coverage():
     pass
 
-def copy_file_into_docker():
-    pass
+
+def copy_file_into_docker(container, dest_path, file_path, file_name):
+    file = open(file_path + file_name, 'rb')
+    file = file.read()
+    # Convert to tar file
+    tar_stream = BytesIO()
+    file_tar = tarfile.TarFile(fileobj=tar_stream, mode='w')
+    # file_data = admin_password.encode('utf8')
+    tarinfo = tarfile.TarInfo(name=file_name)
+    tarinfo.size = len(file)
+    file_tar.addfile(tarinfo, BytesIO(file))
+    file_tar.close()
+
+    tar_stream.seek(0)
+    success = container.put_archive(
+        path=dest_path,
+        data=tar_stream
+    )
+    if success:
+        print("Finished copying ", file_name, " to ", container.name, " @  ", dest_path)
+
 
 
 def copy_file_from_docker():
@@ -147,9 +172,8 @@ def check_covereage_running(url, coverage_name):
         print(coverage_name + " coverage is up")
 
 
-def start_navitia_w_custom_cov(secondary_custom_coverage_name):
-    navitia_docker_compose_file_path = "C:/Dev/Nativia/navitia-docker-compose/"
-    navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"
+def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name):
+    print("Attempting to start Navitia with default coverage and ", secondary_custom_coverage_name, "coverage")
     navitia_docker_compose_file = open(navitia_docker_compose_file_path + navitia_docker_compose_file_name, mode='r')
     navitia_docker_compose_file_contents = navitia_docker_compose_file.read()
     navitia_docker_compose_file.close()
@@ -173,7 +197,7 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name):
     check_covereage_running(get_navitia_url_for_cov(secondary_custom_coverage_name), secondary_custom_coverage_name)
 
 
-def move_one_graph_to_secondary(conatiner, source_cov_name, dest_cov_name):
+def move_one_graph_to_secondary(container, source_cov_name, dest_cov_name):
     command_list = "/bin/sh -c \"mv " + source_cov_name + ".nav.lz4 "+ dest_cov_name + ".nav.lz4\""
     exit_code, output = container.exec_run(cmd=command_list,  stdout=True, workdir="/srv/ed/output/")
     if exit_code != 0:
@@ -192,12 +216,14 @@ def copy_graph_to_local_host(container, coverage_name):
 
 
 def copy_graph_from_remote_host_to_container(container, coverage_name):
+    #THIS IS NOT IMPLEMENTED!
     # Create a local file for writing the incoming graph
-    print(coverage_name + '.nav.lz4')
-    success = container.put_archive('/srv/ed/output/', coverage_name + '.nav.lz4')
-    if success:
-        print("Finished copying ", coverage_name, ".nav.lz4 to ", container.name)
-
+    # print(coverage_name + '.nav.lz4')
+    # use copy_file_into_docker
+    # success = container.put_archive('/srv/ed/output/', coverage_name + '.nav.lz4')
+    # if success:
+    #     print("Finished copying ", coverage_name, ".nav.lz4 to ", container.name)
+    pass
 
 def delete_grpah_from_container(container, coverage_name):
     delete_command= "/bin/sh -c \"rm " + coverage_name +".nav.lz4\""
@@ -212,30 +238,92 @@ def stop_all_containers(docker_client):
     for container in docker_client.containers.list():
         container.stop()
 
+
+def generate_transfers_file(gtfs_file, transfers_script_path, transfers_script_name):
+    # Unzip GTFS to get the stops.txt for processing
+    with zipfile.ZipFile(gtfs_file, 'r') as zip_ref:
+        zip_ref.extract(member="stops.txt")
+    output,errors = subprocess.call(['python', transfers_script_path + transfers_script_name])
+    print("Done")
+
+
+def generate_gtfs_with_transfers(gtfs_file, transfers_script_path, transfers_script_name):
+    # generate_transfers_file(gtfs_file, transfers_script_path, transfers_script_name)
+    transfers_file_full_path = os.getcwd() + "\\transfers.txt"
+    with zipfile.ZipFile(gtfs_file, 'a') as zip_ref:
+        zip_ref.write(transfers_file_full_path, os.path.basename(transfers_file_full_path))
+
+
+def copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name):
+    copy_file_into_docker(worker_con, 'srv/ed/input/default', osm_file_path, osm_file_name)
+    copy_file_into_docker(worker_con, 'srv/ed/input/default', gtfs_file_path, gtfs_file_name)
+
+def validate_osm_gtfs_convertion_to_graph(docker_client , worker_con, navitia_docker_compose_file_path):
+    # tyr_beat must be running as it manages the tasks for the worker, the latter generates the graph
+    print("Validating that tyr_beat is up and running")
+    beat_con = docker_client.containers.list(filters={"name": "beat"})
+    if not beat_con:
+        # restarting tyr_beat
+        print("tyr_beat is down, attempting to re-run")
+        tyr_beat_start_command = "docker-compose up tyr_beat"
+        # beat_run_process = subprocess.Popen(tyr_beat_start_command, cwd=navitia_docker_compose_file_path, stdout=subprocess.PIPE)
+        # output, error = beat_run_process.communicate()
+
+        with open("tyr_beat_output.txt", "a+", encoding="UTF-8") as tyr_beat_output:
+            beat_run_process = subprocess.Popen(tyr_beat_start_command, cwd=navitia_docker_compose_file_path,
+                                                shell=True, stdout=tyr_beat_output, stderr=tyr_beat_output)
+        # Wait 10 seconds for it to come up
+        print("Waiting 10 seconds to see if tyr_beat is up")
+        time.sleep(10)
+
+        with open("tyr_beat_output.txt", "r", encoding="UTF-8") as tyr_beat_output:
+            if "Sending due task udpate-data-every-30-seconds" in tyr_beat_output.read():
+                print("tyr_beat is up and running")
+                tyr_beat_output.close()
+
+        CONTINUE TO WORK ON WHAT HAPPENDS IF BEST IS NOT WORKING PROPERLY
+
 if __name__== "__main__":
     # Global varaibles that might be needed to be in config. file
     gtfs_url = "gtfs.mot.gov.il"
     gtfs_file_name_on_server = "zones.zip"
     # gtfs_file_name_on_server = "israel-public-transportation.zip"
-    osm_url = "https://s3.eu-central-1.amazonaws.com/israeltimemap/Time+Map/vendor.53be82b43926a4befafc.js.map"
+    osm_url = "https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf"
     secondary_custom_coverage_name = "nov-18"
     old_secondary_custom_coverage_name = "jul-18"
     default_coverage_name = "default"
+    transfers_script_path = "C:/Dev/Nativia/navitia-transfers/"
+    transfers_script_name = "gtfs2transfers.py"
 
+    navitia_docker_compose_file_path = "C:/Dev/Nativia/navitia-docker-compose/"
+    navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"
 
     # Download GTFS
     # gtfs_file = get_file_from_url_ftp(gtfs_url, gtfs_file_name_on_server)
-
+    gtfs_file_path = "C:/Dev/TransitAnalystIsrael/GTFS Update Automation/"  # FOR TESTING
+    gtfs_file_name = "GTFS2018-07-01.zip" # FOR TESTING
     # Download OSM
+    osm_file_path = "C:/Dev/TransitAnalystIsrael/GTFS Update Automation/" # FOR TESTING
+    osm_file_name = "israel-and-palestine-latest.osm.pbf" # FOR TESTING
     # osm_file = get_file_from_url_http(osm_url)
+
+    # Generate the Transfers file required for Navitia and add to GTFS
+    # gtfs_and_transfers_file = generate_gtfs_with_transfers(gtfs_file, transfers_script_path, transfers_script_name)
+
+
 
     # Start up docker service and copy files into secondary_custom_coverage_name for processing
     # get the docker service client
     docker_client = get_docker_service_client()
-    worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
     # start Navitia with custom docker-compose that include secondary_custom_coverage_name
     # start_navitia_w_custom_cov(secondary_custom_coverage_name)
+    worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
 
+    # Copy OSM & GTFS files to default cov in order to generate a new graph
+    # copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name)
+
+    # Monitor processing of GTFS & OSM (might require restarting / downloading tyr_beat) on default coverage
+    validate_osm_gtfs_convertion_to_graph(docker_client, worker_con, navitia_docker_compose_file_path)
     # Move the default coverage graph to the secondary coverage
     # try:
     # move_one_graph_to_secondary(worker_con, default_coverage_name, secondary_custom_coverage_name)
@@ -245,14 +333,14 @@ if __name__== "__main__":
 
     # stop all docker containers and restart to process renamed graphs
     # stop_all_containers(docker_client)
-    # start_navitia_w_custom_cov(secondary_custom_coverage_name)
+    # start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name)
 
     # Copy the old secondary custom graph to your host and delete it from the container
     # copy_graph_to_local_host(worker_con, old_secondary_custom_coverage_name)
     # delete_grpah_from_container(worker_con, old_secondary_custom_coverage_name)
 
     #####NEED TO IMPLEMENT COPY BETWEEN E2C
-    copy_graph_from_remote_host_to_container(worker_con, old_secondary_custom_coverage_name)
+    # copy_graph_from_remote_host_to_container(worker_con, old_secondary_custom_coverage_name)
 
 
     # Copy the OSM & GTFS to default coverage
