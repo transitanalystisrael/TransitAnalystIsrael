@@ -1,12 +1,3 @@
-# Script to update Navitia Coverage with latest GTFS data:
-# 1. Download GTFS & OSM
-# 2. bring up custom coverage
-# 3. copy OSM & GTFS to the default coverage,
-# 4. move default graph to the new coverage,
-# 5. store the previous custom graph on your host
-# 6. Restart the docker
-# At the end: The default coverage shows the new GTFS & OSM and the previous default is now secondary_custom_coverage_name
-
 import docker
 import ftplib
 import json
@@ -20,12 +11,13 @@ import time
 import zipfile
 import tarfile
 from io import BytesIO
-
 from dateutil import parser
+from scripts import gtfs2transfers
 
 DEVNULL = open('/dev/null', 'w')
 
 def get_file_from_url_http(url):
+    print("Going to download the latest osm from", url)
     r = requests.get(url, stream=True)
     local_file_name = "israel-and-palestine-latest.osm.pbf"
     file = open(local_file_name, 'wb')
@@ -58,6 +50,7 @@ def file_write(data, dest_file, pbar, size_iterator):
     pbar.update(size_iterator)
 
 def get_file_from_url_ftp(url, file_name_on_server):
+    print("Going to download the latest GTFS from", url)
     try:
         # Connect to FTP
         ftp = ftplib.FTP(url)
@@ -76,7 +69,7 @@ def get_file_from_url_ftp(url, file_name_on_server):
             if name == file_name_on_server:
                 time_str = tokens[0]
                 time = parser.parse(time_str)
-                local_file_name = str(time.strftime('%b') + "-" + time.strftime('%y'))
+                local_file_name = "GTFS-" + str(time.strftime('%b') + "-" + time.strftime('%y'))
                 size = float(tokens[2])
 
         # Generate a progress bar and download
@@ -134,30 +127,31 @@ def copy_file_from_docker():
 
 
 def get_docker_service_client():
-    if platform.uname()[0] == "Windows":
-        # TRAILS FOR RUNNING THE SERVICE
-        # docker_run_command = "C:/Program Files/Docker/Docker/Docker for Windows.exe"
-        # subprocess.call(["C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\powershell.exe", ". \"./SamplePowershell\";", "&hello"])
-        # subprocess.check_output('powershell Net start -ArgumentList  "com.docker.service" -Verb "runAs"',
-        #                         shell=True)
-        # print(subprocess.check_output(["runas", "/noprofile", "/user:Administrator", "|", "echo", "shaked"]))
+    # TRAILS FOR RUNNING THE SERVICE
+    # docker_run_command = "C:/Program Files/Docker/Docker/Docker for Windows.exe"
+    # subprocess.call(["C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\powershell.exe", ". \"./SamplePowershell\";", "&hello"])
+    # subprocess.check_output('powershell Net start -ArgumentList  "com.docker.service" -Verb "runAs"',
+    #                         shell=True)
+    # print(subprocess.check_output(["runas", "/noprofile", "/user:Administrator", "|", "echo", "shaked"]))
 
-        # docker_run_command = "start-service *docker*"
+    # docker_run_command = "start-service *docker*"
 
-        # proc = subprocess.Popen([docker_run_command], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
-        # win32serviceutil.StartService(docker_run_command,None)
-        docker_check_alive_cmd = "docker info"
-        docker_is_up = False
-        while not docker_is_up:
-            docker_check_alive_process = subprocess.Popen(docker_check_alive_cmd, stdout=subprocess.PIPE)
-            output, error = docker_check_alive_process.communicate()
-            docker_is_up = "Containers" in output.decode('utf-8')
-        try:
-            client = docker.from_env()
-            print("Docker Daemon service is up and running")
-        except error:
-            print("Docker deamon service is not up")
-    return client
+    # proc = subprocess.Popen([docker_run_command], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+    # win32serviceutil.StartService(docker_run_command,None)
+    docker_check_alive_cmd = "docker info"
+    docker_is_up = False
+    while not docker_is_up:
+        docker_check_alive_process = subprocess.Popen(docker_check_alive_cmd, stdout=subprocess.PIPE, shell=True)
+        output, error = docker_check_alive_process.communicate()
+        docker_is_up = "Containers" in output.decode('utf-8')
+    try:
+        client = docker.from_env()
+        print("Docker Daemon service is up and running")
+        return client
+    except error:
+        print("Docker deamon service is not up")
+        return None
+
 
 def get_navitia_url_for_cov(cov_name):
     return "http://localhost:9191/v1/coverage/" + cov_name + "/status/"
@@ -172,7 +166,15 @@ def check_covereage_running(url, coverage_name):
         print(coverage_name + " coverage is up")
 
 
-def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name):
+def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
+                               navitia_docker_compose_file_name, extend_wait_time=False):
+    '''
+    :param secondary_custom_coverage_name:
+    :param navitia_docker_compose_file_path:
+    :param navitia_docker_compose_file_name:
+    :param extend_wait_time: uLonger wait time is required when images are being re-downloaded, set True if needed
+    :return:
+    '''
     print("Attempting to start Navitia with default coverage and ", secondary_custom_coverage_name, "coverage")
     navitia_docker_compose_file = open(navitia_docker_compose_file_path + navitia_docker_compose_file_name, mode='r')
     navitia_docker_compose_file_contents = navitia_docker_compose_file.read()
@@ -184,17 +186,30 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_co
               ". Fix config, restart docker and start again")
 
     # run the custom cmopose and redirect logs while nuting the output
-    navitia_docker_start_command = "docker-compose -f docker-compose.yml -f  " + navitia_docker_compose_file_name + " up"
+    cmd = str(' /-f docker-compose.yml /-f ' + navitia_docker_compose_file_name +
+                                    ' up')
+    print("SDFSDFSFSFSSDFSDFFSFS#$#$#$%$%%$" + cmd)
+    navitia_docker_start_command = ['docker-compose', cmd]
 
-    #RETURN MEEEE TO START FOCKER
-    subprocess.Popen(navitia_docker_start_command, cwd=navitia_docker_compose_file_path,  stderr=DEVNULL, stdout=DEVNULL)
-
-    # wait 90 seconds for everything to go up
-    time.sleep(90)
-
+    docker_start_up_process = subprocess.Popen(navitia_docker_start_command, cwd=navitia_docker_compose_file_path,
+                                               stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    output, error = docker_start_up_process.communicate()
+    print(output, error)
+    print("sdfsdf")
+    if extend_wait_time:
+        print("sdfsdf")
+        # Longer wait time is required because images are being re-downloaded
+        t_wait = 60 * 5
+    else:
+        print("sdfsdf")
+        # wait 90 seconds for everything to go up
+        t_wait = 60 * 0.5
+    print("Waiting", t_wait, "seconds to validate Navitia docker is up and running")
+    time.sleep(t_wait)
     # Check if default and secondary_custom_coverage_name regions are up and running
-    check_covereage_running(get_navitia_url_for_cov(default_coverage_name), default_coverage_name)
-    check_covereage_running(get_navitia_url_for_cov(secondary_custom_coverage_name), secondary_custom_coverage_name)
+    default_coverage_name = "default"
+    # check_covereage_running(get_navitia_url_for_cov(default_coverage_name), default_coverage_name)
+    # check_covereage_running(get_navitia_url_for_cov(secondary_custom_coverage_name), secondary_custom_coverage_name)
 
 
 def move_one_graph_to_secondary(container, source_cov_name, dest_cov_name):
@@ -203,16 +218,25 @@ def move_one_graph_to_secondary(container, source_cov_name, dest_cov_name):
     if exit_code != 0:
         print("Couldn't change ", source_cov_name, " to ", dest_cov_name)
         raise Exception("STOP the program")
+    print("Changed the name of", source_cov_name + ".nav.lz4 ", "to", dest_cov_name + ".nav.lz4")
 
 
 def copy_graph_to_local_host(container, coverage_name):
     # Create a local file for writing the incoming graph
+    print("Going to copy", coverage_name, ".nav.lz4 to", os.getcwd(), "on local host")
     local_graph_file = open('./' + coverage_name + '.nav.lz4', 'wb')
     bits, stat = container.get_archive('/srv/ed/output/' + coverage_name + '.nav.lz4')
+    size = stat["size"]
+    pbar = createProgressBar(size)
+    # Download
+    size_iterator = 0
     for chunk in bits:
-        local_graph_file.write(chunk)
+        if chunk:
+            file_write(chunk, local_graph_file, pbar, size_iterator)
+            size_iterator += 1
     local_graph_file.close()
-    print("Finished copying ", coverage_name, ".nav.lz4 to ", os.getcwd())
+    pbar.finish()
+    print("Finished copying", coverage_name, ".nav.lz4 to", os.getcwd(), "on local host")
 
 
 def copy_graph_from_remote_host_to_container(container, coverage_name):
@@ -231,34 +255,42 @@ def delete_grpah_from_container(container, coverage_name):
     if exit_code != 0:
         print("Couldn't delete ", coverage_name, " graph")
         raise Exception("STOP the program")
-    print("Delete graph", coverage_name, "from container ", container.name)
+    print("Finished deleting graph", coverage_name, "from container ", container.name)
 
 
 def stop_all_containers(docker_client):
+    print("Going to stop all Docker containers")
     for container in docker_client.containers.list():
+        print("#")
         container.stop()
+    print("Stopped all Docker containers")
 
 
-def generate_transfers_file(gtfs_file, transfers_script_path, transfers_script_name):
+def generate_transfers_file(gtfs_file):
     # Unzip GTFS to get the stops.txt for processing
     with zipfile.ZipFile(gtfs_file, 'r') as zip_ref:
         zip_ref.extract(member="stops.txt")
-    output,errors = subprocess.call(['python', transfers_script_path + transfers_script_name])
-    print("Done")
+    output_full_path = gtfs2transfers.generate_transfers(os.getcwd() + "/stops.txt")
+    return output_full_path
 
 
-def generate_gtfs_with_transfers(gtfs_file, transfers_script_path, transfers_script_name):
-    # generate_transfers_file(gtfs_file, transfers_script_path, transfers_script_name)
-    transfers_file_full_path = os.getcwd() + "\\transfers.txt"
+def generate_gtfs_with_transfers(gtfs_file):
+    print("Extracting stops.txt and computing transfers.txt")
+    output_file_full_path = generate_transfers_file(gtfs_file)
+    # transfers_file_full_path = os.getcwd() + "\\transfers.txt"
     with zipfile.ZipFile(gtfs_file, 'a') as zip_ref:
-        zip_ref.write(transfers_file_full_path, os.path.basename(transfers_file_full_path))
+        zip_ref.write(output_file_full_path, os.path.basename(output_file_full_path))
+
+    print("Added transfers.txt to", gtfs_file)
 
 
 def copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name):
     copy_file_into_docker(worker_con, 'srv/ed/input/default', osm_file_path, osm_file_name)
     copy_file_into_docker(worker_con, 'srv/ed/input/default', gtfs_file_path, gtfs_file_name)
 
-def validate_osm_gtfs_convertion_to_graph(docker_client , worker_con, navitia_docker_compose_file_path):
+
+def validate_osm_gtfs_convertion_to_graph(docker_client, secondary_custom_coverage_name,
+                                          navitia_docker_compose_file_path, navitia_docker_compose_file_name):
     # tyr_beat must be running as it manages the tasks for the worker, the latter generates the graph
     print("Validating that tyr_beat is up and running")
     beat_con = docker_client.containers.list(filters={"name": "beat"})
@@ -270,82 +302,33 @@ def validate_osm_gtfs_convertion_to_graph(docker_client , worker_con, navitia_do
         # output, error = beat_run_process.communicate()
 
         with open("tyr_beat_output.txt", "a+", encoding="UTF-8") as tyr_beat_output:
-            beat_run_process = subprocess.Popen(tyr_beat_start_command, cwd=navitia_docker_compose_file_path,
+            subprocess.Popen(tyr_beat_start_command, cwd=navitia_docker_compose_file_path,
                                                 shell=True, stdout=tyr_beat_output, stderr=tyr_beat_output)
         # Wait 10 seconds for it to come up
         print("Waiting 10 seconds to see if tyr_beat is up")
         time.sleep(10)
 
         with open("tyr_beat_output.txt", "r", encoding="UTF-8") as tyr_beat_output:
-            if "Sending due task udpate-data-every-30-seconds" in tyr_beat_output.read():
+            if "Sending due task udpate-data-every-30-seconds" not in tyr_beat_output.read():
                 print("tyr_beat is up and running")
                 tyr_beat_output.close()
+            # tyr_beat is malfunctioned, need to delete and re-download
+            else:
+                # stop all containers
+                print("Stopping all containers")
+                stop_all_containers(docker_client)
 
-        CONTINUE TO WORK ON WHAT HAPPENDS IF BEST IS NOT WORKING PROPERLY
+                # delete container and image
+                beat_con = docker_client.containers.list(all=True, filters={"name": "beat"})[0]
+                beat_image = docker_client.images.list(name="navitia/tyr-beat")[0]
+                beat_con_name = beat_con.name
+                beat_image_id = beat_image.id
+                beat_con.remove()
+                print(beat_con_name, "container is removed")
+                docker_client.images.remove(beat_image.id)
+                print(beat_image_id, "image is removed")
 
-if __name__== "__main__":
-    # Global varaibles that might be needed to be in config. file
-    gtfs_url = "gtfs.mot.gov.il"
-    gtfs_file_name_on_server = "zones.zip"
-    # gtfs_file_name_on_server = "israel-public-transportation.zip"
-    osm_url = "https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf"
-    secondary_custom_coverage_name = "nov-18"
-    old_secondary_custom_coverage_name = "jul-18"
-    default_coverage_name = "default"
-    transfers_script_path = "C:/Dev/Nativia/navitia-transfers/"
-    transfers_script_name = "gtfs2transfers.py"
-
-    navitia_docker_compose_file_path = "C:/Dev/Nativia/navitia-docker-compose/"
-    navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"
-
-    # Download GTFS
-    # gtfs_file = get_file_from_url_ftp(gtfs_url, gtfs_file_name_on_server)
-    gtfs_file_path = "C:/Dev/TransitAnalystIsrael/GTFS Update Automation/"  # FOR TESTING
-    gtfs_file_name = "GTFS2018-07-01.zip" # FOR TESTING
-    # Download OSM
-    osm_file_path = "C:/Dev/TransitAnalystIsrael/GTFS Update Automation/" # FOR TESTING
-    osm_file_name = "israel-and-palestine-latest.osm.pbf" # FOR TESTING
-    # osm_file = get_file_from_url_http(osm_url)
-
-    # Generate the Transfers file required for Navitia and add to GTFS
-    # gtfs_and_transfers_file = generate_gtfs_with_transfers(gtfs_file, transfers_script_path, transfers_script_name)
-
-
-
-    # Start up docker service and copy files into secondary_custom_coverage_name for processing
-    # get the docker service client
-    docker_client = get_docker_service_client()
-    # start Navitia with custom docker-compose that include secondary_custom_coverage_name
-    # start_navitia_w_custom_cov(secondary_custom_coverage_name)
-    worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
-
-    # Copy OSM & GTFS files to default cov in order to generate a new graph
-    # copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name)
-
-    # Monitor processing of GTFS & OSM (might require restarting / downloading tyr_beat) on default coverage
-    validate_osm_gtfs_convertion_to_graph(docker_client, worker_con, navitia_docker_compose_file_path)
-    # Move the default coverage graph to the secondary coverage
-    # try:
-    # move_one_graph_to_secondary(worker_con, default_coverage_name, secondary_custom_coverage_name)
-    # catch error:
-    #   print(error)
-    #   exit
-
-    # stop all docker containers and restart to process renamed graphs
-    # stop_all_containers(docker_client)
-    # start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name)
-
-    # Copy the old secondary custom graph to your host and delete it from the container
-    # copy_graph_to_local_host(worker_con, old_secondary_custom_coverage_name)
-    # delete_grpah_from_container(worker_con, old_secondary_custom_coverage_name)
-
-    #####NEED TO IMPLEMENT COPY BETWEEN E2C
-    # copy_graph_from_remote_host_to_container(worker_con, old_secondary_custom_coverage_name)
-
-
-    # Copy the OSM & GTFS to default coverage
-    # Re-start the service so the graph name changes will be updated and OSM & GTFS run
-
-    # Verify the covereges reflect new data within 2 hours, otherwise send an email with alert
-
-    print("Done")
+                # re-run navitia docker-compose
+                print("Restarting docker with defauly coverage and custom coverage: ", secondary_custom_coverage_name)
+                start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
+                                           navitia_docker_compose_file_name, True)
