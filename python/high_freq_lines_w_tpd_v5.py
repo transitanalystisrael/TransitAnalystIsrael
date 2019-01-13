@@ -61,7 +61,7 @@ sstarttimename = '_'+sstarttime[0:2]+sstarttime[3:5]
 sstoptimename = '-'+sstoptime[0:2]+sstoptime[3:5]
 
 FREQUENT_TPD = 60 # e.g. 8 tpd for delta time from start to stop of 2 hours is average of 4 trips an hour 
-MIN_PERCENT_COMMON_STOPS = 5 # to be considered same line if also route short name (line number) is the same
+MIN_PERCENT_COMMON_STOPS = 2 # to be considered same line if also route short name (line number) is the same
 
 gtfspathin = gtfs_parent_path+gtfsdir+'\\'
 gtfspath = gtfspathin
@@ -113,18 +113,18 @@ sstartservicedate = '25250101'
 sendservicedate  = '15150101'
 sline = filein.readline()
 while ((count < maxfilelinecount) and (sline != '')):
-    slinelist=sline[:-1].split(",")
-    #print slinelist
-    in_id = slinelist[inid_index]
-    # print in_id
-    calendar_dict[slinelist[inid_index]] = slinelist
-    sstartservicedate = min(sstartservicedate, slinelist[start_date_i])
-    sendservicedate = max(sendservicedate, slinelist[end_date_i])
-    #print calendarline_dict
-    #print calendar_dict
-    #print '------------------'
-    count += 1
-    sline = filein.readline()
+	slinelist=sline[:-1].split(",")
+	#print slinelist
+	in_id = slinelist[inid_index]
+	# print in_id
+	calendar_dict[slinelist[inid_index]] = slinelist
+	sstartservicedate = min(sstartservicedate, slinelist[start_date_i])
+	sendservicedate = max(sendservicedate, slinelist[end_date_i])
+	#print calendarline_dict
+	#print calendar_dict
+	#print '------------------'
+	count += 1
+	sline = filein.readline()
 print '------------------'
 #print calendar_dict
 print sstartservicedate, sendservicedate
@@ -146,13 +146,13 @@ tripsperdaylist = []
 if (endservicedate.toordinal()-startservicedate.toordinal()) > DAYSTOCOUNT :  endservicedate = startservicedate + timedelta(days=DAYSTOCOUNT-1)
 print 'startservicedate, endservicedate ', startservicedate, endservicedate
 for ordservicedate in range (startservicedate.toordinal(), endservicedate.toordinal()+1):
-    servicedate = date.fromordinal(ordservicedate)
-    servicedayofweek = servicedate.weekday()
-    print servicedate, servicedayofweek
-    tripsperdaylist.append([servicedate, 0])
+	servicedate = date.fromordinal(ordservicedate)
+	servicedayofweek = servicedate.weekday()
+	print servicedate, servicedayofweek
+	tripsperdaylist.append([servicedate, 0])
 print '----tripsperdaylist----'
 for [dayofservice, tripsperday] in tripsperdaylist:
-    print dayofservice, tripsperday
+	print dayofservice, tripsperday
 
 
 #
@@ -184,17 +184,17 @@ route_type_i = keylist.index('route_type')
 count = 0
 sline = filein.readline()
 while ((count < maxfilelinecount) and (sline != '')):
-    slinelist=sline[:-1].split(",")
-    #print slinelist
-    in_id = slinelist[inid_index]
-    # print in_id
-    routes_dict[slinelist[inid_index]] = [slinelist[agency_id_i], slinelist[route_short_name_i], slinelist[route_long_name_i], slinelist[route_desc_i], slinelist[route_type_i], set([]), copy.deepcopy(tripsperdaylist), 0, set([]), str(-1)]
-    count += 1
-    sline = filein.readline()
+	slinelist=sline[:-1].split(",")
+	#print slinelist
+	in_id = slinelist[inid_index]
+	# print in_id
+	routes_dict[slinelist[inid_index]] = [slinelist[agency_id_i], slinelist[route_short_name_i], slinelist[route_long_name_i], slinelist[route_desc_i], slinelist[route_type_i], set([]), copy.deepcopy(tripsperdaylist), 0, set([]), str(-1)]
+	count += 1
+	sline = filein.readline()
 print '------------------'
 #print routes_dict
 #for route_id, routesdictlist in routes_dict.iteritems():
-#    print route_id, routesdictlist[:2], list(routesdictlist[2])
+#	print route_id, routesdictlist[:2], list(routesdictlist[2])
 print '------------------'
 
 print 'route lines scanned ', count 
@@ -229,9 +229,9 @@ count = 0
 sline = filein.readline()
 while ((count < maxfilelinecount) and (sline != '')):
 	slinelist=sline[:-1].split(",")
-    #print slinelist
+	#print slinelist
 	in_id = slinelist[inid_index]
-    # print in_id
+	# print in_id
 	trips_dict[in_id] = [slinelist[service_id_i], slinelist[route_id_i], slinelist[shape_id_i], '00:00:00', slinelist[direction_id_i]]
 	count += 1
 	if count < 5 : print in_id, trips_dict[in_id]
@@ -239,7 +239,7 @@ while ((count < maxfilelinecount) and (sline != '')):
 print '------------------'
 #print trips_dict
 #for trip_id, tripsdictlist in trips_dict.iteritems():
-#    print trip_id, tripsdictlist
+#	print trip_id, tripsdictlist
 print 'trips lines scanned ', count 
 filein.close()
 
@@ -268,7 +268,7 @@ tripcount = 0
 sline = filein.readline()
 while ((count < maxfilelinecount) and (sline != '')):
 	slinelist=sline[:-1].split(",")
-    #print slinelist
+	#print slinelist
 	stop_sequence = slinelist[stop_sequence_i]
 	if stop_sequence == '1' :
 		trip_id = slinelist[trip_id_i]
@@ -309,11 +309,11 @@ count = 0
 tripscount = 0
 sline = filein.readline()
 while ((count < maxfilelinecount) and (sline != '')):
-    slinelist=sline[:-1].split(",")
-    #print slinelist
-    in_id = slinelist[inid_index]
-    # print in_id
-    if routes_dict.has_key(slinelist[inid_index]):
+	slinelist=sline[:-1].split(",")
+	#print slinelist
+	in_id = slinelist[inid_index]
+	# print in_id
+	if routes_dict.has_key(slinelist[inid_index]):
 		trip_id = slinelist[trip_id_i]
 		direction_id = slinelist[direction_id_i]
 		routes_dict[slinelist[inid_index]][trip_set_i].add(trip_id)
@@ -324,8 +324,8 @@ while ((count < maxfilelinecount) and (sline != '')):
 			if direction_id_inroutesdict != direction_id : 
 				print '************* ERROR *********** direction_id_inroutesdict != direction_id', direction_id_inroutesdict, direction_id
 		tripscount += 1
-    count += 1
-    sline = filein.readline()
+	count += 1
+	sline = filein.readline()
 print '------------------'
 #print routes_dict
 #for route_id in routes_dict: print route_id, routes_dict[route_id][:2], list(routes_dict[route_id][trip_set_i])[0:2]
@@ -345,9 +345,9 @@ dayofweek=[monday_i, tuesday_i, wednesday_i, thursday_i, friday_i, saturday_i, s
 maxtripsperdayanyroute = 0
 maxtotaltripsanyroute = 0
 for route_id, [agency_id,route_short_name,route_long_name,route_desc,route_type, tripset, tpdlist, totaltpdperroute, stopset, direction_id] in routes_dict.iteritems():
-    #print route_id, agency_id,route_short_name,route_long_name,route_desc,route_type , list(tripset)[:2], tpdlist[:2], totaltripsperroute
-    count += 1
-    for trip_id in tripset:
+	#print route_id, agency_id,route_short_name,route_long_name,route_desc,route_type , list(tripset)[:2], tpdlist[:2], totaltripsperroute
+	count += 1
+	for trip_id in tripset:
 		trip_start_time = trips_dict[trip_id][3]
 		if trip_start_time >= sstarttime and trip_start_time < sstoptime : # if trip starts between sstarttime and sstoptime of requested period then count trips
 			service_id = trips_dict[trip_id][0]
@@ -366,18 +366,18 @@ for route_id, [agency_id,route_short_name,route_long_name,route_desc,route_type,
 					print '******error**************'
 					print tpdlist[(calendardate-startservicedate).days][0], calendardate 
 				tpdlist[(calendardate-startservicedate).days][1] += int(slinelist[dayofweek[calendardayofweek]]) # add to trip count for that day
-    totaltripsperroute = 0
-    maxtripsperdayperroute = 0
-    for [dayofservice, trips] in tpdlist: # scan all service days per stop to accumulate total trips at stop from trips per day at stop
-        maxtripsperdayperroute = max(maxtripsperdayperroute, trips)
-        totaltripsperroute += trips # and add to total trips at stop
-    routes_dict[route_id][7] = totaltripsperroute
-    maxtotaltripsanyroute = max(maxtotaltripsanyroute, totaltripsperroute)
-    #print route_id, agency_id,route_short_name,route_long_name,route_desc,route_type , list(tripset)[:2], tpdlist[:2], totaltripsperroute
-    if totaltripsperroute>= maxtotaltripsanyroute : print route_id, agency_id, route_short_name, totaltripsperroute
+	totaltripsperroute = 0
+	maxtripsperdayperroute = 0
+	for [dayofservice, trips] in tpdlist: # scan all service days per stop to accumulate total trips at stop from trips per day at stop
+		maxtripsperdayperroute = max(maxtripsperdayperroute, trips)
+		totaltripsperroute += trips # and add to total trips at stop
+	routes_dict[route_id][7] = totaltripsperroute
+	maxtotaltripsanyroute = max(maxtotaltripsanyroute, totaltripsperroute)
+	#print route_id, agency_id,route_short_name,route_long_name,route_desc,route_type , list(tripset)[:2], tpdlist[:2], totaltripsperroute
+	if totaltripsperroute>= maxtotaltripsanyroute : print route_id, agency_id, route_short_name, totaltripsperroute
 	#if totaltripsperroute>1000 : print route_id, agency_id,route_short_name,route_long_name,route_desc,route_type , list(tripset)[:2], tpdlist, totaltripsperroute
-    #print 'maxtripsperdayperroute ', maxtripsperdayperroute
-    #print 'maxtotaltripsanyroute ', maxtotaltripsanyroute
+	#print 'maxtripsperdayperroute ', maxtripsperdayperroute
+	#print 'maxtotaltripsanyroute ', maxtotaltripsanyroute
 print 'count ', count
 print 'maxtotaltripsanyroute ', maxtotaltripsanyroute
 
@@ -407,7 +407,7 @@ stopscount = 0
 sline = filein.readline()
 while ((count < maxfilelinecount) and (sline != '')):
 	slinelist=sline[:-1].split(",")
-    #print slinelist
+	#print slinelist
 	stop_id = slinelist[stop_id_i]
 	trip_id = slinelist[trip_id_i]
 	route_id = trips_dict[trip_id][1]
@@ -473,9 +473,9 @@ count = 0
 sline = filein.readline()
 while ((count < maxfilelinecount) and (sline != '')):
 	slinelist=sline[:-1].split(",")
-    #print slinelist
+	#print slinelist
 	in_id = slinelist[inid_index]
-    # print in_id 
+	# print in_id 
 	if in_id in shapes_dict :
 		shapes_dict[in_id].append([slinelist[shape_pt_lat_i], slinelist[shape_pt_lon_i], slinelist[shape_pt_sequence_i]])
 	else: # first one
@@ -580,7 +580,8 @@ for route_id, [agency_id,route_short_name,route_long_name,route_desc,route_type,
 	count += 1
 	#print 'route count ', count
 	if route_id not in used_route_id_set :
-		out_route_list = [route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,tpdlist,totaltpdperroute]
+		#out_route_list = [route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,tpdlist,totaltpdperroute]
+		out_route_list = [route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,tpdlist,totaltpdperroute,route_id,route_desc[:7]] # debug
 		used_route_id_set.add(route_id)
 		for route_id2, [agency_id2,route_short_name2,route_long_name2,route_desc2,route_type2, tripset2, tpdlist2, totaltpdperroute2, stopset2, direction_id2] in routes_dict.iteritems():
 			common_stop_set = stopset & stopset2
@@ -605,19 +606,19 @@ for route_id, [agency_id,route_short_name,route_long_name,route_desc,route_type,
 				#print out_route_list[0]
 				route_list2 = [route_id2,agency_id2,route_short_name2,route_long_name2,route_desc2,route_type2,tpdlist2,totaltpdperroute2]
 				#print route_list2[0]
-				#out_route_list = [out_route_list[0]+'_'+route_id2,agency_id,route_short_name,route_long_name,route_desc,route_type,map(addtpd,out_route_list[6],tpdlist2),out_route_list[7]+totaltpdperroute2]
-				out_route_list = [out_route_list[0],agency_id,route_short_name,route_long_name,route_desc,route_type,map(addtpd,out_route_list[6],tpdlist2),out_route_list[7]+totaltpdperroute2]
+				out_route_list = [out_route_list[0],agency_id,route_short_name,route_long_name,route_desc,route_type,map(addtpd,out_route_list[6],tpdlist2),out_route_list[7]+totaltpdperroute2,out_route_list[8]+'_'+route_id2,out_route_list[9]+'_'+route_desc2[:7]]  # debug
+				#out_route_list = [out_route_list[0],agency_id,route_short_name,route_long_name,route_desc,route_type,map(addtpd,out_route_list[6],tpdlist2),out_route_list[7]+totaltpdperroute2]
 				#print out_route_list[0]
 				used_route_id_set.add(route_id2)
 		postsline = out_route_list[0]+','+out_route_list[1]+','+out_route_list[2]+','+str(out_route_list[7])
 		totaltpd = out_route_list[7]
 		maxtpd = 0
-		#if out_route_list[0] == '230' : print routes_dict['230'], '\n', routes_dict['229']
 		for [dayofservice, trips] in out_route_list[6]: # scan all service days per route  = 
 			#postsline += ','+str(dayofservice)+','+str(trips)
 			maxtpd = max(maxtpd, trips)
 		postsline += ','+str(maxtpd)
 		postsline += ','+routeswshape_dict[route_id][4]
+		postsline += ','+out_route_list[8]+','+out_route_list[9] # debug
 		postsline += '\n'
 		fileout.write(postsline)
 		# append to list only if frequent route: FREQUENT_TPD or more trips from start time to stop time. filter out singular events during the week like lag-ba-omer
