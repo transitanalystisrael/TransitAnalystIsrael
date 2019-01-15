@@ -10,86 +10,112 @@ Running this script will:
 3. Generate the transfers table )takes 40 minutes) and add it to the GTFS Zipped file
 4. Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
 5. Re-start Navitia docker to apply the change for secondary-cov
-6. copy OSM & GTFS to the default coverage input fodler on the worker container
-7. After 60 minutes - test that both coverages work
+6. copy OSM & GTFS to the default coverage input folder on the worker container
+7. After 15 minutes - test that both osm and gtfs conversions are done
+8. Re-start Navitia to make sure all changes are applies
+8. If it's up - delete the old gtfs and osm files
 At the end: The default coverage shows the new GTFS & OSM and the previous default is now secondary_custom_coverage_name
 
 
 """
 from scripts import utils
+import os
+import datetime
+
 
 if __name__== "__main__":
-
-    #config variables to be moved to config-file downstrem
-    default_coverage_name = "default"
-    secondary_custom_coverage_name = "secondary-cov"
-    gtfs_url = "gtfs.mot.gov.il"
-    gtfs_file_name_on_mot_server = "israel-public-transportation.zip"
-    osm_url = "https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf"
-
-    navitia_docker_compose_file_path = "/home/ec2-user/navitia_server/navitia-docker-compose/"
-    navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"
-
-    # Get the docker service client
-    docker_client = utils.get_docker_service_client()
-    # Get the worker container
-    # worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
-
-    # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
-    # utils.copy_graph_to_local_host(worker_con, secondary_custom_coverage_name)
-    # utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
-
-    # Download GTFS & OSM
-    # gtfs_file = utils.get_file_from_url_ftp(gtfs_url, gtfs_file_name_on_mot_server)
-    # osm_file = utils.get_file_from_url_http(osm_url)
-
-    # Generate the Transfers file required for Navitia and add to GTFS
-    # gtfs_and_transfers_file = utils.generate_gtfs_with_transfers(gtfs_file)
-
-    # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
-    # utils.move_one_graph_to_secondary(worker_con, default_coverage_name, secondary_custom_coverage_name)
-
-    # Re-start Navitia docker to apply the change for secondary-cov
-    # utils.stop_all_containers(docker_client)
-    utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
-                                     navitia_docker_compose_file_name)
-    # Get the new worker container
-    worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
-    '''
-    6. copy OSM & GTFS to the default coverage input fodler on the worker container
-    7. After 60 minutes - test that both coverages work
-    '''
-
-    ###OLD CODEEEE!!!!
-
-    # Monitor processing of GTFS & OSM (might require restarting / downloading tyr_beat) on default coverage
-    # validate_osm_gtfs_convertion_to_graph(docker_client, secondary_custom_coverage_name,
-    #                                       navitia_docker_compose_file_path, navitia_docker_compose_file_name)
-    # Move the default coverage graph to the secondary coverage
-    # try:
-    # move_one_graph_to_secondary(worker_con, default_coverage_name, secondary_custom_coverage_name)
-    # catch error:
-    #   print(error)
-    #   exit
-
-    # stop all docker containers and restart to process renamed graphs
-    # stop_all_containers(docker_client)
-    # start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name, True)
-
-    # Copy the old secondary custom graph to your host and delete it from the container
-    # copy_graph_to_local_host(worker_con, old_secondary_custom_coverage_name)
-    # delete_grpah_from_container(worker_con, old_secondary_custom_coverage_name)
-
-    #####NEED TO IMPLEMENT COPY BETWEEN E2C
-    # copy_graph_from_remote_host_to_container(worker_con, old_secondary_custom_coverage_name)
+    #get logger
+    update_time = datetime.datetime.now().strftime("m%Y_%H%M")
+    _log = utils.get_logger()
 
 
-    # Copy the OSM & GTFS to default coverage
-    # Re-start the service so the graph name changes will be updated and OSM & GTFS run
+    try:
+        #config variables to be moved to config-file downstrem
+        default_coverage_name = "default"
+        secondary_custom_coverage_name = "secondary-cov"
+        gtfs_url = "gtfs.mot.gov.il"
+        gtfs_file_name_on_mot_server = "israel-public-transportation.zip"
+        osm_url = "https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf"
 
-    # Verify the covereges reflect new data within 2 hours, otherwise send an email with alert
+        navitia_docker_compose_file_path = "/home/ec2-user/navitia_server/navitia-docker-compose/"
+        navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"
 
-    print("Done")
+        # Get the docker service client
+        # docker_client = utils.get_docker_service_client()
+        # Get the worker container
+        # worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
+
+        # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
+        # utils.copy_graph_to_local_host(worker_con, secondary_custom_coverage_name)
+        # utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
+
+        # Download GTFS & OSM
+        # gtfs_file_name = utils.get_file_from_url_ftp(gtfs_url, gtfs_file_name_on_mot_server)
+        # osm_file_name = utils.get_file_from_url_http(osm_url)
+
+        # Generate the Transfers file required for Navitia and add to GTFS
+        # gtfs_and_transfers_file = utils.generate_gtfs_with_transfers(gtfs_file)
+
+        # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
+        # utils.move_one_graph_to_secondary(worker_con, default_coverage_name, secondary_custom_coverage_name)
+
+        # Re-start Navitia docker to apply the change for secondary-cov
+        # utils.stop_all_containers(docker_client)
+        # utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
+        #                                  navitia_docker_compose_file_name)
+        # Get the new worker container
+        # worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
+
+        # Clearing the worker log to make sure we're monitoring updated logs
+        # utils.clear_container_logs(worker_con)
+        # Copy OSM & GTFS to the default coverage input folder on the worker container
+        # utils.copy_osm_and_gtfs_to_default_cov(worker_con, os.getcwd(), osm_file_name, os.getcwd(), gtfs_file_name)
+
+        # Validate the conversion process takes place by ensuring tyr_beat is up
+        # utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_custom_coverage_name,
+        #                                             navitia_docker_compose_file_path, navitia_docker_compose_file_name)
+
+        # After 15 minutes - test that both osm and gtfs conversions are done
+        # success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 15)
+
+        # If it didn't succeed, give it 5 more minutes
+        # if not success:
+            # success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 5)
+
+        # If after total of 20 minutes, it didn't succeed, restart Navitia and wait 15 minutes more
+        # utils.stop_all_containers(docker_client)
+        # utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
+        #                                  navitia_docker_compose_file_name)
+        # success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 15)
+
+        #If it still doesn't work, send an e-mail to transitanalystisrael@gmail.com with worker logs
+        # If not success:
+        '''
+    8. Re-start Navitia to make sure all changes are applies
+        # Re-start Navitia docker to apply the change for default
+        # utils.stop_all_containers(docker_client)
+        # utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
+        #                                  navitia_docker_compose_file_name)
+    8. If it's up - delete the old gtfs and osm files
+        '''
+
+        ###OLD CODEEEE!!!!
+
+        # delete_grpah_from_container(worker_con, old_secondary_custom_coverage_name)
+
+
+
+        # Verify the covereges reflect new data within 2 hours, otherwise send an email with alert
+
+        _log.info("Info")
+        _log.debug("Debug")
+        _log.error("error")
+
+        utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
+
+    except Exception as e:
+        utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Failed - see logs")
+
 
 
 
