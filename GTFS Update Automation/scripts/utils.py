@@ -11,6 +11,7 @@ import time
 import zipfile
 import tarfile
 import re
+import datetime
 from io import BytesIO
 from dateutil import parser
 from scripts import gtfs2transfers
@@ -25,7 +26,7 @@ def get_file_from_url_http(url):
     :param url:
     :return: the file's name
     '''
-    _log.info("Going to download the latest osm from", url)
+    _log.info("Going to download the latest osm from %s", url)
     r = requests.get(url, stream=True)
     local_file_name = "israel-and-palestine-latest.osm.pbf"
     file = open(local_file_name, 'wb')
@@ -39,7 +40,7 @@ def get_file_from_url_http(url):
             size_iterator += 1
     file.close()
     pbar.finish()
-    _log.info("Finished loading latest OSM to: ", local_file_name)
+    _log.info("Finished loading latest OSM to: %s", local_file_name)
     return local_file_name
 
 def createProgressBar(file_size):
@@ -65,7 +66,7 @@ def get_file_from_url_ftp(url, file_name_on_server):
     :param file_name_on_server:
     :return: the file name
     '''
-    _log.info("Going to download the latest GTFS from", url)
+    _log.info("Going to download the latest GTFS from %s", url)
     try:
         # Connect to FTP
         ftp = ftplib.FTP(url)
@@ -98,16 +99,16 @@ def get_file_from_url_ftp(url, file_name_on_server):
         pbar.finish()
         sys.stdout.flush()
 
-        _log.info("Finished loading latest GTFS to: ", local_file_name)
+        _log.info("Finished loading latest GTFS to: %s", local_file_name)
         return local_file_name
 
     except ftplib.all_errors as err:
         error_code = err.args[0]
         if error_code == 2:
-            _log.error(file_name_on_server, "is not found on", url)
+            _log.error(file_name_on_server, "is not found on %s", url)
             ftp.quit()
         if error_code == 11001:
-            _log.error("URL", url, "is not valid ")
+            _log.error("URL %s is not valid", url)
 
 
 def start_navitia_with_default_and_custom_coverage():
@@ -115,7 +116,7 @@ def start_navitia_with_default_and_custom_coverage():
 
 
 def copy_file_into_docker(container, dest_path, file_path, file_name):
-    _log.info("Going to copy", file_name, "to", container.name, "@" + dest_path)
+    _log.info("Going to copy %s to %s at %s", file_name, container.name, dest_path)
     file = open(file_path + '/' + file_name, 'rb')
     file = file.read()
     # Convert to tar file
@@ -132,7 +133,7 @@ def copy_file_into_docker(container, dest_path, file_path, file_name):
         data=tar_stream
     )
     if success:
-        _log.info("Finished copying", file_name, "to", container.name, "@" + dest_path)
+        _log.info("Finished copying %s to %s at %s", file_name, container.name, dest_path)
 
 
 
@@ -162,7 +163,7 @@ def get_docker_service_client():
         client = docker.from_env()
         return client
     except error:
-        _log.error("Docker deamon service is not up")
+        _log.error("Docker daemon service is not up")
         return None
 
 
@@ -171,13 +172,47 @@ def get_navitia_url_for_cov(cov_name):
 
 
 def check_covereage_running(url, coverage_name):
-    _log.info("checking if",coverage_name, "is up")
+    _log.info("checking if %s is up", coverage_name,)
     response = requests.get(url)
     json_data = json.loads(response.text)
     if "status" not in json_data or "running" not in json_data["status"]["status"]:
-        _log.error(coverage_name + " coverage is down")
+        _log.error("%s coverage is down", coverage_name)
+        return False
     else:
-        _log.info(coverage_name + " coverage is up")
+        _log.info("%s coverage is up", coverage_name)
+    return True
+
+
+def get_covereage_end_production_date(coverage_name):
+    url = get_navitia_url_for_cov(coverage_name)
+    response = requests.get(url)
+    json_data = json.loads(response.text)
+    if "status" not in json_data or "running" not in json_data["status"]["status"]:
+        _log.debug("%s coverage is down so the end of production date can't be established", coverage_name)
+        raise Exception
+    else:
+        end_prod_date = json_data["status"]["end_production_date"]
+        return end_prod_date
+
+
+def validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name, default_cov_eop_date):
+    """
+    Vaidate that the secondary coverage has the eof of the prvious default cov date (default_cov_eop_date)
+    and the default cov has a different eop date
+    :param default_cov_eop_date:
+    """
+    if get_covereage_end_production_date(default_coverage_name) == default_cov_eop_date:
+        _log.debug("The %s coverage seems not to be up-to-date following update attempts.\n Production date stayed the "
+                   "same. ", default_coverage_name)
+        raise Exception
+    if not get_covereage_end_production_date(secondary_custom_coverage_name) == default_cov_eop_date:
+        _log.debug("The %s coverage seems not to be up-to-date following update attempts.\n Production date should be "
+                   "the same as old %s coverage date", secondary_custom_coverage_name, default_coverage_name)
+        raise Exception
+    else:
+        _log.info(" %s and %s coverages end of production dates are updated.\nCoverages were updated successfully",
+                  default_coverage_name, secondary_custom_coverage_name)
+
 
 
 def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
@@ -189,15 +224,15 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_co
     :param extend_wait_time: uLonger wait time is required when images are being re-downloaded, set True if needed
     :return:
     '''
-    _log.info("Attempting to start Navitia with default coverage and ", secondary_custom_coverage_name, "coverage")
+    _log.info("Attempting to start Navitia with default coverage and %s coverage", secondary_custom_coverage_name)
     navitia_docker_compose_file = open(navitia_docker_compose_file_path + navitia_docker_compose_file_name, mode='r')
     navitia_docker_compose_file_contents = navitia_docker_compose_file.read()
     navitia_docker_compose_file.close()
 
     if secondary_custom_coverage_name != "default" \
             and not secondary_custom_coverage_name in navitia_docker_compose_file_contents:
-        _log.error("The custom configuration does not include a coverage area named: " + secondary_custom_coverage_name +
-              ". Fix config, restart docker and start again")
+        _log.error("The custom configuration does not include a coverage area named: %s. Fix config, restart docker "
+                   "and start again", secondary_custom_coverage_name)
 
     # run the custom cmopose and redirect logs while nuting the output
     navitia_docker_start_command = ["docker-compose", "-f", "docker-compose.yml", "-f", navitia_docker_compose_file_name, "up"]
@@ -212,26 +247,34 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_co
     else:
         # wait 90 seconds for everything to go up
         t_wait = 120
-    _log.info("Waiting", t_wait, "seconds to validate Navitia docker is up and running")
+    _log.info("Waiting %s seconds to validate Navitia docker is up and running", t_wait)
     time.sleep(t_wait)
     # Check if default and secondary_custom_coverage_name regions are up and running
     default_coverage_name = "default"
-    check_covereage_running(get_navitia_url_for_cov(default_coverage_name), default_coverage_name)
-    check_covereage_running(get_navitia_url_for_cov(secondary_custom_coverage_name), secondary_custom_coverage_name)
+    is_default_up = check_covereage_running(get_navitia_url_for_cov(default_coverage_name), default_coverage_name)
+    is_secondary_up = check_covereage_running(get_navitia_url_for_cov(secondary_custom_coverage_name),
+                                              secondary_custom_coverage_name)
+    if not is_default_up or not is_secondary_up:
+        if not is_default_up:
+            _log.debug("%s did not go up.", default_coverage_name)
+        if not is_default_up:
+            _log.debug("%s did not go up.", secondary_custom_coverage_name)
+        return False
+    return True
 
 
 def move_one_graph_to_secondary(container, source_cov_name, dest_cov_name):
     command_list = "/bin/sh -c \"mv " + source_cov_name + ".nav.lz4 "+ dest_cov_name + ".nav.lz4\""
     exit_code, output = container.exec_run(cmd=command_list,  stdout=True, workdir="/srv/ed/output/")
     if exit_code != 0:
-        _log.error("Couldn't change ", source_cov_name, " to ", dest_cov_name)
+        _log.error("Couldn't change %s to %s", source_cov_name, dest_cov_name)
         raise Exception("STOP the program")
-    _log.info("Changed the name of", source_cov_name + ".nav.lz4 ", "to", dest_cov_name + ".nav.lz4")
+    _log.info("Changed the name of %s.nav.lz4 to %s.nav.lz4", source_cov_name, dest_cov_name)
 
 
 def copy_graph_to_local_host(container, coverage_name):
     # Create a local file for writing the incoming graph
-    _log.info("Going to copy", coverage_name, ".nav.lz4 to", os.getcwd(), "on local host")
+    _log.info("Going to copy %s.nav.lz4 to %s on local host", coverage_name, os.getcwd())
     local_graph_file = open('./' + coverage_name + '.nav.lz4', 'wb')
     bits, stat = container.get_archive('/srv/ed/output/' + coverage_name + '.nav.lz4')
     size = stat["size"]
@@ -244,7 +287,7 @@ def copy_graph_to_local_host(container, coverage_name):
             size_iterator += 1
     local_graph_file.close()
     pbar.finish()
-    _log.info("Finished copying", coverage_name, ".nav.lz4 to", os.getcwd(), "on local host")
+    _log.info("Finished copying %s.nav.lz4 to %s on local host", coverage_name, os.getcwd())
 
 
 def copy_graph_from_remote_host_to_container(container, coverage_name):
@@ -258,12 +301,22 @@ def copy_graph_from_remote_host_to_container(container, coverage_name):
     pass
 
 def delete_grpah_from_container(container, coverage_name):
-    delete_command= "/bin/sh -c \"rm " + coverage_name +".nav.lz4\""
+    return delete_file_from_container(coverage_name +".nav.lz4\"")
+
+
+def delete_file_from_container(container, file_name):
+    delete_command= "/bin/sh -c \"rm " + file_name
     exit_code, output = container.exec_run(cmd=delete_command,  stdout=True, workdir="/srv/ed/output/")
     if exit_code != 0:
-        _log.error("Couldn't delete ", coverage_name, " graph")
-        raise Exception("STOP the program")
-    _log.info("Finished deleting graph", coverage_name, "from container ", container.name)
+        _log.error("Couldn't delete %s graph", file_name)
+        return False
+    _log.info("Finished deleting %s from container %s", file_name, container.name)
+
+
+def delete_file_from_host(file_name):
+    delete_command = "rm " + file_name
+    subprocess.Popen(delete_command, shell=True)
+    _log.info("Finished deleting %s from host", file_name)
 
 
 def stop_all_containers(docker_client):
@@ -290,7 +343,7 @@ def generate_gtfs_with_transfers(gtfs_file_name, gtfs_file_path):
     with zipfile.ZipFile(gtfs_file, 'a') as zip_ref:
         zip_ref.write(output_file_full_path, os.path.basename(output_file_full_path))
 
-    _log.info("Added transfers.txt to", gtfs_file)
+    _log.info("Added transfers.txt to %s", gtfs_file)
 
 
 def copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name):
@@ -301,7 +354,7 @@ def copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, g
 def clear_container_logs(con):
     clear_log_command = "sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' " + con.name + ")"
     subprocess.Popen(clear_log_command, shell=True)
-    _log.info("Cleared", con.name, "logs")
+    _log.info("Cleared %s logs", con.name)
 
 
 def validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, time_to_wait):
@@ -311,7 +364,7 @@ def validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, time_to_wait)
     gtfs2ed, ed2nav
     :return:
     '''
-    _log.info("Waiting", time_to_wait, "minutes to let OSM & GTFS conversions to lz4 graph takes place")
+    _log.info("Waiting %s minutes to let OSM & GTFS conversions to lz4 graph takes place", time_to_wait)
     time.sleep(time_to_wait)
     _log.info("I'm back! Verifying that the conversions took place")
     # Success status look like Task tyr.binarisation.ed2nav[feac06ca-51f7-4e39-bf1d-9541eaac0988] succeeded
@@ -321,8 +374,8 @@ def validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, time_to_wait)
         _log.info("OSM conversion task ed2nav amd GTFS conversion task gtfs2ed are successful")
         return True
     else:
-        _log.error("After", time_to_wait, "minutes - tasks aren't completed")
-        return False
+        _log.error("After %s minutes - tasks aren't completed", time_to_wait)
+        raise TimeoutError
 
 
 
@@ -359,12 +412,13 @@ def validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_cu
                 beat_con_name = beat_con.name
                 beat_image_id = beat_image.id
                 beat_con.remove()
-                _log.info(beat_con_name, "container is removed")
+                _log.info("%s container is removed", beat_con_name)
                 docker_client.images.remove(beat_image.id)
-                _log.info(beat_image_id, "image is removed")
+                _log.info("%s image is removed", beat_image_id)
 
                 # re-run navitia docker-compose
-                _log.info("Restarting docker with defauly coverage and custom coverage: ", secondary_custom_coverage_name)
+                _log.info("Restarting docker with defauly coverage and custom coverage: %s",
+                          secondary_custom_coverage_name)
                 start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
                                            navitia_docker_compose_file_name, True)
     else:

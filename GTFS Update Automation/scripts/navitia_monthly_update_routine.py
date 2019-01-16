@@ -5,6 +5,7 @@ a. remote host on ec2-instace with git, docker, docker-compose, python 3
 b. navitia docker is running with 2 coverages: deafult and secondary-cov
 c. This script depends on: utils.py and  gtfs2transfers.py
 Running this script will:
+0. Get the current end of production dates of each coverage for later comparison
 1. Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
 2. Download GTFS & OSM
 3. Generate the transfers table )takes 40 minutes) and add it to the GTFS Zipped file
@@ -28,7 +29,6 @@ if __name__== "__main__":
     update_time = datetime.datetime.now().strftime("m%Y_%H%M")
     _log = utils.get_logger()
 
-
     try:
         #config variables to be moved to config-file downstrem
         default_coverage_name = "default"
@@ -41,10 +41,12 @@ if __name__== "__main__":
         navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"
 
         # Get the docker service client
-        # docker_client = utils.get_docker_service_client()
+        docker_client = utils.get_docker_service_client()
         # Get the worker container
-        # worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
+        worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
 
+        # Get the current end of production dates of default coverage for post-processing comparison
+        default_cov_eop_date = utils.get_covereage_end_production_date(default_coverage_name)
         # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
         # utils.copy_graph_to_local_host(worker_con, secondary_custom_coverage_name)
         # utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
@@ -88,33 +90,28 @@ if __name__== "__main__":
         #                                  navitia_docker_compose_file_name)
         # success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 15)
 
-        #If it still doesn't work, send an e-mail to transitanalystisrael@gmail.com with worker logs
-        # If not success:
-        '''
-    8. Re-start Navitia to make sure all changes are applies
-        # Re-start Navitia docker to apply the change for default
+        # Re-start Navitia to make sure all changes are applies
         # utils.stop_all_containers(docker_client)
-        # utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
-        #                                  navitia_docker_compose_file_name)
-    8. If it's up - delete the old gtfs and osm files
-        '''
+        # is_up = utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name)
 
-        ###OLD CODEEEE!!!!
+        # If it's up - delete the old gtfs and osm files
+        # if is_up:
+        #     utils.delete_file_from_host(osm_file_name)
+        #     utils.delete_file_from_host(gtfs_file_name)
 
-        # delete_grpah_from_container(worker_con, old_secondary_custom_coverage_name)
+        # Validate new data is accessible via default and the old data is accessible via secondary
+        default_cov_eop_date="20180629"
+        utils.validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name, default_cov_eop_date)
 
 
+        # Send e-mail everything is completed
+        # utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
 
-        # Verify the covereges reflect new data within 2 hours, otherwise send an email with alert
-
-        _log.info("Info")
-        _log.debug("Debug")
-        _log.error("error")
-
-        utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
+        _log.info("Done without errors")
 
     except Exception as e:
-        utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Failed - see logs")
+        _log.info("Done with errors")
+        # utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Failed - see logs")
 
 
 

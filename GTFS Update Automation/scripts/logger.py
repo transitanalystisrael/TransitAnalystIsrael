@@ -3,7 +3,6 @@ import datetime
 
 log_file = ''
 
-
 def get_log_file_name():
     return log_file
 
@@ -12,11 +11,13 @@ def get_logger():
     """
     :return: Logger that outputs both to the console and a log file
     """
+    # logging.setLoggerClass(Logger) # Used to support python3 string formatting
+    # logging.setLogRecordFactory(LogRecord)
     logger = logging.getLogger('gtfs_monthly_update')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
     global log_file
-    log_file = 'Transit Israel Monthly Update_' + datetime.datetime.now().strftime("%d%m%Y_%H%M") + '.txt'
+    log_file = 'Transit_israel_monthly_update_' + datetime.datetime.now().strftime("%d%m%Y_%H%M") + '.txt'
     fh = logging.FileHandler(log_file)
     fh.setLevel(logging.NOTSET)
     # create console handler with a higher log level
