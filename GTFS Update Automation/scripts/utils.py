@@ -301,11 +301,12 @@ def copy_graph_from_remote_host_to_container(container, coverage_name):
     pass
 
 def delete_grpah_from_container(container, coverage_name):
-    return delete_file_from_container(coverage_name +".nav.lz4\"")
+    return delete_file_from_container(container, coverage_name + ".nav.lz4")
 
 
 def delete_file_from_container(container, file_name):
-    delete_command= "/bin/sh -c \"rm " + file_name
+    delete_command= "/bin/sh -c \"rm " + file_name + "\""
+    print(delete_command)
     exit_code, output = container.exec_run(cmd=delete_command,  stdout=True, workdir="/srv/ed/output/")
     if exit_code != 0:
         _log.error("Couldn't delete %s graph", file_name)
@@ -326,19 +327,20 @@ def stop_all_containers(docker_client):
     _log.info("Stopped all Docker containers")
 
 
-def generate_transfers_file(gtfs_file):
+def generate_transfers_file(gtfs_file_name):
     # Unzip GTFS to get the stops.txt for processing
-    with zipfile.ZipFile(gtfs_file, 'r') as zip_ref:
+    with zipfile.ZipFile(gtfs_file_name, 'r') as zip_ref:
         zip_ref.extract(member="stops.txt")
     output_full_path = gtfs2transfers.generate_transfers(os.getcwd() + "/stops.txt")
     return output_full_path
 
 
 def generate_gtfs_with_transfers(gtfs_file_name, gtfs_file_path):
+    print(type(gtfs_file_path))
     file = open(gtfs_file_path + '/' + gtfs_file_name, 'rb')
     gtfs_file = file.read()
     _log.info("Extracting stops.txt and computing transfers.txt")
-    output_file_full_path = generate_transfers_file(gtfs_file)
+    output_file_full_path = generate_transfers_file(gtfs_file_name)
     # transfers_file_full_path = os.getcwd() + "\\transfers.txt"
     with zipfile.ZipFile(gtfs_file, 'a') as zip_ref:
         zip_ref.write(output_file_full_path, os.path.basename(output_file_full_path))
