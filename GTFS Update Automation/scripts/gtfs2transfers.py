@@ -6,6 +6,7 @@ from argparse import RawTextHelpFormatter
 import os
 from scripts import utils
 import progressbar
+import re
 
 EARTH_RADIUS = 6372797.560856
 
@@ -47,7 +48,10 @@ def read_file(input_file):
     with open(input_file, encoding="utf8", mode='r') as f:
         reader = csv.reader(f)
         header = next(reader)
-        stop_id_ind = header.index("stop_id")
+        # Due to encoding, sometimes the "stop_id" string is preceded by different characters
+        stop_id_reg = re.compile(r".*stop_id")
+        stop_id_rep = list(filter(stop_id_reg.match, header))[0]
+        stop_id_ind = header.index(stop_id_rep)
         stop_lon_ind = header.index("stop_lon")
         stop_lat_ind = header.index("stop_lat")
         location_type_ind = header.index("location_type")
@@ -65,7 +69,8 @@ def read_file(input_file):
 
 def calculate_transfers(stops, walking_speed, transfer_time, max_distance):
     transfers = list()
-    pbar = utils.createProgressBar((len(stops)**2)) # for progress bar we need the number of coming
+    pbar = utils.createProgressBar((len(stops)**2), action='Calculating Transfers: ')
+    # for progress bar we need the number of coming
     i = 0
     # itrerations
     for stop_1_ind in stops:
@@ -120,7 +125,6 @@ def generate_transfers(input="stops.txt", output="transfers.txt", walking_speed=
     :param max_distance: the maximum distance for tansfer
     :return: output file full path
     '''
-    print(input)
     stops = read_file(input)
     transfers = calculate_transfers(stops, walking_speed, transfer_time, max_distance)
     write_file(output, transfers)

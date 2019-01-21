@@ -43,8 +43,9 @@ def get_file_from_url_http(url):
     _log.info("Finished loading latest OSM to: %s", local_file_name)
     return local_file_name
 
-def createProgressBar(file_size):
-    widgets = ['Downloading: ', progressbar.Percentage(), ' ',
+
+def createProgressBar(file_size, action='Downloading: '):
+    widgets = [action, progressbar.Percentage(), ' ',
                progressbar.Bar(marker='#', left='[', right=']'),
                ' ', progressbar.ETA(), ' ', progressbar.FileTransferSpeed()]
     pbar = progressbar.ProgressBar(widgets=widgets, maxval=file_size)
@@ -84,7 +85,7 @@ def get_file_from_url_ftp(url, file_name_on_server):
             if name == file_name_on_server:
                 time_str = tokens[0]
                 time = parser.parse(time_str)
-                local_file_name = "GTFS-" + str(time.strftime('%b') + "-" + time.strftime('%y') + "shaked.zip")
+                local_file_name = "GTFS-" + str(time.strftime('%b') + "-" + time.strftime('%y') + ".zip")
                 size = float(tokens[2])
 
         # Generate a progress bar and download
@@ -111,10 +112,6 @@ def get_file_from_url_ftp(url, file_name_on_server):
             _log.error("URL %s is not valid", url)
 
 
-def start_navitia_with_default_and_custom_coverage():
-    pass
-
-
 def copy_file_into_docker(container, dest_path, file_path, file_name):
     _log.info("Going to copy %s to %s at %s", file_name, container.name, dest_path)
     file = open(file_path + '/' + file_name, 'rb')
@@ -134,7 +131,6 @@ def copy_file_into_docker(container, dest_path, file_path, file_name):
     )
     if success:
         _log.info("Finished copying %s to %s at %s", file_name, container.name, dest_path)
-
 
 
 def copy_file_from_docker():
@@ -214,6 +210,29 @@ def validate_graph_changes_applied(default_coverage_name, secondary_custom_cover
                   default_coverage_name, secondary_custom_coverage_name)
 
 
+def start_navitia_with_default_coverage(navitia_docker_compose_file_path, extend_wait_time=False):
+    _log.info("Attempting to start Navitia with default coverage")
+
+    # run the custom compose and redirect logs if needed - uncomment code below if you want to see running logs
+    navitia_docker_start_command = ["docker-compose", "up"]
+
+    docker_start_up_process = subprocess.Popen(navitia_docker_start_command, cwd=navitia_docker_compose_file_path,
+                                               stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+    if extend_wait_time:
+        # Longer wait time is required because images are being re-downloaded
+        t_wait = 60 * 5
+    else:
+        # wait 90 seconds for everything to go up
+        t_wait = 120
+    _log.info("Waiting %s seconds to validate Navitia docker is up and running", t_wait)
+    time.sleep(t_wait)
+    # Check if default and secondary_custom_coverage_name regions are up and running
+    default_coverage_name = "default"
+    is_default_up = check_covereage_running(get_navitia_url_for_cov(default_coverage_name), default_coverage_name)
+    if not is_default_up:
+        return False
+    return True
+
 
 def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
                                navitia_docker_compose_file_name, extend_wait_time=False):
@@ -234,7 +253,7 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_co
         _log.error("The custom configuration does not include a coverage area named: %s. Fix config, restart docker "
                    "and start again", secondary_custom_coverage_name)
 
-    # run the custom cmopose and redirect logs while nuting the output
+    # run the custom compose and redirect logs if needed - uncomment code below if you want to see running logs
     navitia_docker_start_command = ["docker-compose", "-f", "docker-compose.yml", "-f", navitia_docker_compose_file_name, "up"]
 
     docker_start_up_process = subprocess.Popen(navitia_docker_start_command, cwd=navitia_docker_compose_file_path,
@@ -255,10 +274,6 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_co
     is_secondary_up = check_covereage_running(get_navitia_url_for_cov(secondary_custom_coverage_name),
                                               secondary_custom_coverage_name)
     if not is_default_up or not is_secondary_up:
-        if not is_default_up:
-            _log.debug("%s did not go up.", default_coverage_name)
-        if not is_default_up:
-            _log.debug("%s did not go up.", secondary_custom_coverage_name)
         return False
     return True
 
@@ -278,7 +293,7 @@ def copy_graph_to_local_host(container, coverage_name):
     local_graph_file = open('./' + coverage_name + '.nav.lz4', 'wb')
     bits, stat = container.get_archive('/srv/ed/output/' + coverage_name + '.nav.lz4')
     size = stat["size"]
-    pbar = createProgressBar(size)
+    pbar = createProgressBar(size, action="Transferring")
     # Download
     size_iterator = 0
     for chunk in bits:
@@ -336,16 +351,14 @@ def generate_transfers_file(gtfs_file_name):
 
 
 def generate_gtfs_with_transfers(gtfs_file_name, gtfs_file_path):
-    print(type(gtfs_file_path))
     file = open(gtfs_file_path + '/' + gtfs_file_name, 'rb')
     gtfs_file = file.read()
     _log.info("Extracting stops.txt and computing transfers.txt")
     output_file_full_path = generate_transfers_file(gtfs_file_name)
-    # transfers_file_full_path = os.getcwd() + "\\transfers.txt"
-    with zipfile.ZipFile(gtfs_file, 'a') as zip_ref:
+    with zipfile.ZipFile(gtfs_file_name, 'a') as zip_ref:
         zip_ref.write(output_file_full_path, os.path.basename(output_file_full_path))
-
-    _log.info("Added transfers.txt to %s", gtfs_file)
+    _log.info("Added transfers.txt to %s", gtfs_file_name)
+    return gtfs_file_name
 
 
 def copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name):
@@ -367,17 +380,18 @@ def validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, time_to_wait)
     :return:
     '''
     _log.info("Waiting %s minutes to let OSM & GTFS conversions to lz4 graph takes place", time_to_wait)
-    time.sleep(time_to_wait)
+    time.sleep(time_to_wait * 60)
     _log.info("I'm back! Verifying that the conversions took place")
     # Success status look like Task tyr.binarisation.ed2nav[feac06ca-51f7-4e39-bf1d-9541eaac0988] succeeded
     # and tyr.binarisation.gtfs2ed[feac06ca-51f7-4e39-bf1d-9541eaac0988] succeeded
     if re.compile(r"tyr\.binarisation\.gtfs2ed\[\S*\] succeeded").search(worker_con.logs().decode('utf-8'))\
-            and re.compile(r'tyr\.binarisation\.gtfs2ed\[\S*\] succeeded').search(worker_con.logs().decode('utf-8')):
-        _log.info("OSM conversion task ed2nav amd GTFS conversion task gtfs2ed are successful")
+            and re.compile(r'tyr\.binarisation\.gtfs2ed\[\S*\] succeeded').search(worker_con.logs().decode('utf-8')) \
+            and re.compile(r'tyr\.binarisation\.ed2nav\[\S*\] succeeded').search(worker_con.logs().decode('utf-8')):
+        _log.info("OSM conversion task ed2nav, GTFS conversion task gtfs2ed  and ed2nav are successful")
         return True
     else:
         _log.error("After %s minutes - tasks aren't completed", time_to_wait)
-        raise TimeoutError
+        return False
 
 
 
@@ -396,7 +410,7 @@ def validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_cu
                                                 shell=True, stdout=tyr_beat_output, stderr=tyr_beat_output)
         # Wait 10 seconds for it to come up
         _log.info("Waiting 10 seconds to see if tyr_beat is up")
-        time.sleep(10)
+        time.sleep(10 * 60)
 
         with open("tyr_beat_output.txt", "r", encoding="UTF-8") as tyr_beat_output:
             if "Sending due task udpate-data-every-30-seconds" not in tyr_beat_output.read():

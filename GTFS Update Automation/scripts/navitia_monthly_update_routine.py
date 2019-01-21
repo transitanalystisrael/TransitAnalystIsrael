@@ -25,7 +25,7 @@ import datetime
 
 
 if __name__== "__main__":
-    #get logger
+    # Get logger
     update_time = datetime.datetime.now().strftime("m%Y_%H%M")
     _log = utils.get_logger()
 
@@ -45,40 +45,37 @@ if __name__== "__main__":
         # Get the worker container
         worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
 
-        # Get the current end of production dates of default coverage for post-processing comparison
+        # # Get the current end of production dates of default coverage for post-processing comparison
         default_cov_eop_date = utils.get_covereage_end_production_date(default_coverage_name)
-        # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
-
-        ######RESTORE USSSS
-        # utils.copy_graph_to_local_host(worker_con, secondary_custom_coverage_name)
-        # utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
+        #
+        # # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
+        utils.copy_graph_to_local_host(worker_con, secondary_custom_coverage_name)
+        utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
 
         # Download GTFS & OSM
-        # gtfs_file_name = utils.get_file_from_url_ftp(gtfs_url, gtfs_file_name_on_mot_server)
-        # osm_file_name = utils.get_file_from_url_http(osm_url)
+        gtfs_file_name = utils.get_file_from_url_ftp(gtfs_url, gtfs_file_name_on_mot_server)
+        osm_file_name = utils.get_file_from_url_http(osm_url)
 
         # Generate the Transfers file required for Navitia and add to GTFS
         ############REMOVE US
-        gtfs_file_name = "GTFS-Jan-19shaked.zip"
-        osm_file_name = "israel-and-palestine-latest.osm.pbf"
-
-        STOPPED HERE WITH TESTING the follwoing. had probkem wtih opening the zip file cus I gave it a file and not file.
-        The filers are in the server, re-run and contiune checking
-
-        gtfs_and_transfers_file = utils.generate_gtfs_with_transfers(gtfs_file_name, os.getcwd())
+        # gtfs_file_name = "GTFS-Jan-18.zip"
+        # osm_file_name = "israel-and-palestine-latest.osm.pbf"
+        gtfs_file_name = utils.generate_gtfs_with_transfers(gtfs_file_name, os.getcwd())
 
         # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
         utils.move_one_graph_to_secondary(worker_con, default_coverage_name, secondary_custom_coverage_name)
 
-        # Re-start Navitia docker to apply the change for secondary-cov
+        # Re-start Navitia docker with default coverage only in order to process the OSM & GTFS
+        # Later we will restart with the custom coverage as well
         utils.stop_all_containers(docker_client)
-        utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
-                                         navitia_docker_compose_file_name)
+        utils.start_navitia_with_default_coverage(navitia_docker_compose_file_path)
+
         # Get the new worker container
         worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
 
         # Clearing the worker log to make sure we're monitoring updated logs
         utils.clear_container_logs(worker_con)
+
         # Copy OSM & GTFS to the default coverage input folder on the worker container
         utils.copy_osm_and_gtfs_to_default_cov(worker_con, os.getcwd(), osm_file_name, os.getcwd(), gtfs_file_name)
 
@@ -86,20 +83,18 @@ if __name__== "__main__":
         utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_custom_coverage_name,
                                                     navitia_docker_compose_file_path, navitia_docker_compose_file_name)
 
-        # After 15 minutes - test that both osm and gtfs conversions are done
-        success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 15)
+        # After 20 minutes - test that both osm and gtfs conversions are done
+        success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 20)
 
-        # If it didn't succeed, give it 5 more minutes
+        # If it didn't succeed, give it 20 more minutes
         if not success:
-            success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 5)
+            success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 25)
 
-        # If after total of 20 minutes, it didn't succeed, restart Navitia and wait 15 minutes more
-        utils.stop_all_containers(docker_client)
-        utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
-                                         navitia_docker_compose_file_name)
-        success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 15)
+        if not success:
+            _log.error("After 45 minutes - tasks aren't completed - connect to server for manual inspection")
+            raise Exception
 
-        # Re-start Navitia to make sure all changes are applies
+        # Re-start Navitia to make sure all changes are applied with default and custom coverages
         utils.stop_all_containers(docker_client)
         is_up = utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name)
 
