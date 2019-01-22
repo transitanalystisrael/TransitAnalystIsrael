@@ -2,7 +2,6 @@ import docker
 import ftplib
 import json
 import os
-import platform
 import progressbar
 import requests
 import subprocess
@@ -11,7 +10,8 @@ import time
 import zipfile
 import tarfile
 import re
-import datetime
+
+
 from io import BytesIO
 from dateutil import parser
 from scripts import gtfs2transfers
@@ -19,6 +19,28 @@ from scripts import send_email
 from scripts import logger
 
 _log = logger.get_logger()
+
+def get_config_params():
+    """
+    Reads monthly_update_config_params.conf file and returns the configuration parameters
+    :return: configuration parameters
+    """
+    with open('monthly_update_config_params.conf') as f:
+        params = {}
+        lines = f.readlines()
+        for line in lines:
+            pair = line.strip().split("=")
+            params[pair[0]] = pair[1]
+        default_coverage_name = params['default_coverage_name']
+        secondary_custom_coverage_name = params['secondary_custom_coverage_name']
+        gtfs_url = params['gtfs_url']
+        gtfs_file_name_on_mot_server = params['gtfs_file_name_on_mot_server']
+        osm_url = params['osm_url']
+        navitia_docker_compose_file_path = params['navitia_docker_compose_file_path']
+        navitia_docker_compose_file_name = params['navitia_docker_compose_file_name']
+        return default_coverage_name, secondary_custom_coverage_name, gtfs_url, gtfs_file_name_on_mot_server, osm_url, \
+                    navitia_docker_compose_file_path, navitia_docker_compose_file_name
+
 
 def get_file_from_url_http(url):
     '''
