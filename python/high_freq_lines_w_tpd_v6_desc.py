@@ -4,7 +4,8 @@
 #
 # count the number of trips per day tpd for all lines (unique routes)
 # in a GTFS file over the first week of the entire service period
-# also collect set of stops per route and use to merge routes with same short name that share some stops
+# merge routes that are the same line using route short name and agency and route decription and direction
+# also collect set of stops per route and use to measure common stops between routes that are the same line for a histogram
 #
 # inputs:
 #   parent_path = 'C:\\transitanalyst\\processed\\'
@@ -18,7 +19,7 @@
 # outputs:
 #   txt file of routes with tripcount and stops count - 'routeswtripcountperday.txt'
 #   txt file of unique routes - 'uniquerouteswtripcountat'+sstarttimename+sstoptimename+'.txt'
-#   js file of routes with name max trips per day and shape geometry - 'route_freq_at'+sstarttimename+sstoptimename+'_'+sstartservicedate+'.js'
+#   js file of lines with name max trips per day and shape geometry - 'route_freq_at'+sstarttimename+sstoptimename+'_'+sstartservicedate+'.js'
 #   txt file for histogram of samestops for route_id pairs - samestopshist.txt
 #
 print '----------------- count the number of trips per day tpd for all lines (unique routes) --------------------------'
