@@ -137,7 +137,7 @@
 		var tpdperline = [];
 		if (props) {
 			Object.entries(munisWtpdperline[props.muni_id].tpdperline_dict).forEach(entry => 
-				{ let key = entry[0]; let value = entry[1][2];
+				{ let key = entry[0]; let value = entry[1];
 					tpdperline.push({line_name:key, tpd:value});
 				});
 			tpdperline.sort(function(a, b){return b.tpd - a.tpd});
@@ -147,7 +147,7 @@
 		this._div.innerHTML = '<h3>Muni TransitScore with<br>tpd per line</h3>' 
 			+'<br>'+'Muni TransitScore, total tpd' + '<br>'
 			+  (props ?
-				'<b>' + props.muni_name + ' - ' + props.transitscore + ' , ' + munisWtpdperline[props.muni_id].total_muni_tpd+'</b>' + 
+				'<b>' + props.muni_name + ' - ' + props.transitscore + ' , ' + munisWtpdperline[props.muni_id].maxday_muni_tpd+'</b>' + 
 				'<br><br>tpd : line-agency' + 
 				displaystring
 				: 'Hover over a muni');

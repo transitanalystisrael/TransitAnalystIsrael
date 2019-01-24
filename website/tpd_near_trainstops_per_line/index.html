@@ -252,7 +252,8 @@
 			ts_tpdperline.forEach(function(ts_tpdline) {
 				s_tpdperline.forEach(function(s_tpdline) {
 					if (ts_tpdline.line_name == s_tpdline.line_name) { 
-						both_tpdperline.push(s_tpdline.tpd < ts_tpdline.tpd ? s_tpdline : ts_tpdline);
+						//both_tpdperline.push(s_tpdline.tpd < ts_tpdline.tpd ? s_tpdline : ts_tpdline); // use min tpd
+						both_tpdperline.push(ts_tpdline); // use neartrainstop tpd
 					}
 				});
 			});
