@@ -92,12 +92,25 @@ docker ps -qa | xargs docker inspect --format='{{.LogPath}}' | xargs sudo du -hl
 16K     /var/lib/docker/containers/cf00ac041201dfdca6623e4a9ba7af92821eafa8e0997e24dc5083f1faf12583/cf00ac041201dfdca6623e4a9ba7af92821eafa8e0997e24dc5083f1faf12583-json.log
 28M     /var/lib/docker/containers/aa3ff4d992a946f2567932297506326ab746865eee6a2d7a71d80c410520bc38/aa3ff4d992a946f2567932297506326ab746865eee6a2d7a71d80c410520bc38-json.log
 
+31/12
+=====
+
+[ec2-user@ip-172-31-3-142 ~]$ docker ps -qa | xargs docker inspect --format='{{.LogPath}}' | xargs sudo du -hl
+56K     /var/lib/docker/containers/182ce81b44e06b29f93109f855ef36ca93f0f70e492a7b64003809f4ecc7b4f5/182ce81b44e06b29f93109f855ef36ca                     93f0f70e492a7b64003809f4ecc7b4f5-json.log
+221M    /var/lib/docker/containers/df900aa7038234bb7b9d8e756810652970956857dfb52281fb3929b108a6c29f/df900aa7038234bb7b9d8e7568106529                     70956857dfb52281fb3929b108a6c29f-json.log
+5.9M    /var/lib/docker/containers/89d6e5c96594f3df62d75d7565d298656c6106bc7ed6fa71424b8329d1143b76/89d6e5c96594f3df62d75d7565d29865                     6c6106bc7ed6fa71424b8329d1143b76-json.log
+2.1M    /var/lib/docker/containers/4839bd1f0234937d98a5d485cf4cfd1eb424c7d255f4ba0ddd1867c9990e5cba/4839bd1f0234937d98a5d485cf4cfd1e                     b424c7d255f4ba0ddd1867c9990e5cba-json.log
+20K     /var/lib/docker/containers/b67a0c2b49e2ba76a447f939af5a3298d59a58f19ffe4e3eddc6f1c946993f9f/b67a0c2b49e2ba76a447f939af5a3298                     d59a58f19ffe4e3eddc6f1c946993f9f-json.log
+1.3M    /var/lib/docker/containers/fe5180b1386cfefe9c4a18840c0c47f8d001507af3950a2fec57f1ffd0dfdf82/fe5180b1386cfefe9c4a18840c0c47f8                     d001507af3950a2fec57f1ffd0dfdf82-json.log
+58M     /var/lib/docker/containers/55c27cd34d963897fb71224883280bedac499d3ec698c75467c993965d4f7d2a/55c27cd34d963897fb71224883280bed                     ac499d3ec698c75467c993965d4f7d2a-json.log
+16K     /var/lib/docker/containers/cf00ac041201dfdca6623e4a9ba7af92821eafa8e0997e24dc5083f1faf12583/cf00ac041201dfdca6623e4a9ba7af92                     821eafa8e0997e24dc5083f1faf12583-json.log
+97M     /var/lib/docker/containers/aa3ff4d992a946f2567932297506326ab746865eee6a2d7a71d80c410520bc38/aa3ff4d992a946f2567932297506326a                     b746865eee6a2d7a71d80c410520bc38-json.log
+
+
  
  Exploring size of biggest fodlers in a certain folder:
  sudo du -sh /var/lib/docker/* | sort -nr | head -n 20
 
- 
- 
  
  06/12:
 =======
@@ -133,6 +146,25 @@ docker ps -qa | xargs docker inspect --format='{{.LogPath}}' | xargs sudo du -hl
 0       /var/lib/docker/runtimes
 0       /var/lib/docker/plugins
 
+30/12
+======
+
+[ec2-user@ip-172-31-3-142 ~]$  sudo du -sh /var/lib/docker/* | sort -nr | head -n 20
+392K    /var/lib/docker/containerd
+320M    /var/lib/docker/containers
+123M    /var/lib/docker/swarm
+96K     /var/lib/docker/network
+56K     /var/lib/docker/buildkit
+16K     /var/lib/docker/builder
+8.7M    /var/lib/docker/image
+6.1G    /var/lib/docker/overlay2
+5.4G    /var/lib/docker/volumes
+0       /var/lib/docker/trust
+0       /var/lib/docker/tmp
+0       /var/lib/docker/runtimes
+0       /var/lib/docker/plugins
+
+
  
  Exploring the docker use level reports:
  docker system df
@@ -145,6 +177,14 @@ Images              10                  8                   2.345GB             
 Containers          9                   9                   329MB               0B (0%)
 Local Volumes       8                   6                   5.7GB               0B (0%)
 Build Cache         0                   0                   0B                  0B
+
+30/12
+======
+[ec2-user@ip-172-31-3-142 ~]$ docker system df
+TYPE                TOTAL               ACTIVE              SIZE                RECLAIMABLE
+Images              10                  8                   2.345GB             797.1MB (33%)
+Containers          9                   9                   332.5MB             0B (0%)
+Local Volumes       6                   6                   5.7GB               0B (0%
 
 
 13/12
