@@ -20,6 +20,7 @@ from scripts import logger
 
 _log = logger.get_logger()
 
+
 def get_config_params():
     """
     Reads monthly_update_config_params.conf file and returns the configuration parameters
