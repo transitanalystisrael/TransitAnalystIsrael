@@ -11,7 +11,7 @@ scripts
 
 What does this script do?
 
-0. Get the current end of production dates of each coverage for later when we want to validate new data is present
+0. Get the current start of production dates of each coverage for later when we want to validate new data is present
 1. Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
 2. Download latest GTFS & OSM
 3. Generate the transfers table for Navitia and add it to the GTFS Zipped file (takes ~40 minutes)
@@ -48,8 +48,8 @@ if __name__== "__main__":
         # Get the worker container
         worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
 
-        # Get the current end of production dates of default coverage for post-processing comparison
-        default_cov_eop_date = utils.get_coverage_end_production_date(default_coverage_name)
+        # Get the current start of production dates of default coverage for post-processing comparison
+        default_cov_eos_date = utils.get_coverage_start_production_date(default_coverage_name)
 
         # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
         utils.copy_graph_to_local_host(worker_con, secondary_custom_coverage_name)
@@ -104,7 +104,7 @@ if __name__== "__main__":
             utils.delete_file_from_host(gtfs_file_name)
 
         # Validate new data is accessible via default and the old data is accessible via secondary
-        utils.validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name, default_cov_eop_date)
+        utils.validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name, default_cov_eos_date)
 
         # Send e-mail everything is completed
         utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")

@@ -1,9 +1,19 @@
+"""
+Logger for logging info and error messages both to the console and logger file named
+"Transit_israel_monthly_update_<current_date_time>.txt"
+
+"""
 import logging
 import datetime
 
 log_file = ''
 
+
 def get_log_file_name():
+    """
+    the name of the logging file
+    :return:
+    """
     return log_file
 
 
