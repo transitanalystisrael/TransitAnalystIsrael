@@ -41,8 +41,8 @@ if __name__== "__main__":
     default_coverage_name, secondary_custom_coverage_name, gtfs_url, gtfs_file_name_on_mot_server, osm_url, \
         navitia_docker_compose_file_path, navitia_docker_compose_file_name = utils.get_config_params()
 
+    print(default_coverage_name)
     try:
-        _log.info("I was triggered by AWS lambda")
         # Get the docker service client
         docker_client = utils.get_docker_service_client()
         # Get the worker container
