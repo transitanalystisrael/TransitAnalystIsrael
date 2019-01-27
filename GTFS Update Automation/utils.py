@@ -14,9 +14,9 @@ import re
 
 from io import BytesIO
 from dateutil import parser
-from scripts import gtfs2transfers
-from scripts import send_email
-from scripts import logger
+import gtfs2transfers
+import send_email
+import logger
 
 _log = logger.get_logger()
 
@@ -26,12 +26,16 @@ def get_config_params():
     Reads monthly_update_config_params.conf file and returns the configuration parameters
     :return: configuration parameters
     """
-    with open('monthly_update_config_params.conf') as f:
+    with open('assets\monthly_update_config_params.conf') as f:
         params = {}
+
+        # Read file
         lines = f.readlines()
         for line in lines:
             pair = line.strip().split("=")
             params[pair[0]] = pair[1]
+
+        # Get parameters
         default_coverage_name = params['default_coverage_name']
         secondary_custom_coverage_name = params['secondary_custom_coverage_name']
         gtfs_url = params['gtfs_url']
@@ -44,22 +48,27 @@ def get_config_params():
 
 
 def get_file_from_url_http(url):
-    '''
-    Donwloads a file to the working directory
-    :param url:
-    :return: the file's name
-    '''
+    """
+    Downloads a file to the working directory
+    :param url: HTTP utl to downloads from - not an FTP URL
+    :return: file name of the downloaded content in the working directory
+    """
+
+    # Preparing file for fetching
     _log.info("Going to download the latest osm from %s", url)
     r = requests.get(url, stream=True)
     local_file_name = "israel-and-palestine-latest.osm.pbf"
     file = open(local_file_name, 'wb')
+
+    # Creating a progress bar
     size = int(r.headers['Content-Length'])
     pbar = createProgressBar(size)
-    # Download
+
+    # Fetching
     size_iterator = 0
     for chunk in r.iter_content(chunk_size=1024):
         if chunk:
-            file_write(chunk, file, pbar, size_iterator)
+            file_write_update_progress_bar(chunk, file, pbar, size_iterator)
             size_iterator += 1
     file.close()
     pbar.finish()
@@ -68,6 +77,12 @@ def get_file_from_url_http(url):
 
 
 def createProgressBar(file_size, action='Downloading: '):
+    """
+    Craeting a progress bar for continious tasks like downloading file or processing data
+    :param file_size: the total size of the file to set the 100% of the bar
+    :param action: type of action for the progress bar description, default is "Downloading: "
+    :return: a progress bar object
+    """
     widgets = [action, progressbar.Percentage(), ' ',
                progressbar.Bar(marker='#', left='[', right=']'),
                ' ', progressbar.ETA(), ' ', progressbar.FileTransferSpeed()]
@@ -76,20 +91,21 @@ def createProgressBar(file_size, action='Downloading: '):
     return pbar
 
 
-def file_write(data, dest_file, pbar, size_iterator):
+def file_write_update_progress_bar(data, dest_file, pbar, size_iterator):
     """
-    Call back for writing the downlaoed data from FTP while updating the progress bar
+    Call back for writing fetched or processed data from FTP while updating the progress bar
     """
     dest_file.write(data)
     pbar.update(size_iterator)
 
-def get_file_from_url_ftp(url, file_name_on_server):
-    '''
-    Donwloads a file to the working directory
-    :param url:
-    :param file_name_on_server:
-    :return: the file name
-    '''
+
+def get_gtfs_file_from_url_ftp(url, file_name_on_server):
+    """
+    Downloads a GTFS file from an FTP server to the working directory
+    :param url: the FTP server URL that points to file's containing folder
+    :param file_name_on_server: The file name on the FTP server
+    :return: file name of the downloaded content in the working directory
+    """
     _log.info("Going to download the latest GTFS from %s", url)
     try:
         # Connect to FTP
@@ -114,8 +130,9 @@ def get_file_from_url_ftp(url, file_name_on_server):
         # Generate a progress bar and download
         local_file = open(local_file_name, 'wb')
         pbar = createProgressBar(size)
+
         # Download
-        ftp.retrbinary("RETR " + file_name_on_server, lambda data: file_write(data, local_file, pbar, len(data)))
+        ftp.retrbinary("RETR " + file_name_on_server, lambda data: file_write_update_progress_bar(data, local_file, pbar, len(data)))
 
         # Finish
         local_file.close()
@@ -128,71 +145,100 @@ def get_file_from_url_ftp(url, file_name_on_server):
 
     except ftplib.all_errors as err:
         error_code = err.args[0]
+        # file not found on server
         if error_code == 2:
             _log.error(file_name_on_server, "is not found on %s", url)
             ftp.quit()
+        # Unvalid URL
         if error_code == 11001:
             _log.error("URL %s is not valid", url)
 
 
 def copy_file_into_docker(container, dest_path, file_path, file_name):
+    """
+    Copy a given file to a destination folder in a Docker container
+    :param container: container object
+    :param dest_path: destination folder path inside the container
+    :param file_path: source path of the file on the host
+    :param file_name: the file name to be copied
+    """
     _log.info("Going to copy %s to %s at %s", file_name, container.name, dest_path)
+
+    # Read the file
     file = open(file_path + '/' + file_name, 'rb')
     file = file.read()
-    # Convert to tar file
-    tar_stream = BytesIO()
-    file_tar = tarfile.TarFile(fileobj=tar_stream, mode='w')
-    tarinfo = tarfile.TarInfo(name=file_name)
-    tarinfo.size = len(file)
-    file_tar.addfile(tarinfo, BytesIO(file))
-    file_tar.close()
 
-    tar_stream.seek(0)
-    success = container.put_archive(
-        path=dest_path,
-        data=tar_stream
-    )
-    if success:
-        _log.info("Finished copying %s to %s at %s", file_name, container.name, dest_path)
+    try:
+        # Convert to tar file
+        tar_stream = BytesIO()
+        file_tar = tarfile.TarFile(fileobj=tar_stream, mode='w')
+        tarinfo = tarfile.TarInfo(name=file_name)
+        tarinfo.size = len(file)
+        file_tar.addfile(tarinfo, BytesIO(file))
+        file_tar.close()
 
+        # Put in the container
+        tar_stream.seek(0)
+        success = container.put_archive(
+            path=dest_path,
+            data=tar_stream
+        )
+        if success:
+            _log.info("Finished copying %s to %s at %s", file_name, container.name, dest_path)
+        else:
+            raise FileNotFoundError
 
-def copy_file_from_docker():
-    pass
+    except FileNotFoundError as err:
+        _log.error("Couldn't copy %s to %s at %s", file_name, container.name, dest_path)
+        raise err
 
 
 def get_docker_service_client():
-    # TRAILS FOR RUNNING THE SERVICE
-    # docker_run_command = "C:/Program Files/Docker/Docker/Docker for Windows.exe"
-    # subprocess.call(["C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\powershell.exe", ". \"./SamplePowershell\";", "&hello"])
-    # subprocess.check_output('powershell Net start -ArgumentList  "com.docker.service" -Verb "runAs"',
-    #                         shell=True)
-    # _log.info(subprocess.check_output(["runas", "/noprofile", "/user:Administrator", "|", "echo", "shaked"]))
-
-    # docker_run_command = "start-service *docker*"
-
-    # proc = subprocess.Popen([docker_run_command], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
-    # win32serviceutil.StartService(docker_run_command,None)
+    """
+    Checks that the docker daemon service is running and returns the service client
+    :return: the docker service client
+    """
+    # Check that the docker daemon service is up, and timeout after five minutes
     docker_check_alive_cmd = "docker info"
     docker_is_up = False
-    while not docker_is_up:
-        docker_check_alive_process = subprocess.Popen(docker_check_alive_cmd, stdout=subprocess.PIPE, shell=True)
-        output, error = docker_check_alive_process.communicate()
-        docker_is_up = "Containers" in output.decode('utf-8')
+    timeout = time.time() + 60 * 5
     try:
+        while not docker_is_up:
+            if time.time() > timeout:
+                raise TimeoutError
+            # Check that the daemon is up and running
+            docker_check_alive_process = subprocess.Popen(docker_check_alive_cmd, stdout=subprocess.PIPE, shell=True)
+            output, error = docker_check_alive_process.communicate()
+            docker_is_up = "Containers" in output.decode('utf-8')
+
+        # Get the docker client
         client = docker.from_env()
         return client
-    except error:
+    except BaseException as error:
         _log.error("Docker daemon service is not up")
-        return None
+        raise error
 
 
-def get_navitia_url_for_cov(cov_name):
+def get_navitia_url_for_cov_status(cov_name):
+    """
+    Get the url of Navitia coverage status page
+    :param cov_name: the name of the coverage to return, e.g. "default" or "secondary-cov"
+    :return: url of Navitia coverage status page
+    """
     return "http://localhost:9191/v1/coverage/" + cov_name + "/status/"
 
 
-def check_covereage_running(url, coverage_name):
-    _log.info("checking if %s is up", coverage_name,)
+def check_coverage_running(url, coverage_name):
+    """
+    Check if Navitia coverage is up and running
+    :param url: Navitia server coverage url
+    :param coverage_name: the name of the coverage to check
+    :return: Whether a Navitia coverage is up and running
+    """
+    _log.info("checking if %s is up", coverage_name)
     response = requests.get(url)
+
+    # Get the status of the coverage as Json
     json_data = json.loads(response.text)
     if "status" not in json_data or "running" not in json_data["status"]["status"]:
         _log.error("%s coverage is down", coverage_name)
@@ -202,9 +248,15 @@ def check_covereage_running(url, coverage_name):
     return True
 
 
-def get_covereage_end_production_date(coverage_name):
-    url = get_navitia_url_for_cov(coverage_name)
+def get_coverage_end_production_date(coverage_name):
+    """
+    Get the end production date of the current GTFS in the given coverage
+    :param coverage_name: the name of the coverage
+    :return: end of current production date
+    """
+    url = get_navitia_url_for_cov_status(coverage_name)
     response = requests.get(url)
+    # Get the status of the coverage as Json
     json_data = json.loads(response.text)
     if "status" not in json_data or "running" not in json_data["status"]["status"]:
         _log.debug("%s coverage is down so the end of production date can't be established", coverage_name)
@@ -216,15 +268,20 @@ def get_covereage_end_production_date(coverage_name):
 
 def validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name, default_cov_eop_date):
     """
-    Vaidate that the secondary coverage has the eof of the prvious default cov date (default_cov_eop_date)
-    and the default cov has a different eop date
-    :param default_cov_eop_date:
+    Validate that the secondary_custom_coverage has the original end of production date of the previous default coverage
+    and that the default cov has a now different date (usually later one)
+    :param default_coverage_name: The coverage that gets a new (usually more recent) end of production date
+    :param secondary_custom_coverage_name: The coverage that gets a the original default_coverage end of production date
+    :param default_cov_eop_date: end of production date of original default coverage (before changes applied)
+    :return: whether the graph changes were applied
     """
-    if get_covereage_end_production_date(default_coverage_name) == default_cov_eop_date:
+
+    # Check that
+    if get_coverage_end_production_date(default_coverage_name) == default_cov_eop_date:
         _log.debug("The %s coverage seems not to be up-to-date following update attempts.\n Production date stayed the "
                    "same. ", default_coverage_name)
         raise Exception
-    if not get_covereage_end_production_date(secondary_custom_coverage_name) == default_cov_eop_date:
+    if not get_coverage_end_production_date(secondary_custom_coverage_name) == default_cov_eop_date:
         _log.debug("The %s coverage seems not to be up-to-date following update attempts.\n Production date should be "
                    "the same as old %s coverage date", secondary_custom_coverage_name, default_coverage_name)
         raise Exception
@@ -251,7 +308,7 @@ def start_navitia_with_default_coverage(navitia_docker_compose_file_path, extend
     time.sleep(t_wait)
     # Check if default and secondary_custom_coverage_name regions are up and running
     default_coverage_name = "default"
-    is_default_up = check_covereage_running(get_navitia_url_for_cov(default_coverage_name), default_coverage_name)
+    is_default_up = check_coverage_running(get_navitia_url_for_cov_status(default_coverage_name), default_coverage_name)
     if not is_default_up:
         return False
     return True
@@ -293,9 +350,9 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_co
     time.sleep(t_wait)
     # Check if default and secondary_custom_coverage_name regions are up and running
     default_coverage_name = "default"
-    is_default_up = check_covereage_running(get_navitia_url_for_cov(default_coverage_name), default_coverage_name)
-    is_secondary_up = check_covereage_running(get_navitia_url_for_cov(secondary_custom_coverage_name),
-                                              secondary_custom_coverage_name)
+    is_default_up = check_coverage_running(get_navitia_url_for_cov_status(default_coverage_name), default_coverage_name)
+    is_secondary_up = check_coverage_running(get_navitia_url_for_cov_status(secondary_custom_coverage_name),
+                                             secondary_custom_coverage_name)
     if not is_default_up or not is_secondary_up:
         return False
     return True
@@ -321,7 +378,7 @@ def copy_graph_to_local_host(container, coverage_name):
     size_iterator = 0
     for chunk in bits:
         if chunk:
-            file_write(chunk, local_graph_file, pbar, size_iterator)
+            file_write_update_progress_bar(chunk, local_graph_file, pbar, size_iterator)
             size_iterator += 1
     local_graph_file.close()
     pbar.finish()

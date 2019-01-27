@@ -4,7 +4,7 @@ import math
 import sys
 from argparse import RawTextHelpFormatter
 import os
-from scripts import utils
+import utils
 import progressbar
 import re
 
@@ -69,7 +69,7 @@ def read_file(input_file):
 
 def calculate_transfers(stops, walking_speed, transfer_time, max_distance):
     transfers = list()
-    pbar = utils.createProgressBar((len(stops)**2), action='Calculating Transfers: ')
+    pbar = utils.createProgressBar((len(stops) ** 2), action='Calculating Transfers: ')
     # for progress bar we need the number of coming
     i = 0
     # itrerations

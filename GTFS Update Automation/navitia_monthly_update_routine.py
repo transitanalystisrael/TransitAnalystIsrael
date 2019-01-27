@@ -27,14 +27,14 @@ At the end: The default coverage shows the new GTFS & OSM and the previous defau
 10. Send success / failure e-mail to transitanalystisrael@gmail.com
 """
 
-from scripts import utils
+import utils
 import os
 import datetime
 
 
 if __name__== "__main__":
     # Get logger
-    update_time = datetime.datetime.now().strftime("m%Y_%H%M")
+    update_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
     _log = utils.get_logger()
 
     # config variables to be moved to config-file downstrem
@@ -49,14 +49,14 @@ if __name__== "__main__":
         worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
 
         # Get the current end of production dates of default coverage for post-processing comparison
-        default_cov_eop_date = utils.get_covereage_end_production_date(default_coverage_name)
+        default_cov_eop_date = utils.get_coverage_end_production_date(default_coverage_name)
 
         # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
         utils.copy_graph_to_local_host(worker_con, secondary_custom_coverage_name)
         utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
 
         # Download GTFS & OSM
-        gtfs_file_name = utils.get_file_from_url_ftp(gtfs_url, gtfs_file_name_on_mot_server)
+        gtfs_file_name = utils.get_gtfs_file_from_url_ftp(gtfs_url, gtfs_file_name_on_mot_server)
         osm_file_name = utils.get_file_from_url_http(osm_url)
 
         # Generate the Transfers file required for Navitia and add to GTFS
@@ -81,7 +81,7 @@ if __name__== "__main__":
 
         # Validate the conversion process takes place by ensuring tyr_beat is up
         utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_custom_coverage_name,
-                                                    navitia_docker_compose_file_path, navitia_docker_compose_file_name)
+                                                               navitia_docker_compose_file_path, navitia_docker_compose_file_name)
 
         # After 20 minutes - test that both osm and gtfs conversions are done
         success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 20)
