@@ -26,7 +26,7 @@ def get_config_params():
     Reads monthly_update_config_params.conf file and returns the configuration parameters
     :return: configuration parameters
     """
-    with open('assets\monthly_update_config_params.conf') as f:
+    with open('assets/monthly_update_config_params.conf') as f:
         params = {}
 
         # Read file
