@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # collect a set of trip_id s at all stops in a GTFS file over the selected week of the service period starting at serviceweekstartdate
-# filter stops near trainstations based on input txt file - stopsneartrainstop_post_edit
-# merge sets of trips at stops near each trainstation to count trips per hour and per day
+# filter stops in munis based on input txt file - stopsinmuni_post_edit
+# merge sets of trips at stops in each muni to count trips per hour and per day
 #
 # inputs:
 #   parent_path = 'C:\\transitanalyst\\gtfs\\'
@@ -10,12 +10,12 @@
 #   sserviceweekstartdate = '20181021'
 #   gtfsdate = '20181021'
 #   gtfsdir = 'israel'+gtfsdate
-#   stopsneartrainstop_post_edit = 'stopsneartrainstop_post_edit'+'_'+servicedate+'.txt'
+#   stopsinmuni_post_edit = 'stopsinmuni_post_edit'+'_'+servicedate+'.txt'
 #
 # outputs:
-#   output txtfileout4 of trainstops with tpd per line (agency_id+route_short_name) near trainstop - 'trainstop_w_tpd_per_line'+'_'+servicedate+'.txt'
-#   output txtfileout3 of trainstops with trips per hour in day summed over one week -'trainstops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
-#   output jsfileout of trainstops with location and tpd per line (agency_id+route_short_name) near trainstop - 'trainstop_w_tpd_per_line_'+sserviceweekstartdate+'.js'
+#   output txtfileout4 of munis with tpd per line (agency_id+route_short_name) in muni - 'muni_w_tpd_per_line'+'_'+servicedate+'.txt'
+#   output txtfileout3 of munis with trips per hour in day summed over one week -'munis_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
+#   output jsfileout of munis with tpd per line (agency_id+route_short_name) in muni - 'muni_w_tpd_per_line_'+sserviceweekstartdate+'.js'
 #
 print '----------------- collect a set of trip_id s at all stops --------------------------'
 print 'output txt file of stops with trip_id s'
@@ -29,20 +29,23 @@ import gtfs_config as gtfscfg
 print "Local current time :", time.asctime( time.localtime(time.time()) )
 #
 def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
-	# input:
+# input:
 	parent_path = gtfspath
 	pathout = processedpath
 	sserviceweekstartdate = serviceweekstartdate # recommend to use gtfsdate (expect gtfs files to be most accurate for first week in service range)
 	gtfsdir = gtfsdirbase+gtfsdate
 	servicedate = sserviceweekstartdate
-	stopsneartrainstop_post_edit = 'stopsneartrainstop_post_edit'+'_'+servicedate+'.txt'
+	stopsinmuni_post_edit = 'stopsinmuni_post_edit'+'_'+servicedate+'.txt'
 
 	# output:
-	txtfileout4 = 'trainstop_w_tpd_per_line'+'_'+servicedate+'.txt'
+	txtfileout4 = 'muni_w_tpd_per_line'+'_'+servicedate+'.txt'
 	#txtfileout1 = 'stops_w_trip_ids'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # commented out - generates very big file
 	#txtfileout2 = 'stops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' #  stops with trips per hour in day summed over one week 
-	txtfileout3 = 'trainstops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # trainstops with trips per hour in day summed over one week 
-	jsfileout = 'trainstop_w_tpd_per_line_'+sserviceweekstartdate+'.js'
+	txtfileout3 = 'munis_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # munis with trips per hour in day summed over one week 
+	jsfileout = 'muni_w_tpd_per_line_'+sserviceweekstartdate+'.js'
+
+	#parent_path = 'C:\\transitanalyst\\processed\\' # small files for test
+	#gtfsdir = 'israel20180106-binyamina_station' # small files for test
 
 	gtfspathin = parent_path+gtfsdir+'\\'
 	gtfspath = gtfspathin
@@ -181,9 +184,9 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 		count += 1
 		sline = filein.readline()
 	print '------------------'
-	#print stops_dict
+	print in_id, stops_dict[in_id] #last one
 	#for stop_id, stopsdictlist in stops_dict.iteritems():
-	#	print stop_id, stopsdictlist[:2], list(stopsdictlist[2])
+		#print stop_id, stopsdictlist[:2], list(stopsdictlist[2])
 	print '------------------'
 	print 'minlat, minlon : ', minlat, minlon
 	print 'maxlat, maxlon : ', maxlat, maxlon
@@ -240,7 +243,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	#	for trip_id in stops_dict[stop_id][trip_dict_i]:
 	#		print '>>>', trip_id, len(stops_dict[stop_id][trip_dict_i][trip_id])
 	#		if len(stops_dict[stop_id][trip_dict_i][trip_id]) > 1 : print '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-	#print 'last stops_dict entry updated: ', stops_dict[slinelist[inid_index]]
+	#print 'last stops_dict entry updated: ', stops_dict[stop_id]
 	print 'stop_times lines scanned ', count
 	print 'stops found in dict ', stopscount 
 	print 'maxlat, maxlon', maxlat, maxlon
@@ -349,7 +352,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	print 'trips lines scanned ', count 
 	print 'trip ids in week ', count_trip_ids_in_week 
 	filein.close()
-
+	'''
 	#
 	# scan agency.txt to create agency dict keyed on agency_id and includes agency name
 	#
@@ -383,7 +386,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	#print agency_dict
 	print 'agency lines scanned ', count 
 	filein.close()
-
+	'''
 	#
 	# scan stops dict to populate trips per hour by looking up the each trip_id in the set in the trip dict
 	#   to get the service_id to look up the service days in the calendar dict
@@ -451,76 +454,68 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	print 'maxtpwanystop ', maxtpwanystop
 	print 'maxtphanystop ', maxtphanystop
 	print deltatimehist
+
 	#
-	# >>> load txt file of stopsneartrainstop post edit
+	# >>> load txt file of stopsinmuni post edit
 	#
-	print '>>> load txt file of stopsneartrainstop post edit'
-	txtfilein = stopsneartrainstop_post_edit
-	stopsneartrainstop = {}
+	print '>>> load txt file of stopsinmuni post edit'
+	txtfilein = stopsinmuni_post_edit
+	stopsinmuni = {}
 	with open(processedpathin+txtfilein, 'rb') as f:
 		reader = csv.reader(f)
-		header = reader.next() # ['trainstop_id', 'stop_id']
+		header = reader.next() # ['muni_id', 'stop_id']
 		print header
 		for row in reader:
 			#print row
-			trainstop_id = row[0]
+			muni_id = row[0]
 			stop_id = row[1]
-			# add to list, do not remove trainstop from list of stopsneartrainstop
-			if trainstop_id in stopsneartrainstop :
-				stopsneartrainstop[trainstop_id].append(stop_id)
+			# add to list, do not remove muni from list of stopsinmuni
+			if muni_id in stopsinmuni :
+				stopsinmuni[muni_id].append(stop_id)
 			else :
-				stopsneartrainstop[trainstop_id] = [stop_id]
-			'''
-			if trainstop_id == stop_id : # remove trainstop from list of stopsneartrainstop
-				print trainstop_id
-			else : # add to list
-				if trainstop_id in stopsneartrainstop :
-					stopsneartrainstop[trainstop_id].append(stop_id)
-				else :
-					stopsneartrainstop[trainstop_id] = [stop_id]
-			'''
+				stopsinmuni[muni_id] = [stop_id]
 
-	print stopsneartrainstop[trainstop_id] # last one
-	print 'stopsneartrainstop loaded. trainstop count ', len(stopsneartrainstop)
+	print stopsinmuni[muni_id] # last one
+	print 'stopsinmuni loaded. muni count ', len(stopsinmuni)
 
 	#
-	# to create tripsneartrainstop_dict
-	# for each trainstop and stop near trainstop location 
-	#   merge the tripsatstop_dict from all stops near trainstop to create mergedtripsneartrainstop_dict
+	# to create tripsinmuni_dict
+	# for each muni and stop in muni location 
+	#   merge the tripsatstop_dict from all stops in muni to create mergedtripsinmuni_dict
 	#
-	trainstopcount = 0
-	tripsneartrainstop_dict = {} # trainstop_id: mergedtripsneartrainstop_dict
-	# for each trainstop
-	# get near stop list to use as filter
-	for trainstop_id, stopsnearlist in stopsneartrainstop.iteritems():
-		print trainstopcount, trainstop_id
-		trainstopcount +=1
-	# for stops w tpd per line near trainstop
-		mergedtripsneartrainstop_dict = {} # trip_id: [timeneartrainstop1, timeneartrainstop2, timeneartrainstop3...]
-		stopneartrainstopcount = 0
-		for stop_id in stopsnearlist :
+	municount = 0
+	tripsinmuni_dict = {} # muni_id: mergedtripsinmuni_dict
+	# for each muni
+	# get in stop list to use as filter
+	for muni_id, stopsinlist in stopsinmuni.iteritems():
+		print municount, muni_id
+		municount +=1
+	# for stops w tpd per line in muni
+		mergedtripsinmuni_dict = {} # trip_id: [timeinmuni1, timeinmuni2, timeinmuni3...]
+		stopinmunicount = 0
+		for stop_id in stopsinlist :
 			[stop_lat, stop_lon, tripsatstop_dict, tphlist, totaltpwatstop] = stops_dict[stop_id]
-			stopneartrainstopcount +=1
-	#   merge the tripsatstop_dict from all stops near trainstop to create mergedtripsneartrainstop_dict
+			stopinmunicount +=1
+	#   merge the tripsatstop_dict from all stops in muni to create mergedtripsinmuni_dict
 			for trip_id, timeatstoplist in tripsatstop_dict.iteritems() :
 				if trips_dict[trip_id][2] > 0 : # xinweek > 0 then add first or merge otherwise don't add to dict at all
-					if trip_id not in mergedtripsneartrainstop_dict: # not in merged dict then add it
-						mergedtripsneartrainstop_dict[trip_id] = timeatstoplist
+					if trip_id not in mergedtripsinmuni_dict: # not in merged dict then add it
+						mergedtripsinmuni_dict[trip_id] = timeatstoplist
 					else: # already in merged dict then append timeatstoplist
-						mergedtripsneartrainstop_dict[trip_id].extend(timeatstoplist)
-		tripsneartrainstop_dict[trainstop_id] = mergedtripsneartrainstop_dict
-		print 'trainstop_id, len(mergedtripsneartrainstop_dict) : ', trainstop_id, len(mergedtripsneartrainstop_dict)
-	#print trainstop_id, mergedtripsneartrainstop_dict # last one
-	print 'trainstopcount, stopneartrainstopcount, ', trainstopcount, stopneartrainstopcount
+						mergedtripsinmuni_dict[trip_id].extend(timeatstoplist)
+		tripsinmuni_dict[muni_id] = mergedtripsinmuni_dict
+		print 'muni_id, len(mergedtripsinmuni_dict) : ', muni_id, len(mergedtripsinmuni_dict)
+	#print muni_id, mergedtripsinmuni_dict # last one
+	print 'municount, stopinmunicount, ', municount, stopinmunicount
 
 	#
-	# create tripswxinweekandminmaxtimesneartrainstop_dict by converting the list of times per trip near trainstop to 
-	# a list of min and max time for trip near trainstop and add also times per week that the trip is used
+	# create tripswxinweekandminmaxtimesinmuni_dict by converting the list of times per trip in muni to 
+	# a list of min and max time for trip in muni and add also times per week that the trip is used
 	#
-	tripswxinweekandminmaxtimesneartrainstop_dict = {} # trainstop_id: tripswxinweekandminmaxtimes_dict
-	for trainstop_id, mergedtripsneartrainstop_dict in tripsneartrainstop_dict.iteritems() :
+	tripswxinweekandminmaxtimesinmuni_dict = {} # muni_id: tripswxinweekandminmaxtimes_dict
+	for muni_id, mergedtripsinmuni_dict in tripsinmuni_dict.iteritems() :
 		tripswxinweekandminmaxtimes_dict ={} # trip_id: [xinweek, mintimetripatstop, maxtimetripatstop, deltatimetripatstop, agency_id]
-		for trip_id, timeatstoplist in mergedtripsneartrainstop_dict.iteritems() :
+		for trip_id, timeatstoplist in mergedtripsinmuni_dict.iteritems() :
 			maxtimetripatstop = 0
 			mintimetripatstop = 30*60
 			for timeatstop in timeatstoplist :
@@ -529,37 +524,30 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 				mintimetripatstop = min(mintimetripatstop, inttimeatstop)
 			deltatimetripatstop = maxtimetripatstop - mintimetripatstop
 			tripswxinweekandminmaxtimes_dict[trip_id] = [trips_dict[trip_id][2], mintimetripatstop, maxtimetripatstop, deltatimetripatstop, trips_dict[trip_id][4]] 
-		tripswxinweekandminmaxtimesneartrainstop_dict[trainstop_id] = tripswxinweekandminmaxtimes_dict
-		print 'trainstop_id, len(tripswxinweekandminmaxtimes_dict) : ', trainstop_id, len(tripswxinweekandminmaxtimes_dict)
-	#print trainstop_id, tripswxinweekandminmaxtimes_dict # last one
+		tripswxinweekandminmaxtimesinmuni_dict[muni_id] = tripswxinweekandminmaxtimes_dict
+		print 'muni_id, len(tripswxinweekandminmaxtimes_dict) : ', muni_id, len(tripswxinweekandminmaxtimes_dict)
+	#print muni_id, tripswxinweekandminmaxtimes_dict # last one
 
 	#
-	# create tripswxpdandlineneartrainstop_dict by looking up xpd and line in trips_dict for trip near trainstop and add also times per week that the trip is used
+	# create tripswxpdandlineinmuni_dict by looking up xpd and line in trips_dict for trip in muni and add also times per week that the trip is used
 	#
-	tripswxpdandlineneartrainstop_dict = {} # trainstop_id: tripswxpdandline_dict
-	for trainstop_id, mergedtripsneartrainstop_dict in tripsneartrainstop_dict.iteritems() :
+	tripswxpdandlineinmuni_dict = {} # muni_id: tripswxpdandline_dict
+	for muni_id, mergedtripsinmuni_dict in tripsinmuni_dict.iteritems() :
 		tripswxpdandline_dict ={} # trip_id: [xinweek, xpdlist, agency_id, route_short_name]
-		for trip_id, timeatstoplist in mergedtripsneartrainstop_dict.iteritems() :
+		for trip_id, timeatstoplist in mergedtripsinmuni_dict.iteritems() :
 			tripswxpdandline_dict[trip_id] = [trips_dict[trip_id][2], copy.deepcopy(trips_dict[trip_id][3]), trips_dict[trip_id][4], trips_dict[trip_id][5]] 
-			#if trips_dict[trip_id][4] == '2' : print 'train>>>', trainstop_id, trip_id,[trips_dict[trip_id][2], trips_dict[trip_id][3], trips_dict[trip_id][4], trips_dict[trip_id][5]] 
-		tripswxpdandlineneartrainstop_dict[trainstop_id] = tripswxpdandline_dict
-		print 'trainstop_id, len(tripswxpdandline_dict) : ', trainstop_id, len(tripswxpdandline_dict)
-	#print trainstop_id, tripswxpdandline_dict # last one
-
-	'''
-	for trainstop_id, tripswxpdandline_dict in tripswxpdandlineneartrainstop_dict.iteritems() :
-		for trip_id, [xinweek, xpdlist, agency_id, route_short_name] in tripswxpdandline_dict.iteritems() :
-			if xpdlist[0] > 1 : print '>>>> ' ,trainstop_id, trip_id, [xinweek, xpdlist, agency_id, route_short_name]
-	'''
+		tripswxpdandlineinmuni_dict[muni_id] = tripswxpdandline_dict
+		print 'muni_id, len(tripswxpdandline_dict) : ', muni_id, len(tripswxpdandline_dict)
+	#print muni_id, tripswxpdandline_dict # last one
 
 	#
-	# create tpdperlineneartrainstop_dict by collecting perline tpd dict for each trip near trainstop 
+	# create tpdperlineinmuni_dict by collecting perline tpd dict for each trip in muni 
 	#
-	tpdperlineneartrainstop_dict = {} # trainstop_id: tpdperline_dict
-	for trainstop_id, tripswxpdandline_dict in tripswxpdandlineneartrainstop_dict.iteritems() :
+	tpdperlineinmuni_dict = {} # muni_id: tpdperline_dict
+	for muni_id, tripswxpdandline_dict in tripswxpdandlineinmuni_dict.iteritems() :
 		tpdperline_dict = {} # line_name_i: [tpw, tpdlist]
 		for trip_id, [xinweek, xpdlist, agency_id, route_short_name] in tripswxpdandline_dict.iteritems() :
-			#if xpdlist[0] > 1 : print '>>>>> ' ,trainstop_id, trip_id, [xinweek, xpdlist, agency_id, route_short_name]
+			#if xpdlist[0] > 1 : print '>>>>> ' ,muni_id, trip_id, [xinweek, xpdlist, agency_id, route_short_name]
 			#line_name = agency_dict[agency_id]+'-'+route_short_name
 			line_name_i = agency_id+'-'+route_short_name # smaller geojson file, but need to lookup agency name in client app for display
 			if line_name_i in tpdperline_dict : # if line name already in dict then merge
@@ -567,54 +555,35 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 				for i in range(len(xpdlist)) : tpdperline_dict[line_name_i][1][i] += xpdlist[i]
 			else : # if line_name_i new then set to this trip values
 				tpdperline_dict[line_name_i] = [xinweek, copy.deepcopy(xpdlist)]
-		tpdperlineneartrainstop_dict[trainstop_id] = tpdperline_dict
-		print 'trainstop_id, len(tpdperline_dict) : ', trainstop_id, len(tpdperline_dict)
-	print trainstop_id # last one
+		tpdperlineinmuni_dict[muni_id] = tpdperline_dict
+		print 'muni_id, len(tpdperline_dict) : ', muni_id, len(tpdperline_dict)
+	print muni_id # last one
 	for line_name_i, [tpw, tpdlist] in tpdperline_dict.iteritems() : print tpw, tpdlist # last one
+
 	#
 	#   output to txt file
 	#
 	#
-	#   output txtfileout3 of trainstops with trips per hour in day summed over one week -'trainstops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
-	# **************************** need to separate out train trips to trainstops - see change that kept trainstops in >>> load txt file of stopsneartrainstop post edit
+	#   output txtfileout3 of munis with trips per hour in day summed over one week -'munis_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
 	#
 	fileout = open(gtfspathout+txtfileout3, 'w') # save results in file
-	postsline = 'trainstop_id,train,tph00,tph01,tph02,tph03,tph04,tph05,tph06,tph07,tph08,tph09,tph10,tph11,tph12,tph13,tph14,tph15,tph16,tph17,tph18,tph19,tph20,tph21,tph22,tph23\n'
+	postsline = 'muni_id,tph00,tph01,tph02,tph03,tph04,tph05,tph06,tph07,tph08,tph09,tph10,tph11,tph12,tph13,tph14,tph15,tph16,tph17,tph18,tph19,tph20,tph21,tph22,tph23\n'
 	fileout.write(postsline)
-	for trainstop_id, tripswxinweekandminmaxtimes_dict in tripswxinweekandminmaxtimesneartrainstop_dict.iteritems() :
+	for muni_id, tripswxinweekandminmaxtimes_dict in tripswxinweekandminmaxtimesinmuni_dict.iteritems() :
 		tphlist24 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-		train_tphlist24 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-		tpwneartrainstop = 0
-		tpwtrainstop = 0
-		count2x = 0
+		tpwinmuni = 0
 		count1x = 0
 		for trip_id, [xinweek, mintimetripatstop, maxtimetripatstop, deltatimetripatstop, agency_id] in tripswxinweekandminmaxtimes_dict.iteritems() :
-			if deltatimetripatstop > 30 : 
-				tpwneartrainstop += xinweek * 2
-				count2x +=1
-				hour_i = int(mintimetripatstop/60)%24
-				tphlist24[hour_i] +=xinweek
-				hour_i = int(maxtimetripatstop/60)%24
-				tphlist24[hour_i] +=xinweek
-				#print hour_i, maxtimetripatstop
-			else :
-				tpwneartrainstop += xinweek * 1
-				count1x +=1
-				hour_i = int(mintimetripatstop/60)%24
-				tphlist24[hour_i] +=xinweek
-			if agency_id == '2' : # train
-				tpwtrainstop += xinweek * 1
-				hour_i = int(mintimetripatstop/60)%24
-				train_tphlist24[hour_i] +=xinweek
-		print trainstop_id, tphlist24, train_tphlist24, tpwneartrainstop, tpwtrainstop, count2x, count1x
+			tpwinmuni += xinweek * 1
+			count1x +=1
+			hour_i = int(mintimetripatstop/60)%24
+			tphlist24[hour_i] +=xinweek
+		print muni_id, tphlist24, tpwinmuni, count1x
 		stph24 = ''
-		train_stph24 = ''
 		for i in range(24) : stph24 +=','+str(tphlist24[i])
-		for i in range(24) : train_stph24 +=','+str(train_tphlist24[i])
-		postsline = trainstop_id+',0'+stph24+'\n'
+		postsline = muni_id+stph24+'\n'
 		fileout.write(postsline)
-		postsline = trainstop_id+',1'+train_stph24+'\n'
-		fileout.write(postsline)
+
 	fileout.close()
 	print gtfspathout+txtfileout3
 
@@ -650,60 +619,53 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	'''
 
 	#
-	# create stopsforoutput_dict
+	# create munisforoutput_dict
 	# find day with max tpd and compute tpw
 	# include in outputdict the tpdperline detail of the day with max tpd
-	# stopsforoutput_dict[stop_id] = [stop_lat, stop_lon, tpwatstop, maxdaytpdatstop, averagetpdatstop, maxdaytpdperline_dict, train_maxdaytpd, train_tpw]
+	# munisforoutput_dict[muni_id] = [tpwinmuni, maxdaytpdinmuni, averagetpdinmuni, maxdaytpdperline_dict, tpdperline_dict]
 	#
 	count = 0
-	stopsforoutput_dict = {}
-	for stop_id, tpdperline_dict in tpdperlineneartrainstop_dict.iteritems():
-		tpwatstop = 0
+	munisforoutput_dict = {}
+	for muni_id, tpdperline_dict in tpdperlineinmuni_dict.iteritems():
+		tpwinmuni = 0
 
-		maxdaytpdatstop = 0
-		averagetpdatstop = 0
+		maxdaytpdinmuni = 0
+		averagetpdinmuni = 0
 		maxdaytpdperline_dict = {}
-		train_maxdaytpd = 0
-		train_tpw = 0
-		tpdatstoplist = [0,0,0,0,0,0,0]
+		tpdinmunilist = [0,0,0,0,0,0,0]
 		maxday_i = 0
 		for line_name_i, [tpw, tpdlist] in tpdperline_dict.iteritems() :
-			tpwatstop += tpw
-			if line_name_i == '2-' : train_tpw += tpw
-			for i in range(len(tpdlist)) : tpdatstoplist[i] += tpdlist[i]
-		for i in range(len(tpdatstoplist)) :
-			if tpdatstoplist[i] > tpdatstoplist[maxday_i] : maxday_i = i
-		maxdaytpdatstop = tpdatstoplist[maxday_i]
-		averagetpdatstop = tpwatstop/daysofservicetocount
+			tpwinmuni += tpw
+			for i in range(len(tpdlist)) : tpdinmunilist[i] += tpdlist[i]
+		for i in range(len(tpdinmunilist)) :
+			if tpdinmunilist[i] > tpdinmunilist[maxday_i] : maxday_i = i
+		maxdaytpdinmuni = tpdinmunilist[maxday_i]
+		averagetpdinmuni = tpwinmuni/daysofservicetocount
 		for line_name_i, [tpw, tpdlist] in tpdperline_dict.iteritems() :
 			maxdaytpdperline_dict[line_name_i] = tpdlist[maxday_i]
-			if line_name_i == '2-' : train_maxdaytpd = tpdlist[maxday_i]
-		stop_lat = stops_dict[stop_id][0]
-		stop_lon = stops_dict[stop_id][1]
-		stopsforoutput_dict[stop_id] = [stop_lat, stop_lon, tpwatstop, maxdaytpdatstop, averagetpdatstop, maxdaytpdperline_dict, train_maxdaytpd, train_tpw]
-		#print count, stop_id
+		munisforoutput_dict[muni_id] = [tpwinmuni, maxdaytpdinmuni, averagetpdinmuni, maxdaytpdperline_dict, tpdperline_dict]
+		#print count, muni_id
 		count +=1
-	print 'stopsforoutput_dict created , len: ', len(stopsforoutput_dict), count
-	print stop_id, stopsforoutput_dict[stop_id] # print last one
+	print 'munisforoutput_dict created , len: ', len(munisforoutput_dict), count
+	print muni_id, munisforoutput_dict[muni_id] # print last one
 
 	#
-	#   output js file of stops with max and average trips per day and tpd per line (agency_id, route short name) -'stops_w_tpd_per_line'+'_'+sserviceweekstartdate+'.js'
-	# stopsforoutput_dict[stop_id] = [stop_lat, stop_lon, tpwatstop, maxdaytpdatstop, averagetpdatstop, maxdaytpdperline_dict, train_maxdaytpd, train_tpw]
+	#   output js file of munis with max and average trips per day and tpd per line (agency_id, route short name) -'munis_w_tpd_per_line'+'_'+sserviceweekstartdate+'.js'
+	# munisforoutput_dict[muni_id] = [tpwinmuni, maxdaytpdinmuni, averagetpdinmuni, maxdaytpdperline_dict, tpdperline_dict]
 	#
+	'''
 	def getJSON(s_id):
 		return {
 			"type": "Feature",
 			"geometry": {
 				"type": "Point",
-				"coordinates": [float(stopsforoutput_dict[s_id][1]),float(stopsforoutput_dict[s_id][0])]
+				"coordinates": []
 			},
 			"properties": { 
-				"trainstop_id": s_id,
-				"train_tpd": stopsforoutput_dict[s_id][6],
-				"total_bus_tpd": stopsforoutput_dict[s_id][3]-stopsforoutput_dict[s_id][6],
-				"tpdperline_dict": stopsforoutput_dict[s_id][5], # no sort in py, sort in js during display
-				"tpwatstop": stopsforoutput_dict[s_id][2],
-				"train_tpw": stopsforoutput_dict[s_id][7]
+				"muni_id": s_id,
+				"total_tpd": munisforoutput_dict[s_id][1],
+				"tpdperline_dict": munisforoutput_dict[s_id][3], # no sort in py, sort in js during display
+				"tpwinmuni": munisforoutput_dict[s_id][0]
 			}
 		}
 
@@ -711,26 +673,55 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	print ("Generating GeoJSON export.")
 	geoj = {
 		"type": "FeatureCollection",
-		"features": [getJSON(stop_id) for stop_id in stopsforoutput_dict]
+		"features": [getJSON(muni_id) for muni_id in munisforoutput_dict]
 	}
 	print ("Saving file: " + gtfspathout+jsfileout+ " ...")
 	nf = open(gtfspathout+jsfileout, "w")
 	jsonstr = json.dumps(geoj, separators=(',',':')) # smaller file for download
 	outstr = jsonstr.replace('}},', '}},\n')
-	nf.write('var stopsWtpdperline =\n')
+	nf.write('var munisWtpdperline =\n')
+	nf.write(outstr)
+	nf.close()
+	print ("Saved file: " + jsfileout)
+	'''
+
+	def getJSON(m_id):
+		return {
+			m_id: {
+				"tpwinmuni": munisforoutput_dict[m_id][0],
+				"maxday_muni_tpd": munisforoutput_dict[m_id][1],
+				"average_muni_tpd": munisforoutput_dict[m_id][2],
+				"tpdperline_dict": munisforoutput_dict[m_id][3] # no sort in py, sort in js during display
+			}
+		}
+
+	# saveGeoJSON
+
+	print ("Generating JSON export.")
+	json_list = [getJSON(muni_id) for muni_id in munisforoutput_dict]
+	print ("Saving file: " + gtfspathout+jsfileout+ " ...")
+	nf = open(gtfspathout+jsfileout, "w")
+	jsonstr = json.dumps(json_list, separators=(',',':')) # smaller file for download
+	outstr = jsonstr.replace('}},{', '},\n').replace('[{', '{').replace('}]', '}')
+	nf.write('var munisWtpdperline =\n')
 	nf.write(outstr)
 	nf.close()
 	print ("Saved file: " + jsfileout)
 
 	#
-	#   output txt file with tpd per line (agency_id+route_short_name) near trainstop - 'trainstop_w_tpd_per_line'+'_'+servicedate+'.txt'
+	#   output txt file with tpd per line (agency_id+route_short_name) in muni - 'muni_w_tpd_per_line'+'_'+servicedate+'.txt'
 	#
 	fileout = open(gtfspathout+txtfileout4, 'w') # open file to save results 
-	postsline = 'trainstop_id,tpwatstop,train_tpw,train_tpd,total_bus_tpd,line_name_i,maxdaylinetpd\n'
+	postsline = 'muni_id,tpwinmuni,total_tpd,line_name_i,maxdaylinetpd,muniline,tpw,tpd1,tpd2,tpd3,tpd4,tpd5,tpd6,tpd7\n'
 	fileout.write(postsline)
-	for trainstop_id, [stop_lat, stop_lon, tpwatstop, maxdaytpdatstop, averagetpdatstop, maxdaytpdperline_dict, train_maxdaytpd, train_tpw] in stopsforoutput_dict.iteritems():
+	for muni_id, [tpwinmuni, maxdaytpdinmuni, averagetpdinmuni, maxdaytpdperline_dict, tpdperline_dict] in munisforoutput_dict.iteritems():
+		
 		for line_name_i, maxdaylinetpd in sorted(maxdaytpdperline_dict.iteritems(), reverse=True, key=lambda(k,v):(v)):
-			postsline = trainstop_id+','+str(tpwatstop)+','+str(train_tpw)+','+str(train_maxdaytpd)+','+str(maxdaytpdatstop-train_maxdaytpd)+','+line_name_i+','+str(maxdaylinetpd)+'\n'
+			postsline = muni_id+','+str(tpwinmuni)+','+str(maxdaytpdinmuni)+','+line_name_i+','+str(maxdaylinetpd)
+			postsline += ','+str(tpdperline_dict[line_name_i][0])
+			tpd7list = tpdperline_dict[line_name_i][1]
+			for i in range(len(tpd7list)) : postsline += ','+str(tpd7list[i])
+			postsline += '\n'
 			fileout.write(postsline)
 	fileout.close()
 	print gtfspathout+txtfileout4

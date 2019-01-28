@@ -1,24 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # collect a set of trip_id s at all stops in a GTFS file over the selected week of the service period starting at serviceweekstartdate
-# filter stops near trainstations based on input txt file - stopsneartrainstop_post_edit
-# merge sets of trips at stops near each trainstation to count trips per hour and per day
+# filter and cluster stops based on input txt file of merge_id per stop_id (e.g. stopsneartrainstop_post_edit or stopsinmuni_post_edit)
+# merge sets of trips at stops per merge_id to count trips per hour and per day
 #
 # inputs:
-#   parent_path = 'C:\\transitanalyst\\gtfs\\'
-#   pathout = 'C:\\transitanalyst\\processed\\'
-#   sserviceweekstartdate = '20181021'
-#   gtfsdate = '20181021'
-#   gtfsdir = 'israel'+gtfsdate
-#   stopsneartrainstop_post_edit = 'stopsneartrainstop_post_edit'+'_'+servicedate+'.txt'
+#   (gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate, stopsmergefile, mergeidwlocfile, txtfileoutwtpdperline, txtfileoutwtphsummedoverweek, jsfileoutwtpdperline)
+#   e.g. - ('20181021', 'C:\\transitanalyst\\gtfs\\', 'israel', 'C:\\transitanalyst\\processed\\', '20181021', 'stopsneartrainstop_post_edit_20181021.txt', mergeidwlocfile??, 'trainstop_w_tpd_per_line_20181021.txt', 'trainstops_w_tph_summed_over_week_20181021_20181021.txt', 'trainstop_w_tpd_per_line_20181021.js')
 #
 # outputs:
-#   output txtfileout4 of trainstops with tpd per line (agency_id+route_short_name) near trainstop - 'trainstop_w_tpd_per_line'+'_'+servicedate+'.txt'
-#   output txtfileout3 of trainstops with trips per hour in day summed over one week -'trainstops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
-#   output jsfileout of trainstops with location and tpd per line (agency_id+route_short_name) near trainstop - 'trainstop_w_tpd_per_line_'+sserviceweekstartdate+'.js'
+#   output txtfileoutwtpdperline of merge_ids with tpd per line (agency_id+route_short_name) 
+#   output txtfileoutwtphsummedoverweek of merge_ids with trips per hour in day summed over one week 
+#   output jsfileoutwtpdperline of merge_ids with location and tpd per line (agency_id+route_short_name) 
 #
-print '----------------- collect a set of trip_id s at all stops --------------------------'
-print 'output txt file of stops with trip_id s'
+tried to generalize to be used both for muni and for near trainstops... but got too complicated , so gave up...
+
+
+
+print '----------------- collect a set of trip_id s at all stops and merge stops to count trips per hour and per day --------------------------'
 from datetime import date
 from datetime import timedelta
 import time
@@ -28,21 +27,18 @@ import csv
 import gtfs_config as gtfscfg
 print "Local current time :", time.asctime( time.localtime(time.time()) )
 #
-def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
+def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate, stopsmergefile, mergeidwlocfile, txtfileoutwtpdperline, txtfileoutwtphsummedoverweek, jsfileoutwtpdperline):
 	# input:
 	parent_path = gtfspath
 	pathout = processedpath
 	sserviceweekstartdate = serviceweekstartdate # recommend to use gtfsdate (expect gtfs files to be most accurate for first week in service range)
 	gtfsdir = gtfsdirbase+gtfsdate
 	servicedate = sserviceweekstartdate
-	stopsneartrainstop_post_edit = 'stopsneartrainstop_post_edit'+'_'+servicedate+'.txt'
 
 	# output:
-	txtfileout4 = 'trainstop_w_tpd_per_line'+'_'+servicedate+'.txt'
-	#txtfileout1 = 'stops_w_trip_ids'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # commented out - generates very big file
-	#txtfileout2 = 'stops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' #  stops with trips per hour in day summed over one week 
-	txtfileout3 = 'trainstops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # trainstops with trips per hour in day summed over one week 
-	jsfileout = 'trainstop_w_tpd_per_line_'+sserviceweekstartdate+'.js'
+	txtfileout4 = txtfileoutwtpdperline
+	txtfileout3 = txtfileoutwtphsummedoverweek # trainstops with trips per hour in day summed over one week 
+	jsfileout = jsfileoutwtpdperline
 
 	gtfspathin = parent_path+gtfsdir+'\\'
 	gtfspath = gtfspathin
@@ -455,7 +451,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	# >>> load txt file of stopsneartrainstop post edit
 	#
 	print '>>> load txt file of stopsneartrainstop post edit'
-	txtfilein = stopsneartrainstop_post_edit
+	txtfilein = stopsmergefile
 	stopsneartrainstop = {}
 	with open(processedpathin+txtfilein, 'rb') as f:
 		reader = csv.reader(f)

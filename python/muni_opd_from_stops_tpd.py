@@ -27,190 +27,182 @@ import copy
 import os
 import json
 from shapely.geometry import shape, Point, Polygon, MultiPolygon
+import gtfs_config as gtfscfg
 #import math
 
+def main(gtfsdate, processedpath, serviceweekstartdate):
+	# input:
+	sserviceweekstartdate = serviceweekstartdate
+	pathin = processedpath
+	pathout = processedpath
+	stopsfilein = 'stopswtpdand10xforrail'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # txt file with average tpd per stop and top location
+	cityfilein = 'israel_city_boarders.geojson'
+	townfilein = 'israel_town_boarders.geojson' # moatzot mekomiyot
 
-# input:
-gtfsdate = '20181021'
-sserviceweekstartdate = '20181021'
-pathin = 'C:\\transitanalyst\\processed\\'
-pathout = 'C:\\transitanalyst\\processed\\'
-stopsfilein = 'stopswtpdand10xforrail'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # txt file with average tpd per stop and top location
-cityfilein = 'israel_city_boarders.geojson'
-townfilein = 'israel_town_boarders.geojson' # moatzot mekomiyot
-
-# output:
-munifileout = stopsfilein.replace('stopswtpdand10xforrail', 'muni_opd') #  txt file with average opd per muni 
-print 'stopsfilein, munifileout : ', stopsfilein, munifileout
+	# output:
+	munifileout = stopsfilein.replace('stopswtpdand10xforrail', 'muni_opd') #  txt file with average opd per muni 
+	print 'stopsfilein, munifileout : ', stopsfilein, munifileout
 
 
-'''
+	'''
 
-muniboarderfile = 'israel_muni_boarders_filtered_v3.txt'
-muniboarderandtripcountfile = 'israel_muni_boarders_and_trip_count.txt'
-munitransitfile = 'israel_muni_transit.txt'
-munistopsfile = 'stopswtripcountand10xforrail.txt'
-munikmlfile = 'israel_muni_boarders.kml'
+	muniboarderfile = 'israel_muni_boarders_filtered_v3.txt'
+	muniboarderandtripcountfile = 'israel_muni_boarders_and_trip_count.txt'
+	munitransitfile = 'israel_muni_transit.txt'
+	munistopsfile = 'stopswtripcountand10xforrail.txt'
+	munikmlfile = 'israel_muni_boarders.kml'
 
-kml = Kml()
-'''
-gtfspathin = pathin
-gtfspathout = pathout
+	kml = Kml()
+	'''
+	gtfspathin = pathin
+	gtfspathout = pathout
 
-MAX_STOPS_COUNT = 50000
-MAX_STOP_TIMES_COUNT = 25000000
-MAX_TRIPS_COUNT = 900000
-MAX_SHAPES_COUNT = 10000000
-MAX_ROUTES_COUNT = 15000
-MAX_AGENCY_COUNT = 100
-MAX_CALENDAR_COUNT = 250000
+	#
+	# load files 
+	#
 
-#
-# load files 
-#
+	#
+	# scan stopfile to create munistops_dict and compute maxaveragetpdatstop and totaltripsatallstops
+	#
+	# 1st sline is 'stop_id,stop_lat,stop_lon,averagetpdatstop\n'
+	#
+	maxaveragetpdatstop = 0
+	totaltripsatallstops = 0L
 
-#
-# scan stopfile to create munistops_dict and compute maxaveragetpdatstop and totaltripsatallstops
-#
-# 1st sline is 'stop_id,stop_lat,stop_lon,averagetpdatstop\n'
-#
-maxaveragetpdatstop = 0
-totaltripsatallstops = 0L
-
-munistops_dict = {}
-slinelist=[]
-print pathin+stopsfilein
-filein = open(gtfspathin+stopsfilein, 'r')
-sline = filein.readline()
-keylinelen = len(sline)
-slinelist=sline[:-1].split(",")
-print slinelist
-keylist = slinelist
-stop_id_i = keylist.index('stop_id')
-stop_lat_i = keylist.index('stop_lat')
-stop_lon_i = keylist.index('stop_lon')
-averagetpdatstop_i = keylist.index('averagetpdatstop')
-print slinelist[stop_id_i], slinelist[stop_lat_i], slinelist[stop_lon_i], slinelist[averagetpdatstop_i]
-maxfilelinecount = MAX_STOPS_COUNT
-count = 0
-sline = filein.readline()
-fileinlines = (os.path.getsize(gtfspathin+stopsfilein)-keylinelen)/len(sline)
-# scan stopsfilein
-while ((count < maxfilelinecount) and (sline != '')):
-	slinelist=sline[:-1].split(",")
-	#print slinelist
-	stop_id = slinelist[stop_id_i]
-	stop_lat = slinelist[stop_lat_i]
-	stop_lon = slinelist[stop_lon_i]
-	averagetpdatstop = int(slinelist[averagetpdatstop_i])
-	maxaveragetpdatstop = max(maxaveragetpdatstop, averagetpdatstop)
-	totaltripsatallstops += averagetpdatstop
-	munistops_dict[stop_id] = [stop_lat, stop_lon, averagetpdatstop]
-	count += 1
-	#print count, fileinlines, averagetpdatstop, maxaveragetpdatstop, totaltripsatallstops
+	munistops_dict = {}
+	slinelist=[]
+	print pathin+stopsfilein
+	filein = open(gtfspathin+stopsfilein, 'r')
 	sline = filein.readline()
-print 'count, fileinlines, averagetpdatstop, maxaveragetpdatstop, totaltripsatallstops'
-print count, fileinlines, averagetpdatstop, maxaveragetpdatstop, totaltripsatallstops
-print '------------------'
-print 'stops lines scanned ', count
-filein.close()
+	keylinelen = len(sline)
+	slinelist=sline[:-1].split(",")
+	print slinelist
+	keylist = slinelist
+	stop_id_i = keylist.index('stop_id')
+	stop_lat_i = keylist.index('stop_lat')
+	stop_lon_i = keylist.index('stop_lon')
+	averagetpdatstop_i = keylist.index('averagetpdatstop')
+	print slinelist[stop_id_i], slinelist[stop_lat_i], slinelist[stop_lon_i], slinelist[averagetpdatstop_i]
+	maxfilelinecount = gtfscfg.MAX_STOPS_COUNT
+	count = 0
+	sline = filein.readline()
+	fileinlines = (os.path.getsize(gtfspathin+stopsfilein)-keylinelen)/len(sline)
+	# scan stopsfilein
+	while ((count < maxfilelinecount) and (sline != '')):
+		slinelist=sline[:-1].split(",")
+		#print slinelist
+		stop_id = slinelist[stop_id_i]
+		stop_lat = slinelist[stop_lat_i]
+		stop_lon = slinelist[stop_lon_i]
+		averagetpdatstop = int(slinelist[averagetpdatstop_i])
+		maxaveragetpdatstop = max(maxaveragetpdatstop, averagetpdatstop)
+		totaltripsatallstops += averagetpdatstop
+		munistops_dict[stop_id] = [stop_lat, stop_lon, averagetpdatstop]
+		count += 1
+		#print count, fileinlines, averagetpdatstop, maxaveragetpdatstop, totaltripsatallstops
+		sline = filein.readline()
+	print 'count, fileinlines, averagetpdatstop, maxaveragetpdatstop, totaltripsatallstops'
+	print count, fileinlines, averagetpdatstop, maxaveragetpdatstop, totaltripsatallstops
+	print '------------------'
+	print 'stops lines scanned ', count
+	filein.close()
 
-# >>> load city boarders 
-with open(pathin+cityfilein) as cf:
-	city_geo = json.load(cf)
-print 'loaded city geo, feature count: ', len(city_geo['features'])
-#print city_geo
+	# >>> load city boarders 
+	with open(pathin+cityfilein) as cf:
+		city_geo = json.load(cf)
+	print 'loaded city geo, feature count: ', len(city_geo['features'])
+	#print city_geo
 
-# >>> load town boarders 
-with open(pathin+townfilein) as tf:
-	town_geo = json.load(tf)
-print 'loaded town geo, feature count: ', len(town_geo['features'])
-#print town_geo
+	# >>> load town boarders 
+	with open(pathin+townfilein) as tf:
+		town_geo = json.load(tf)
+	print 'loaded town geo, feature count: ', len(town_geo['features'])
+	#print town_geo
 
-#
-# process loaded files
-#
+	#
+	# process loaded files
+	#
 
-#
-# for each city and town 
-#   filter stops w tpd in boarders multipoly 
-#   sum the tpd from all stops in muni to get opd for muni
-#   output muni opd to txt file
-#
+	#
+	# for each city and town 
+	#   filter stops w tpd in boarders multipoly 
+	#   sum the tpd from all stops in muni to get opd for muni
+	#   output muni opd to txt file
+	#
 
-fileout = open(pathout+munifileout, 'w') # open file to save results 
-postsline = 'municode,muni_name,opdinmuni,stopinmunicount\n'
-fileout.write(postsline)
-
-# for each city 
-for feature in city_geo['features']:
-# get muni boarders multipoly to use as filter
-	#print feature['properties']
-	muni_id = feature['properties']['muni_id']
-	muni_name = feature['properties']['muni_name']
-	print muni_name
-	muni_boarder_multipoly = shape(feature['geometry']) # get muni boarders multipoly to use as filter
-	#print len(feature['geometry']['coordinates']), muni_boarder_multipoly.geom_type
-	#print feature['geometry']['coordinates'][0][0][0]
-	if not muni_boarder_multipoly.is_valid : 
-		muni_boarder_multipoly = muni_boarder_multipoly.buffer(0) # clean multipoly if not valid
-		print 'cleaned multipoly'
-
-# filter stops w tpd per line in boarders multipoly 
-	muni_stops_dict = {}
-	stopinmunicount = 0
-	opdinmuni = 0
-	for stop_id, [stop_lat, stop_lon, averagetpdatstop] in munistops_dict.iteritems() :
-		stop_loc = Point(float(stop_lon), float(stop_lat))
-		if muni_boarder_multipoly.contains(stop_loc) :
-		#print stop_loc
-			stopinmunicount +=1
-
-# sum tpd per stop in muni to get opd
-			opdinmuni += averagetpdatstop
-
-	print 'stopinmunicount, opdinmuni: ', stopinmunicount, opdinmuni
-	#print muni_tpdperline_dict
-
-# output muni opportunities per day (opd) to txt file
-	postsline = muni_id+','+muni_name+','+str(opdinmuni)+','+str(stopinmunicount)+'\n' 
+	fileout = open(pathout+munifileout, 'w') # open file to save results 
+	postsline = 'municode,muni_name,opdinmuni,stopinmunicount\n'
 	fileout.write(postsline)
 
-# for each town 
-for feature in town_geo['features']:
-# get muni boarders multipoly to use as filter
-	#print feature['properties']
-	muni_id = feature['properties']['muni_id']
-	muni_name = feature['properties']['muni_name']
-	print muni_name
-	muni_boarder_multipoly = shape(feature['geometry']) # get muni boarders multipoly to use as filter
-	#print len(feature['geometry']['coordinates']), muni_boarder_multipoly.geom_type
-	#print feature['geometry']['coordinates'][0][0][0]
-	if not muni_boarder_multipoly.is_valid : 
-		muni_boarder_multipoly = muni_boarder_multipoly.buffer(0) # clean multipoly if not valid
-		print 'cleaned multipoly'
+	# for each city 
+	for feature in city_geo['features']:
+	# get muni boarders multipoly to use as filter
+		#print feature['properties']
+		muni_id = feature['properties']['muni_id']
+		muni_name = feature['properties']['muni_name']
+		print muni_name
+		muni_boarder_multipoly = shape(feature['geometry']) # get muni boarders multipoly to use as filter
+		#print len(feature['geometry']['coordinates']), muni_boarder_multipoly.geom_type
+		#print feature['geometry']['coordinates'][0][0][0]
+		if not muni_boarder_multipoly.is_valid : 
+			muni_boarder_multipoly = muni_boarder_multipoly.buffer(0) # clean multipoly if not valid
+			print 'cleaned multipoly'
 
-# filter stops w tpd per line in boarders multipoly 
-	muni_stops_dict = {}
-	stopinmunicount = 0
-	opdinmuni = 0
-	for stop_id, [stop_lat, stop_lon, averagetpdatstop] in munistops_dict.iteritems() :
-		stop_loc = Point(float(stop_lon), float(stop_lat))
-		if muni_boarder_multipoly.contains(stop_loc) :
-		#print stop_loc
-			stopinmunicount +=1
+	# filter stops w tpd per line in boarders multipoly 
+		muni_stops_dict = {}
+		stopinmunicount = 0
+		opdinmuni = 0
+		for stop_id, [stop_lat, stop_lon, averagetpdatstop] in munistops_dict.iteritems() :
+			stop_loc = Point(float(stop_lon), float(stop_lat))
+			if muni_boarder_multipoly.contains(stop_loc) :
+			#print stop_loc
+				stopinmunicount +=1
 
-# sum tpd per stop in muni to get opd
-			opdinmuni += averagetpdatstop
+	# sum tpd per stop in muni to get opd
+				opdinmuni += averagetpdatstop
 
-	print 'stopinmunicount, opdinmuni: ', stopinmunicount, opdinmuni
-	#print muni_tpdperline_dict
+		print 'stopinmunicount, opdinmuni: ', stopinmunicount, opdinmuni
+		#print muni_tpdperline_dict
 
-# output muni opportunities per day (opd) to txt file
-	postsline = muni_id+','+muni_name+','+str(opdinmuni)+','+str(stopinmunicount)+'\n' 
-	fileout.write(postsline)
+	# output muni opportunities per day (opd) to txt file
+		postsline = muni_id+','+muni_name+','+str(opdinmuni)+','+str(stopinmunicount)+'\n' 
+		fileout.write(postsline)
 
-fileout.close()
-print 'closed file: ', munifileout
+	# for each town 
+	for feature in town_geo['features']:
+	# get muni boarders multipoly to use as filter
+		#print feature['properties']
+		muni_id = feature['properties']['muni_id']
+		muni_name = feature['properties']['muni_name']
+		print muni_name
+		muni_boarder_multipoly = shape(feature['geometry']) # get muni boarders multipoly to use as filter
+		#print len(feature['geometry']['coordinates']), muni_boarder_multipoly.geom_type
+		#print feature['geometry']['coordinates'][0][0][0]
+		if not muni_boarder_multipoly.is_valid : 
+			muni_boarder_multipoly = muni_boarder_multipoly.buffer(0) # clean multipoly if not valid
+			print 'cleaned multipoly'
+
+	# filter stops w tpd per line in boarders multipoly 
+		muni_stops_dict = {}
+		stopinmunicount = 0
+		opdinmuni = 0
+		for stop_id, [stop_lat, stop_lon, averagetpdatstop] in munistops_dict.iteritems() :
+			stop_loc = Point(float(stop_lon), float(stop_lat))
+			if muni_boarder_multipoly.contains(stop_loc) :
+			#print stop_loc
+				stopinmunicount +=1
+
+	# sum tpd per stop in muni to get opd
+				opdinmuni += averagetpdatstop
+
+		print 'stopinmunicount, opdinmuni: ', stopinmunicount, opdinmuni
+		#print muni_tpdperline_dict
+
+	# output muni opportunities per day (opd) to txt file
+		postsline = muni_id+','+muni_name+','+str(opdinmuni)+','+str(stopinmunicount)+'\n' 
+		fileout.write(postsline)
+
+	fileout.close()
+	print 'closed file: ', munifileout
 
 

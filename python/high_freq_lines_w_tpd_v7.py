@@ -8,18 +8,14 @@
 # also collect set of stops per route and use to measure common stops between routes that are the same line for a histogram
 #
 # inputs:
-#   parent_path = 'C:\\transitanalyst\\processed\\'
-#   gtfs_parant_path = 'C:\\transitanalyst\\gtfs\\'
-#   gtfsdir = 'israel20181021'
-#   sstarttime = '00:00:00'
-#   sstoptime = '24:00:00'
-#   FREQUENT_TPD = 60 # e.g. 8 tpd for delta time from start to stop of 2 hours is average of 4 trips an hour 
+#   (gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, freqtpdmin) 
+#   e.g. for high freq lines in all israel ('20181021', 'C:\\transitanalyst\\gtfs\\', 'israel', 'C:\\transitanalyst\\processed\\', '00:00:00', '24:00:00', 60)
 #
 # outputs:
 #   txt file of routes with tripcount and stops count - 'routeswtripcountperday.txt'
 #   txt file of unique routes - 'uniquerouteswtripcountat'+sstarttimename+sstoptimename+'.txt'
-#   js file of lines with name max trips per day and shape geometry - 'route_freq_at'+sstarttimename+sstoptimename+'_'+sstartservicedate+'.js'
 #   txt file for histogram of samestops for route_id pairs - samestopshist.txt
+#   js file of lines with name max trips per day and shape geometry - 'route_freq_at'+sstarttimename+sstoptimename+'_'+sstartservicedate+gtfs_area+'.js'
 #
 print '----------------- count the number of trips per day tpd for all lines (unique routes) --------------------------'
 print 'generate js file of routes with name max trips per day and shape geometry'
@@ -28,6 +24,7 @@ from datetime import timedelta
 import time
 import copy
 import json
+import gtfs_config as gtfscfg
 #
 print "Local current time :", time.asctime( time.localtime(time.time()) )
 #
@@ -75,18 +72,10 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	DAYSTOCOUNT = 7
 	daysofservicetocount = DAYSTOCOUNT - DAYSTOCOUNT/7
 
-	MAX_STOPS_COUNT = 50000
-	MAX_STOP_TIMES_COUNT = 25000000
-	MAX_TRIPS_COUNT = 900000
-	MAX_SHAPES_COUNT = 10000000
-	MAX_ROUTES_COUNT = 15000
-	MAX_AGENCY_COUNT = 100
-	MAX_CALENDAR_COUNT = 250000
-
 	#
 	# scan lines in calendar to compute start and end service dates and to fill calendar_dict with calendar lines keyed on service_id
 	#
-	maxfilelinecount = MAX_CALENDAR_COUNT
+	maxfilelinecount = gtfscfg.MAX_CALENDAR_COUNT
 	gtfsfile = 'calendar.txt'
 	inid = 'service_id'
 	calendar_dict = {}
@@ -162,7 +151,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	# scan routes.txt to create a routes dict keyed on route_id that includes a route name, an empty set of trip_id s for this route and a 
 	# trips per day at route list with service day (from start to end) and count of 0, also set of stop_id s per route and a direction_id placeholder
 	#
-	maxfilelinecount = MAX_ROUTES_COUNT
+	maxfilelinecount = gtfscfg.MAX_ROUTES_COUNT
 	gtfsfile = 'routes.txt'
 	inid = 'route_id'
 	routes_dict = {}
@@ -207,7 +196,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	# scan trips.txt to create trips dict keyed on trip_id and includes service_id and route_id and shape_id and start_time placeholder and direction
 	# trips.txt : route_id,service_id,trip_id,trip_headsign,direction_id,shape_id
 
-	maxfilelinecount = MAX_TRIPS_COUNT
+	maxfilelinecount = gtfscfg.MAX_TRIPS_COUNT
 	gtfspath = gtfspathin
 	gtfsfile = 'trips.txt'
 	inid = 'trip_id'
@@ -249,7 +238,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	#
 	# scan stop_times.txt to populate trip start_time in trips dict
 	#
-	maxfilelinecount = MAX_STOP_TIMES_COUNT
+	maxfilelinecount = gtfscfg.MAX_STOP_TIMES_COUNT
 	gtfspath = gtfspathin
 	gtfsfile = 'stop_times.txt'
 	inid = 'stop_id'
@@ -288,7 +277,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	#
 	# scan trips.txt to populate trip_id set per route in the routes dict and direction_id into routes dict
 	#
-	maxfilelinecount = MAX_TRIPS_COUNT
+	maxfilelinecount = gtfscfg.MAX_TRIPS_COUNT
 	gtfspath = gtfspathin
 	gtfsfile = 'trips.txt'
 	inid = 'route_id'
@@ -388,7 +377,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	# scan stop_times.txt to populate stop_id set per route in the routes dict
 	# to find route_id - lookup trip_id in trips dict 
 	#
-	maxfilelinecount = MAX_STOP_TIMES_COUNT
+	maxfilelinecount = gtfscfg.MAX_STOP_TIMES_COUNT
 	gtfspath = gtfspathin
 	gtfsfile = 'stop_times.txt'
 	inid = 'stop_id'
@@ -425,7 +414,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	#
 	# scan shapes.txt to create shape dict keyed on shape_id and includes list of latlon points
 	#
-	maxfilelinecount = MAX_SHAPES_COUNT
+	maxfilelinecount = gtfscfg.MAX_SHAPES_COUNT
 	gtfspath = gtfspathin
 	gtfsfile = 'shapes.txt'
 	inid = 'shape_id'
@@ -550,7 +539,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	#
 	# scan agency.txt to create agency dict keyed on agency_id and includes agency name
 	#
-	maxfilelinecount = MAX_AGENCY_COUNT
+	maxfilelinecount = gtfscfg.MAX_AGENCY_COUNT
 	gtfspath = gtfspathin
 	gtfsfile = 'agency.txt'
 	inid = 'agency_id'
@@ -755,5 +744,3 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	nf.close()
 	print ("Saved file: " + jsfileout)
 	
-	
-	return
