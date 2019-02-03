@@ -41,7 +41,6 @@ if __name__== "__main__":
     default_coverage_name, secondary_custom_coverage_name, gtfs_url, gtfs_file_name_on_mot_server, osm_url, \
         navitia_docker_compose_file_path, navitia_docker_compose_file_name = utils.get_config_params()
 
-    print(default_coverage_name)
     try:
         # Get the docker service client
         docker_client = utils.get_docker_service_client()
@@ -106,10 +105,13 @@ if __name__== "__main__":
         # Validate new data is accessible via default and the old data is accessible via secondary
         utils.validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name, default_cov_eos_date)
 
-        # Send e-mail everything is completed
-        utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
-
-        _log.info("Done without errors")
+        # Send e-mail everything is completed - only on automatic script on AWS
+        # On local Windows machine, there's no need.
+        if utils.is_aws_machine():
+            # utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
+            _log.info("Done without errors - log was sent to email")
+        else:
+            _log.info("Done without errors - log is saved locally")
 
     except Exception as e:
         _log.exception("Done with errors - see Exception stacktrace")

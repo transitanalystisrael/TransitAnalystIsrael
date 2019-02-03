@@ -10,6 +10,7 @@ import time
 import zipfile
 import tarfile
 import re
+from boto.utils import get_instance_metadata
 
 
 from io import BytesIO
@@ -613,6 +614,19 @@ def send_log_to_email(subject, message):
     """
     attached_file = logger.get_log_file_name()
     return send_email.create_msg_and_send_email(subject, message, attached_file)
+
+
+def is_aws_machine():
+    """
+    Checks whether the machine is AWS EC2 instance or not
+    :return:
+    """
+    m = get_instance_metadata(timeout=5, num_retries=1)
+
+    if len(m.keys()) > 0:
+        return True
+    else:
+        return False
 
 
 def get_logger():

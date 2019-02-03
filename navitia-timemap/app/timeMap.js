@@ -338,7 +338,7 @@ function durationToString (duration) {
 
 
 /*var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";*/
-var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/heat_maps";
+var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/default/heat_maps";
 var resolution = "750";
 var date_time_picker;
 
@@ -545,21 +545,22 @@ legend.addTo(map);
 
 //Creating the default map after getting the date
 function getdate_and_generateHeatMap(){
-    d3fetch.json("dates.conf").then(function (data) {
-        var start_date =  moment(data["start_date"], "DD/MM/YYYY").toDate()
-        date_time_picker = $('#datetimepicker').datetimepicker({
-            formatDate: 'd.m.Y',
-            formatTime: 'H:i',
-            minDate: moment(start_date).format('DD.MM.YYYY'), //'21.10.2018',
-            maxDate: moment(start_date).add(6, 'days').format('DD.MM.YYYY'),//'27.10.2018',
-            showSecond: false,
-            step: 30,
-        });
-
-        //Default time
-        date_time_picker.val(moment(start_date).format('YYYY/MM/DD') + (' 08:00'));
-        generateHeatMap()
+    var start_date_string = "03/02/2019"
+    var end_date_string = "03/04/2019"
+    var start_date =  moment(start_date_string, "DD/MM/YYYY").toDate()
+    var end_date =  moment(end_date_string, "DD/MM/YYYY").toDate()
+    date_time_picker = $('#datetimepicker').datetimepicker({
+        formatDate: 'd.m.Y',
+        formatTime: 'H:i',
+        minDate: moment(start_date).format('DD.MM.YYYY'), //'21.10.2018',
+        maxDate: moment(end_date ).format('DD.MM.YYYY'),//'27.10.2018',
+        showSecond: false,
+        step: 30,
     });
+
+    //Default time
+    date_time_picker.val(moment(start_date).format('YYYY/MM/DD') + (' 08:00'));
+    generateHeatMap()
 }
 
 //main function
