@@ -10,7 +10,7 @@ import time
 import zipfile
 import tarfile
 import re
-from boto.utils import get_instance_metadata
+
 
 
 from io import BytesIO
@@ -621,11 +621,13 @@ def is_aws_machine():
     Checks whether the machine is AWS EC2 instance or not
     :return:
     """
-    m = get_instance_metadata(timeout=5, num_retries=1)
-
-    if len(m.keys()) > 0:
-        return True
-    else:
+    try:
+        r = requests.get("http://169.254.169.254/latest/dynamic/instance-identity/document")
+        if r.json() is not None:
+            return True
+        else:
+            return False
+    except requests.exceptions.ConnectionError:
         return False
 
 

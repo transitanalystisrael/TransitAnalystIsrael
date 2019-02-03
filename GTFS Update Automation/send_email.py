@@ -14,9 +14,13 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from apiclient import errors, discovery  #needed for gmail service
-
+import boto3
 
 def get_credentials():
+    # get credentials from S3 bucket - this would only work on Transit Analyst EC2 that has a proper IAM role
+    # boto3.
+
+
     store = file.Storage('assets/token.json')
     creds = store.get()
     if not creds or creds.invalid:

@@ -108,7 +108,7 @@ if __name__== "__main__":
         # Send e-mail everything is completed - only on automatic script on AWS
         # On local Windows machine, there's no need.
         if utils.is_aws_machine():
-            # utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
+            utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
             _log.info("Done without errors - log was sent to email")
         else:
             _log.info("Done without errors - log is saved locally")
