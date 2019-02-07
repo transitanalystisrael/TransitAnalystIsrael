@@ -9,6 +9,8 @@ Steps to Deploy Israel transit Analyst Alpha Version on AWS
 Trnaist Map Deployment - Steps:
 1. Launch EC2 instance and run the docker container:
 ====================================================
+0. Update the instance OS:	
+	$ sudo yum update
 a. Start a new Linux EC2 instance with at leat 4 GB RAM and 10GB EBS storage - Acquire the needed ssh .pem key and save it!
 	The following ports should be exposed for 
 		inbound traffic: TCP 80 (http), TCP 22 (ftp), TCP 9191 (navitia)
@@ -18,22 +20,37 @@ a. Start a new Linux EC2 instance with at leat 4 GB RAM and 10GB EBS storage - A
    
 b. Install Git on the EC2 instance: 
 	$sudo yum install -y git
-c. Pull Navitia docker project (adjusted to our needs) from: https://github.com/shakedk/navitia-docker-compose
-d. Install docker and docker-compose tools (or as detailed here: https://gist.github.com/benfogel/041e3c4b8b856cdcdfd8d9d5aa0a7f73):
-	$ sudo yum update
-	$ sudo yum install -y docker
+c. Install Python3 and modules:
+	$ sudo yum install python3
+	$ python3 -m pip install --user docker progressbar2 python-dateutil oauth2client google-api-python-client
+d. Pull Navitia docker project (adjusted to our needs) from: https://github.com/shakedk/navitia-docker-compose
+e. Install docker and docker-compose tools (or as detailed here: https://gist.github.com/benfogel/041e3c4b8b856cdcdfd8d9d5aa0a7f73):
+	$ sudo amazon-linux-extras install docker
 	$ sudo usermod -a -G docker ec2-user
 	$ sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-`uname -s`-`uname -m` | sudo tee /usr/local/bin/docker-compose > /dev/null
 	$ sudo chmod +x /usr/local/bin/docker-compose
 	$ sudo service docker start
 	$ sudo chkconfig docker on
-e. Copy the OSM and GTFS files to the worker container so the graph will be genreated:	
+	
+	Configure the dokcer logs for rotation so they don't blow up:
+	$ cd /etc/docker
+	$ sudo touch daemon.json
+	$ sudo vim daemon.json
+	Go into to edit mode by pressing I and add:
+	{
+		"log-driver": "json-file",
+		"log-opts": {"max-size": "10m", "max-file": "3"}
+	}
+	Quit with w and q
+	$sudo systemctl reload docker
+
+f. Copy the OSM and GTFS files to the worker container so the graph will be genreated:	
 	Open Bash terminal session where the .pem file is lcoated and use the following commands to copy the GTFS and OSM files to the EC2 instance
 	scp -i <pem-key-file-name>.pem israel-and-palestine-latest.osm.pbf ec2-user@<public-dns-of-ec2-instance, e.g. ec2-52-28-9-228.eu-central-1.compute.amazonaws.com>:/<destiantion directory>
-f. change dir to the git repo and run:
+g. change dir to the git repo and run:
 	$docker-compose up
 After 40-60 minutes the graph will be generated and if you go to http://<elastic-ip>:9191/v1/coverage/default you should see info about Israel coverage
-g. Delete the OSM and GTFS files from the Linux host (they are automatically delete from the docker containers, so no worries about that) to save space
+h. Delete the OSM and GTFS files from the Linux host (they are automatically delete from the docker containers, so no worries about that) to save space
 
 2. Assign an Elastic IP to teh isntance:
 ========================================

@@ -1,1 +1,6 @@
+GTFS Update Automation/scripts/AWS Lambda function/
+GTFS Update Automation/.idea/
 *.pem
+*.json
+*.pyc
+*.txt

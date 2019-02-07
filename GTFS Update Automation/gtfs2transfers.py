@@ -1,10 +1,27 @@
+"""
+This script takes a stops.txt file and generates transfers.txt file compatible with Navitia server
+(https://github.com/CanalTP/navitia-docker-compose) graph calculations.
+After transfers.txt file is added to GTFS file, when Navitia processes the GTFS the transfer time indicated in the txt
+file is taken into account for more refined graph building.
+
+The script can be executed from a command line ("Python gtfs2transfers.py") or as a module by calling
+"gtfs2transfers.generate_transfers"
+
+List of parameters to supply:
+ input          GTFS stops.txt input file (default "stops.txt")
+ output         name of output file (default "trasnfers.txt"
+ walking_speed  The walking speed is meters per second.
+                You may want to divide your initial speed by sqrt(2) to simulate Manhattan distances (default 0.875 m/s)
+ transfer_time  Minimal transfer time in seconds (default 0 seconds)
+ max_distance   The max distance in meters to compute the transfer (default 500 meters)
+"""
 import argparse
 import csv
 import math
 import sys
 from argparse import RawTextHelpFormatter
 import os
-from scripts import utils
+import utils
 import progressbar
 import re
 
@@ -69,7 +86,7 @@ def read_file(input_file):
 
 def calculate_transfers(stops, walking_speed, transfer_time, max_distance):
     transfers = list()
-    pbar = utils.createProgressBar((len(stops)**2), action='Calculating Transfers: ')
+    pbar = utils.createProgressBar((len(stops) ** 2), action='Calculating Transfers: ')
     # for progress bar we need the number of coming
     i = 0
     # itrerations
@@ -162,5 +179,3 @@ def generate_transfers_from_command_line(argv):
 if __name__ == "__main__":
     generate_transfers_from_command_line(sys.argv[1:])
 
-
-# USE https://stackoverflow.com/questions/46572860/speeding-up-a-nested-for-loop-through-two-pandas-dataframes

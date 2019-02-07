@@ -1,22 +1,30 @@
+"""
+Send an e-mail with attachment to transitanalystisrael@gmail.com from transitanalystisrael@gmail.com
+There's also an option to send an e-mail without an attachment
+"""
 import httplib2
 import os
 from oauth2client import client, tools, file
 import base64
 
-#needed for attachment
+# needed for attachment
 import mimetypes
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from apiclient import errors, discovery  #needed for gmail service
-from scripts import utils
+import boto3
 
 def get_credentials():
-    store = file.Storage('token.json')
+    # get credentials from S3 bucket - this would only work on Transit Analyst EC2 that has a proper IAM role
+    # boto3.
+
+
+    store = file.Storage('assets/token.json')
     creds = store.get()
     if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets('credentials.json', 'https://www.googleapis.com/auth/gmail.send')
+        flow = client.flow_from_clientsecrets('assets/credentials.json', 'https://www.googleapis.com/auth/gmail.send')
         creds = tools.run_flow(flow, store)
     return creds
 
@@ -39,21 +47,21 @@ def create_message_and_send(sender, to, subject,  message_text_plain, attached_f
     message_with_attachment = create_Message_with_attachment(sender, to, subject, message_text_plain, attached_file)
     send_Message_with_attachement(service, "me", message_with_attachment, message_text_plain,attached_file)
 
-# def create_message_without_attachment (sender, to, subject, message_text_html, message_text_plain):
-    # #Create message container
-    # message = MIMEMultipart('alternative') # needed for both plain & HTML (the MIME type is multipart/alternative)
-    # message['Subject'] = subject
-    # message['From'] = sender
-    # message['To'] = to
+def create_message_without_attachment (sender, to, subject, message_text_html, message_text_plain):
+    # Create message container
+    message = MIMEMultipart('alternative') # needed for both plain & HTML (the MIME type is multipart/alternative)
+    message['Subject'] = subject
+    message['From'] = sender
+    message['To'] = to
 
-    # #Create the body of the message (a plain-text and an HTML version)
-    # message.attach(MIMEText(message_text_plain, 'plain'))
-    # message.attach(MIMEText(message_text_html, 'html'))
+    # Create the body of the message (a plain-text and an HTML version)
+    message.attach(MIMEText(message_text_plain, 'plain'))
+    message.attach(MIMEText(message_text_html, 'html'))
 
-    # raw_message_no_attachment = base64.urlsafe_b64encode(message.as_bytes())
-    # raw_message_no_attachment = raw_message_no_attachment.decode()
-    # body  = {'raw': raw_message_no_attachment}
-    # return body
+    raw_message_no_attachment = base64.urlsafe_b64encode(message.as_bytes())
+    raw_message_no_attachment = raw_message_no_attachment.decode()
+    body  = {'raw': raw_message_no_attachment}
+    return body
 
 
 
