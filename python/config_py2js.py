@@ -7,13 +7,15 @@ import transitanalystisrael_config as cfg
 import os
 
 pyfile = 'transitanalystisrael_config.py'
-jsfile = 'docs//'+'transitanalystisrael_config.js'
+jsfile = 'docs\\'+'transitanalystisrael_config.js'
+
+out_dir = cfg.websitelocalpath[:-1]+'_no_data'+'\\'
 
 maxfilelinecount = 2000
 print 'input from ', cfg.pythonpath+pyfile
 print 'output to ', cfg.websitelocalpath+jsfile
 filein = open(cfg.pythonpath+pyfile, 'r')
-fileout = open(cfg.websitelocalpath+jsfile, 'w')
+fileout = open(out_dir+jsfile, 'w')
 count = 0
 sline = filein.readline()
 while ((count < maxfilelinecount) and (sline != '')):
@@ -31,7 +33,7 @@ while ((count < maxfilelinecount) and (sline != '')):
 		fileout.write(postsline)
 	else :
 		sline2 = sline.replace('#','; //')
-		postsline = 'var cfg.'+sline2[:-1]+' ;\n'
+		postsline = 'var cfg_'+sline2[:-1]+' ;\n'
 		fileout.write(postsline)
 	#print len(sline), sline
 	count +=1
@@ -41,5 +43,5 @@ print ' infile line count ',count
 filein.close()
 fileout.close()
 print 'closed ', cfg.pythonpath+pyfile
-print 'closed ', cfg.websitelocalpath+jsfile
+print 'closed ', out_dir+jsfile
 

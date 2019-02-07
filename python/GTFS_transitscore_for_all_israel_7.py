@@ -69,7 +69,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	filein = open(gtfspath+gtfsfile, 'r')
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
-	# print slinelist
+	print slinelist
 	keylist = slinelist
 	inid_index = keylist.index(inid)
 	stop_id_i = keylist.index('stop_id')
@@ -135,7 +135,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	filein = open(gtfspath+gtfsfile, 'r')
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
-	# print slinelist
+	print slinelist
 	keylist = slinelist
 	inid_index = keylist.index(inid)
 	stop_id_i = keylist.index('stop_id')

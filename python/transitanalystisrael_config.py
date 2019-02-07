@@ -9,15 +9,19 @@ import time
 print "Local current time :", time.asctime( time.localtime(time.time()) )
 
 # common config
-gtfsdate = '20181021'
-serviceweekstartdate = '20181021'
+#gtfsdate = '20181021'
+#serviceweekstartdate = '20181021'
+gtfsdate = '20190202'
+serviceweekstartdate = '20190202'
 gtfsdirbase = 'israel'
 gtfspath = 'C:\\transitanalyst\\gtfs\\'
 processedpath = 'C:\\transitanalyst\\processed\\'
-websitelocalpath = 'C:\\git\\TransitAnalystIsrael\website\\'
+#processedpath = 'C:\\transitanalyst\\temp\\'
+websitelocalpath = 'C:\\gitno\\TransitAnalystIsrael\website\\'
 pythonpath = 'C:\\git\\TransitAnalystIsrael\\python\\'
 sstarttimeall = '00:00:00'
 sstoptimeall = '24:00:00'
+bigjs2gzip = 500000
 
 # line_freq config
 freqtpdmin = 60
