@@ -18,13 +18,17 @@ import boto3
 
 def get_credentials():
     # get credentials from S3 bucket - this would only work on Transit Analyst EC2 that has a proper IAM role
-    # boto3.
+    s3 = boto3.resource('s3')
+    keys_buckets = s3.Bucket('transit-analyst-key-bucket')
+    credentials_json = 'credentials.json'
+    keys_buckets.download_file(credentials_json , credentials_json )
+    token_json = 'token.json'
+    keys_buckets.download_file(token_json , token_json)
 
-
-    store = file.Storage('assets/token.json')
+    store = file.Storage(token_json)
     creds = store.get()
     if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets('assets/credentials.json', 'https://www.googleapis.com/auth/gmail.send')
+        flow = client.flow_from_clientsecrets(credentials_json, 'https://www.googleapis.com/auth/gmail.send')
         creds = tools.run_flow(flow, store)
     return creds
 

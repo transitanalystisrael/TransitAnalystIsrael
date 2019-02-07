@@ -4,3 +4,5 @@ GTFS Update Automation/.idea/
 *.json
 *.pyc
 *.txt
+navitia-timemap/dist*
+GTFS Update Automation/AWS Lambda function/
