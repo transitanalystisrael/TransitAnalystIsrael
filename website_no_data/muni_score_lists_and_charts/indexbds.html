@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130620396-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130620396-1');
+</script>
+
+<title>Municipal Transit Ranking</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+
+<style> 
+	.slidecontainer {width: 100%;}
+
+	.slider {
+		-webkit-appearance: none;
+		width: 100%;
+		height: 25px;
+		background: #d3d3d3;
+		outline: none;
+		opacity: 0.7;
+		-webkit-transition: .2s;
+		transition: opacity .2s;
+	}
+
+	.slider:hover {
+		opacity: 1;
+	}
+
+	.slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 25%;
+		height: 25px;
+		background: #4CAF50;
+		cursor: pointer;
+	}
+
+	.slider::-moz-range-thumb {
+		width: 25%;
+		height: 25px;
+		background: #4CAF50;
+		cursor: pointer;
+	}
+</style>
+
+<style>
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+}
+
+/* Style the header */
+.header {
+	background-color: #f1f1f1;
+	padding: 0px;
+	text-align: center;
+}
+
+/* Style the top navigation bar */
+.topnav {
+	overflow: hidden;
+	background-color: #333;
+}
+
+/* Style the topnav links */
+.topnav a {
+	float: left;
+	display: block;
+	color: #f2f2f2;
+	text-align: center;
+	padding: 14px 16px;
+}
+
+/* Change color on hover */
+.topnav a:hover {
+	background-color: #ddd;
+	color: black;
+}
+
+/* Create two unequal columns that floats next to each other */
+.column {
+	float: left;
+	padding: 10px;
+	height: 760px;
+	overflow: scroll;
+}
+
+/* Right column */
+.column.side {
+	width: 20%;
+}
+
+/* Middle column */
+.column.middle {
+	width: 80%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+/* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+	.column.side, .column.middle {
+		width: 100%;
+	}
+}
+</style>
+
+<style>
+.list {
+	font-family:sans-serif;
+}
+td {
+	padding:6px; 
+	border:solid 1px #eee;
+}
+
+input {
+	border:solid 1px #ccc;
+	border-radius: 5px;
+	padding:7px 14px;
+	margin-bottom:10px
+}
+input:focus {
+	outline:none;
+	border-color:#aaa;
+}
+.sort {
+	padding:8px 30px;
+	border-radius: 6px;
+	border:none;
+	display:inline-block;
+	color:#fff;
+	text-decoration: none;
+	background-color: #28a8e0;
+	height:30px;
+}
+.sort:hover {
+	text-decoration: none;
+	background-color:#1b8aba;
+}
+.sort:focus {
+	outline:none;
+}
+.sort:after {
+	display:inline-block;
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+	content:"";
+	position: relative;
+	top:-10px;
+	right:-5px;
+}
+.sort.asc:after {
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 5px solid #fff;
+	content:"";
+	position: relative;
+	top:4px;
+	right:-5px;
+}
+.sort.desc:after {
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 5px solid #fff;
+	content:"";
+	position: relative;
+	top:-4px;
+	right:-5px;
+}
+
+</style>
+
+	<link rel="stylesheet" href="../css/topnav.css"/>
+</head>
+<body>
+<script>
+	var showAbout = true;
+	//console.log(showAbout);
+	function displayAbout(){
+		//console.log(showAbout);
+		if (showAbout) {
+			document.getElementById('about').style.display='block';
+			showAbout = false;
+		} else {
+			document.getElementById('about').style.display='none';
+			showAbout = true;
+		};
+	}
+</script>
+
+<div class="topnav">
+  <a class="active" href="index.html"><b style="font-size: 20px;">Municipal Transit Ranking</b></a>
+  <a href="../index.html">Home</a>
+  <button type="button" onclick="displayAbout()">About - אודות</button>
+</div>
+
+<div id="about" style="display: none;">
+	<table style="width:100%">
+	  <tr>
+		<th id="aboutE" style="width:50%; text-align: left; font-weight: normal;">***</th>
+		<th id="aboutH" style="width:50%; text-align: right; font-weight: normal; direction: rtl;">***</th> 
+	  </tr>
+	</table>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+
+<script type="text/javascript" src=muni_builtdensityscore_xy.js></script>
+
+<div class="topnav">
+	<a href="indexts.html">TransitScore</a>
+	<a href="indexfss.html">FairShareScore</a>
+	<a href="indexbds.html"><b style="color:DodgerBlue;">BuiltDensityScore</b></a>
+</div>
+
+<div class="row">
+	<div class="column middle">
+		<canvas id="myChartall" width="800" height="60" style="border:1px solid #000000;"></canvas>
+
+		<div class="slidecontainer">
+		  <input type="range" min="0" max="151" value="0" class="slider" id="xRange">
+		</div>
+		<br>
+		<canvas id="myChart" width="800" height="300" style="border:1px solid #000000;"></canvas>
+
+		<script type="text/javascript">
+			var slider = document.getElementById("xRange");
+			var xlow = 0;
+			var xhigh = xlow+50;
+			//var output = document.getElementById("demo");
+			//output.innerHTML = slider.value;
+
+			slider.oninput = function() {
+				xlow = Number(this.value);
+				xhigh = xlow+50;
+				//console.log(xlow, xhigh);
+				builtdensityscoreData.labels = chartx.slice(xlow, xhigh);
+				builtdensityscoreData.datasets[0].data = charty.slice(xlow, xhigh);
+				builtdensityscoreData.datasets[0].backgroundColor = barColor.slice(xlow, xhigh);
+				builtdensityscoreData.datasets[0].borderColor = barColor.slice(xlow, xhigh);
+				//console.log(builtdensityscoreData);
+				for (i = 0; i < chartxall.length; i++) { 
+					if (xlow <= i & i< xhigh) barcolorall = "green"; else barcolorall = "grey";
+					zoomcolorall[i] = barcolorall;
+				}
+				myChart.update();
+				myChartall.update();
+			}
+
+			var chartx = Object.keys(chartxy);
+			var i;
+			for (i = 0; i < chartx.length; i++) { 
+				var rank = ' #'+String(i+1);
+				//console.log(chartx[i], rank);
+				chartx[i] = chartx[i]+rank;
+				//console.log(chartx[i]);
+			}
+			
+			var barColor =[];
+			for (i = 0; i < chartx.length; i++) { 
+				barColor[i] = 'grey';
+			}
+			
+			var charty = Object.values(chartxy);
+			//console.log(chartx);
+			var builtdensityscoreData = {
+				labels: chartx.slice(xlow, xhigh),
+				datasets: [{
+					label: 'Muni BuiltDensityScore Ranking',
+					data: charty.slice(xlow, xhigh),
+					backgroundColor: barColor.slice(xlow, xhigh),
+					borderColor: barColor.slice(xlow, xhigh),
+					borderWidth: 1
+				}]
+			}
+
+			function clickHandler(e){
+				var activePoint = myChart.getElementAtEvent(e);
+				if (activePoint[0]) { 
+					var selectIndex = activePoint[0]._index+xlow;
+					//console.log(activePoint[0]._index+xlow);
+					barColor[selectIndex] = barColor[selectIndex] == 'grey' ? 'red' :
+						barColor[selectIndex] == 'red' ? 'blue' : 
+						'grey';
+					//console.log(barColor.slice(xlow, xhigh));
+					builtdensityscoreData.datasets[0].backgroundColor = barColor.slice(xlow, xhigh);
+					builtdensityscoreData.datasets[0].borderColor = barColor.slice(xlow, xhigh);
+					myChart.update();
+					myChartall.update();
+					//*****var listIndex = e.path[1].rowIndex
+					var listIndex = userList.get("name", namelist[selectIndex])[0].elm.rowIndex;
+					nameElements = document.getElementsByClassName("name");
+					nameElement = nameElements[listIndex];
+					nameElement.style.backgroundColor = barColor[selectIndex];
+					//console.log(userList.get("name", namelist[selectIndex])[0].elm.rowIndex);
+				}
+			}
+					
+			var builtdensityscoreChart = {
+				type: 'bar',
+				data: builtdensityscoreData,
+				options: {
+					//events: ['click'],
+					onClick: clickHandler,
+					legend: {
+						labels: {
+							fontSize: 24
+						}
+					},
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero:true,
+								suggestedMin: 0,
+								suggestedMax: 32000,
+								fontSize: 18
+							}
+						}],
+						xAxes: [{
+							ticks: {
+								autoSkip: false,
+								fontSize: 18
+							}
+						}]
+					}
+				}
+			}
+			var ctx = document.getElementById("myChart").getContext('2d');
+			var myChart = new Chart(ctx, builtdensityscoreChart);
+		</script>
+
+		<script type="text/javascript">
+			var chartxall = Object.keys(chartxy);
+			var i;
+			for (i = 0; i < chartxall.length; i++) { 
+				chartxall[i] ='# '+String(i+1);
+			}
+			var chartyall = Object.values(chartxy)
+			//console.log(chartx);
+			var zoomcolorall = []
+			for (i = 0; i < chartxall.length; i++) { 
+				if (xlow <= i & i< xhigh) barcolorall = "green"; else barcolorall = "grey";
+				zoomcolorall[i] = barcolorall;
+			}
+			var builtdensityscoreDataall = {
+				labels: chartxall,
+				datasets: [{
+					label: 'Muni BuiltDensityScore',
+					data: chartyall,
+					backgroundColor: barColor,
+					borderColor: zoomcolorall,
+					borderWidth: 0.4
+				}]
+			}
+			var builtdensityscoreChartall = {
+				type: 'bar',
+				data: builtdensityscoreDataall,
+				options: {
+					legend: {
+						display: false
+					},
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero:true,
+								display: false
+							}
+						}],
+						xAxes: [{
+							ticks: {
+								//padding:0,
+								//mirror: true,
+								//labelOffset: -10
+							}
+						}]
+					}
+				}
+			}
+			var ctx = document.getElementById("myChartall").getContext('2d');
+			var myChartall = new Chart(ctx, builtdensityscoreChartall);
+</script>
+	</div>
+	<div class="column side">
+		<div id="users">
+			<input class="search" placeholder="Search" /><br>
+			<button class="sort" data-sort="name">
+				Muni Name
+			</button>
+			<button class="sort" data-sort="BuiltDensityScore">
+				Built Density
+			</button>
+			<table>
+				<!-- IMPORTANT, class="list" have to be at tbody -->
+				<tbody class="list"></tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var namelist = Object.keys(chartxy);
+	var bdslist = Object.values(chartxy);
+</script>
+
+<script type="text/javascript">
+	function clicknamefunction(e){
+		var muniName = e.target.innerHTML;
+		//console.log(e.path[1].rowIndex);
+		var listIndex = e.path[1].rowIndex
+		var muniIndex = namelist.indexOf(muniName);
+		//console.log(muniIndex, muniName);
+		barColor[muniIndex] = barColor[muniIndex] == 'grey' ? 'red' :
+			barColor[muniIndex] == 'red' ? 'blue' : 
+			'grey';
+		//console.log(barColor.slice(xlow, xhigh));
+		builtdensityscoreData.datasets[0].backgroundColor = barColor.slice(xlow, xhigh);
+		builtdensityscoreData.datasets[0].borderColor = barColor.slice(xlow, xhigh);
+		myChart.update();
+		myChartall.update();
+		var nameElements = document.getElementsByClassName("name");
+		var nameElement = nameElements[listIndex];
+		nameElement.style.backgroundColor = barColor[muniIndex];
+	}
+	
+	var options = {
+		valueNames: [ 'bdsrank', 'name', 'BuiltDensityScore' ],
+		item: '<tr><td class="bdsrank"></td><td class="name" style="color:white; background-color:grey;" onclick="clicknamefunction(event)"><td class="BuiltDensityScore"></td></tr>'
+	};
+	//console.log(options);
+	
+	var values = [];
+
+	var userList = new List('users', options, values);
+	
+	var i;
+	for (i = 0; i < namelist.length; i++) { 
+		//console.log(namelist[i]);
+		userList.add({
+			bdsrank: i+1,
+			name: namelist[i],
+			BuiltDensityScore: bdslist[i].toFixed(0)
+		});
+	}
+	//console.log(userList);	
+</script>
+<script src="../docs/transitanalystisrael_config.js" ></script>
+<script src="../docs/tool_descriptions_e.js" ></script>
+<script src="../docs/tool_descriptions_h.js" ></script>
+<script>
+	document.getElementById("aboutE").innerHTML = descEtool4 + servicePeriodE + logos;
+	//console.log(document.getElementById("aboutE").innerHTML)
+	document.getElementById("aboutH").innerHTML = descHtool4 + servicePeriodH + logos;
+</script>
+
+</body>
+</html>

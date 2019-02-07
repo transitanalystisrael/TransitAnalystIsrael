@@ -719,7 +719,7 @@ print ("Saved file: " + jsfileout)
 #   output txt file with tpd per line (agency_id+route_short_name) in muni - 'muni_w_tpd_per_line'+'_'+servicedate+'.txt'
 #
 fileout = open(gtfspathout+txtfileout4, 'w') # open file to save results 
-postsline = 'muni_id,tpwinmuni,total_tpd,line_name_i,maxdaylinetpd,munilinetpw,tpd1,tpd2,tpd3,tpd4,tpd5,tpd6,tpd7\n'
+postsline = 'muni_id,tpwinmuni,total_tpd,line_name_i,maxdaylinetpd,muniline,tpw,tpd1,tpd2,tpd3,tpd4,tpd5,tpd6,tpd7\n'
 fileout.write(postsline)
 for muni_id, [tpwinmuni, maxdaytpdinmuni, averagetpdinmuni, maxdaytpdperline_dict, tpdperline_dict] in munisforoutput_dict.iteritems():
 	
