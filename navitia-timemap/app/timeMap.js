@@ -11,6 +11,7 @@ import 'leaflet-providers';
 import 'moment';
 import moment from "moment";
 
+
 /** Map generation section**/
 var map;
 var heatMapLayerId;
@@ -19,6 +20,13 @@ var default_starting_location = [32.073443, 34.790410];
 var starting_location;
 var default_starting_zoom = 13;
 var goToHeatLayerButtonDiv;
+
+// var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/default";
+var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/secondary-cov";
+var navitia_server_url_heat_maps = navitia_server_url +  "/heat_maps"
+var resolution = "750";
+var date_time_picker;
+
 
 //Creating the grey icon
 var geryIcon = new L.Icon({
@@ -335,16 +343,6 @@ function durationToString (duration) {
     }
 };
 
-
-
-/*var navitia_server_url= "http://localhost:9191/v1/coverage/default/heat_maps";*/
-var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/default/heat_maps";
-var resolution = "750";
-var date_time_picker;
-
-
-
-
 /**Switch Button**/
 //Setting the switch button and attaching it's style to a var
 $('#switchButton').toggles({
@@ -463,7 +461,7 @@ function generateHeatMap() {
     //calcualte max duration in seconds
     var max_duration = selectedTimeRange*60;
 
-    var heatMapJsonUrl = navitia_server_url +
+    var heatMapJsonUrl = navitia_server_url_heat_maps  +
         "?max_duration=" + max_duration +
         from_to + starting_location.lng +
         "%3B" + starting_location.lat +
@@ -496,11 +494,21 @@ map.on('popupopen', function(e) {
 });
 
 
-//About - getting from the outer JS. Should be changed to module
-//Overridingthe logos injection
-var logos = '<br><br><img src="https://s3.eu-central-1.amazonaws.com/israeltimemap/Time+Map/assets/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="https://s3.eu-central-1.amazonaws.com/israeltimemap/Time+Map/assets/images/YEE_logo.jpg" alt="YEE logo" height="60px">';
-document.getElementById("aboutE").innerHTML = descEtool10 + servicePeriodE + logos;
-document.getElementById("aboutH").innerHTML = descHtool10 + servicePeriodH + logos;
+//About - getting from the outer JS.
+//Overriding service date Period
+var navitia_service_start_date
+var navitia_service_end_date
+d3fetch.json(navitia_server_url).then(function (data) {
+    var navitia_service_start_date = data.regions[0].start_production_date;
+    var start_date_formatted =  moment(navitia_service_start_date, "YYYYMMDD").format("ddd MMM DD YYYY")
+    var navitia_service_end_date = data.regions[0].end_production_date;
+    var end_date_formatted =  moment(navitia_service_end_date, "YYYYMMDD").format("ddd MMM DD YYYY")
+    var servicePeriodE = '<br><br>Service Week Analyzed : '+ start_date_formatted +' to '+ end_date_formatted ;
+    var servicePeriodH = '<br><br>תקופת השירות שנותחה'+' : '+  start_date_formatted +' - '+end_date_formatted;
+    document.getElementById("aboutE").innerHTML = descEtool10 + servicePeriodE + logos;
+    document.getElementById("aboutH").innerHTML = descHtool10 + servicePeriodH + logos;
+});
+
 
 var showAbout = true;
 $('#aboutBtn').on("click", function(){
@@ -514,7 +522,7 @@ $('#aboutBtn').on("click", function(){
 });
 
 $('#homeBtn').on("click", function(){
-    window.location.href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael/index.html";
+    window.location.href="../index.html";
 });
 
 $('#selfBtn').on("click", function(){
@@ -545,22 +553,28 @@ legend.addTo(map);
 
 //Creating the default map after getting the date
 function getdate_and_generateHeatMap(){
-    var start_date_string = "03/02/2019"
-    var end_date_string = "03/04/2019"
-    var start_date =  moment(start_date_string, "DD/MM/YYYY").toDate()
-    var end_date =  moment(end_date_string, "DD/MM/YYYY").toDate()
-    date_time_picker = $('#datetimepicker').datetimepicker({
-        formatDate: 'd.m.Y',
-        formatTime: 'H:i',
-        minDate: moment(start_date).format('DD.MM.YYYY'), //'21.10.2018',
-        maxDate: moment(end_date ).format('DD.MM.YYYY'),//'27.10.2018',
-        showSecond: false,
-        step: 30,
-    });
+    d3fetch.json(navitia_server_url).then(function (data) {
+        var navitia_service_start_date = data.regions[0].start_production_date;
+        // Get the next Sunday for default starting date
+        var start_date = moment(navitia_service_start_date, "YYYYMMDD")
+        if (start_date.day() != 0) {
+            start_date = start_date.add(1, 'weeks').isoWeekday(0);
+        }
+        var navitia_service_end_date = data.regions[0].end_production_date;
+        var end_date  = moment(navitia_service_end_date, "YYYYMMDD")
+        date_time_picker = $('#datetimepicker').datetimepicker({
+            formatDate: 'd.m.Y',
+            formatTime: 'H:i',
+            minDate: moment(start_date).format('DD.MM.YYYY'),
+            maxDate: moment(end_date).format('DD.MM.YYYY'),
+            showSecond: false,
+            step: 30,
+        });
 
-    //Default time
-    date_time_picker.val(moment(start_date).format('YYYY/MM/DD') + (' 08:00'));
-    generateHeatMap()
+        //Default time
+        date_time_picker.val(moment(start_date).format('YYYY/MM/DD') + (' 08:00'));
+        generateHeatMap()
+    })
 }
 
 //main function
