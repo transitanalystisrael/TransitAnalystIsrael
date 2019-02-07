@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130620396-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130620396-1');
+</script>
+	
+	<title>Municipal FairShareScore</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="../dist/leaflet.css" />
+    <script src="../dist/leaflet.js" ></script>
+
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+	</style>
+
+	<style>
+		#map { width: 100%; height: 95%; }
+		
+		.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } 
+		.info h4 { margin: 0 0 5px; color: #777; }
+		
+		.legend { text-align: left; line-height: 18px; color: #555; } 
+		.legend i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 0.7; }
+	</style>
+	
+	<link rel="stylesheet" href="../css/topnav.css"/>
+</head>
+<body>
+<script>
+	var showAbout = true;
+	//console.log(showAbout);
+	function displayAbout(){
+		//console.log(showAbout);
+		if (showAbout) {
+			document.getElementById('about').style.display='block';
+			showAbout = false;
+		} else {
+			document.getElementById('about').style.display='none';
+			showAbout = true;
+		};
+	}
+</script>
+
+<div class="topnav">
+  <a class="active" href="index.html"><b style="font-size: 20px;">Municipal FairShareScore</b></a>
+  <a href="../index.html">Home</a>
+  <button type="button" onclick="displayAbout()">About - אודות</button>
+</div>
+
+<div id="about" style="display: none;">
+	<table style="width:100%">
+	  <tr>
+		<th id="aboutE" style="width:50%; text-align: left; font-weight: normal;">***</th>
+		<th id="aboutH" style="width:50%; text-align: right; font-weight: normal; direction: rtl;">***</th> 
+	  </tr>
+	</table>
+</div>
+
+<div id='map'></div>
+
+<script type="text/javascript" src="israel_city_boarders_w_properties.js"></script>
+<script type="text/javascript" src="israel_town_boarders_w_properties.js"></script>
+
+<script type="text/javascript">
+
+	var map = L.map('map', {
+		closePopupOnClick: false
+	}).setView([32.079, 34.780], 13);
+
+
+	var Stamen_TonerLite = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
+		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+		subdomains: 'abcd',
+		minZoom: 0,
+		maxZoom: 18,
+		ext: 'png'
+	}).addTo(map);
+	
+	var OpenStreetMap_BlackAndWhite = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+		maxZoom: 18,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	});
+	
+	var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	});
+	
+	var baseMaps = {
+		"Stamen_TonerLite": Stamen_TonerLite,
+		"OSM_B&W": OpenStreetMap_BlackAndWhite,
+		"OSM": OpenStreetMap_Mapnik
+	};
+	
+	L.control.layers(baseMaps).addTo(map);
+
+	// control that shows muni info on hover
+	var info = L.control();
+
+	info.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info');
+		this.update();
+		return this._div;
+	};
+
+	info.update = function (props) {
+		this._div.innerHTML = '<h2>Muni FairShareScore</h2>' +  (props ?
+			'<b>' + props.muni_name + ' - ' + Number(props.fairsharescore).toFixed(0) + '%</b>'
+			: 'Hover over a muni');
+	};
+
+	info.addTo(map);
+	
+	// get color depending on transitscore value
+	function getColor(d) {
+		return  d >= 200 ? '#006837' :
+				d >= 150 ? '#1a9850' :
+				d >= 120 ? '#66bd63' :
+				d >= 100 ? '#a6d96a' :
+				d >= 80 ? '#d9ef8b' :
+				d >= 60 ? '#ffffbf' :
+				d >= 40 ? '#fee08b' :
+				d >= 20 ? '#fdae61' :
+				d >= 10 ? '#f46d43' :
+				d >= 0  ? '#d73027' :
+				'#a50026';
+	}
+	
+	function style(feature) {
+		return {
+			weight: 1,
+			opacity: 1,
+			color: '#666',
+			dashArray: '3',
+			fillOpacity: 0.5,
+			fillColor: getColor(feature.properties.fairsharescore)
+		};
+	}
+	
+	function highlightFeature(e) {
+		var layer = e.target;
+
+		layer.setStyle({
+			weight: 2,
+			color: '#666',
+			dashArray: '',
+			fillOpacity: 0.7
+		});
+
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+
+		info.update(layer.feature.properties);
+	}
+
+	var cityGeojson;
+	var townGeojson;
+	
+	function resetHighlight(e) {
+		cityGeojson.resetStyle(e.target);
+		townGeojson.resetStyle(e.target);
+		info.update();
+	}
+
+	function zoomToFeature(e) {
+		map.fitBounds(e.target.getBounds());
+	}
+
+	function showTag(e) {
+		var popup = new L.popup({
+			minWidth: 20,
+			//maxHeight: 32,
+			autoClose: false,
+			closeOnClick: false
+		});
+		//console.log(e.target.feature.properties.muni_name);
+		var muni_name = e.target.feature.properties.muni_name;
+		var fss = e.target.feature.properties.fairsharescore;
+		fss =Number(fss).toFixed(0);
+		map.addLayer(popup
+			.setLatLng(e.latlng)
+			.setContent('<div style="text-align:center;"><small><b>'+
+				muni_name+'</b></small><br>'+
+				fss+'%</div>')
+			//.openOn(map)
+		);
+	}
+
+	function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			//click: zoomToFeature
+			click: showTag
+		});
+		//layer.bindPopup(feature.properties["muni_name"]);
+	}
+
+	cityGeojson = L.geoJson(cityBoarders, {
+		style: style,
+		onEachFeature: onEachFeature
+	}).addTo(map);
+
+	townGeojson = L.geoJson(townBoarders, {
+		style: style,
+		onEachFeature: onEachFeature
+	}).addTo(map);
+	
+	map.attributionControl.addAttribution('TransitScore data &copy; <a href="http://miu.org.il/">Merhav</a>');
+
+
+	var legend = L.control({position: 'bottomright'});
+
+	legend.onAdd = function (map) {
+
+		var div = L.DomUtil.create('div', 'info legend'),
+			grades = [0, 10, 20, 40, 60, 80, 100, 120, 150, 200],
+			labels = [],
+			from, to;
+
+		for (var i = 0; i < grades.length; i++) {
+			from = grades[i];
+			to = grades[i + 1];
+
+			labels.push(
+				'<i style="background:' + getColor(from) + '"> </i> ' +
+				from + (to ? '&ndash;' + to : '+'));
+		}
+
+		div.innerHTML = labels.join('<br>');
+		return div;
+	};
+
+	legend.addTo(map);
+
+
+	
+</script>
+<script src="../docs/transitanalystisrael_config.js" ></script>
+<script src="../docs/tool_descriptions_e.js" ></script>
+<script src="../docs/tool_descriptions_h.js" ></script>
+<script>
+	document.getElementById("aboutE").innerHTML = descEtool3 + servicePeriodE + logos;
+	//console.log(document.getElementById("aboutE").innerHTML)
+	document.getElementById("aboutH").innerHTML = descHtool3 + servicePeriodH + logos;
+</script>
+
+</body>
+</html>

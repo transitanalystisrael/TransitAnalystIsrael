@@ -1,0 +1,459 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130620396-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130620396-1');
+</script>
+	
+	<title>Accessible level of service to and at train stations</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="../dist/leaflet.css" />
+    <script src="../dist/leaflet.js" ></script>
+	<script src="../dist/turf.min.js"></script>
+	
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+	</style>
+
+	<style>
+		#map { width: 100%; height: 95%; }
+		
+		.info { height: 600px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } 
+		.info h4 { margin: 0 0 5px; color: #777; }
+		
+		.legend { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
+		.legend i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
+		
+		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
+		.savefilecontrol i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
+	</style>
+	
+	<link rel="stylesheet" href="../css/topnav.css"/>
+</head>
+<body>
+<script>
+	var showAbout = true;
+	//console.log(showAbout);
+	function displayAbout(){
+		//console.log(showAbout);
+		if (showAbout) {
+			document.getElementById('about').style.display='block';
+			showAbout = false;
+		} else {
+			document.getElementById('about').style.display='none';
+			showAbout = true;
+		};
+	}
+</script>
+
+<div class="topnav">
+  <a class="active" href="index.html"><b style="font-size: 20px;">Accessible level of service to and at train stations</b></a>
+  <a href="../index.html">Home</a>
+  <button type="button" onclick="displayAbout()">About - אודות</button>
+</div>
+
+<div id="about" style="display: none;">
+	<table style="width:100%">
+	  <tr>
+		<th id="aboutE" style="width:50%; text-align: left; font-weight: normal;">***</th>
+		<th id="aboutH" style="width:50%; text-align: right; font-weight: normal; direction: rtl;">***</th> 
+	  </tr>
+	</table>
+</div>
+	
+
+<div id='map'></div>
+
+<script type="text/javascript" src="trainstop_w_tpd_per_line.js"></script>
+<script type="text/javascript" src="agency.js"></script>
+<script type="text/javascript" src="train_stops.js"></script>
+<script type="text/javascript" src="stopswtrainstopids.js"></script>
+
+<script src="../dist/Blob.js"></script>
+<script src="../dist/FileSaver.min.js"></script>
+
+<script type="text/javascript">
+
+	var map = L.map('map').setView([32.11057,34.83797], 13);
+
+	var Stamen_TonerLite = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
+		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+		subdomains: 'abcd',
+		minZoom: 0,
+		maxZoom: 18,
+		ext: 'png'
+	}).addTo(map);
+	
+	var OpenStreetMap_BlackAndWhite = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+		maxZoom: 18,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	});
+	
+	var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	});
+	
+	var baseMaps = {
+		"Stamen_TonerLite": Stamen_TonerLite,
+		"OSM_B&W": OpenStreetMap_BlackAndWhite,
+		"OSM": OpenStreetMap_Mapnik
+	};
+	
+	L.control.layers(baseMaps).addTo(map);
+	
+	// control that shows state info on hover
+	var info = L.control();
+
+	info.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info');
+		this.update();
+		return this._div;
+	};
+	var ts_tpdperline = [];
+	var s_tpdperline = [];
+	info.update = function (props) {
+		var displaystring = '';
+		ts_tpdperline = [];
+		if (props) {
+			Object.entries(props.tpdperline_dict).forEach(entry => 
+				{ let key = entry[0]; let value = entry[1];
+					ts_tpdperline.push({line_name:key, tpd:value});
+				});
+			ts_tpdperline.sort(function(a, b){return b.tpd - a.tpd});
+			//console.log(ts_tpdperline);
+			ts_tpdperline.forEach(dispFunction);
+		}
+		this._div.innerHTML = '<h3>Trips per Day (tpd) Near Train Station</h3>' 
+			+'<br>'+'total bus tpd' + ' , ' + 'train tpd' + ' : ' + 'train station name' + '<br>'
+			+  (props ?
+				'<b>' + trainstopsName[props.trainstop_id] + ' : ' + props.train_tpd + ' , ' + props.total_bus_tpd + '</b>' + 
+				'<br><br>tpd : line-agency' + 
+				displaystring
+				: 'Hover over a station');
+
+		function dispFunction(linetpd){
+			var agency_id = linetpd["line_name"].split('-')[0];
+			var route_short_name = linetpd["line_name"].split('-')[1];
+			var tpd = linetpd["tpd"]
+			displaystring += '<br>' + agencies[agency_id] + ' - ' + route_short_name + ' : ' + tpd;
+		}
+	};
+	info.addTo(map);
+	
+	var savefilecontrol = L.control({position: 'bottomright'});
+	savefilecontrol.onAdd = function (map) {
+		var div3 = L.DomUtil.create('div', 'savefilecontrol');
+		div3.innerHTML = ''
+			+ '<form id="text-options"><input type="submit" value="Save"></input></form>'
+		return div3;
+	};
+	savefilecontrol.addTo(map);
+
+	(function(view) {
+		"use strict";
+		var document = view.document;
+		var session = view.sessionStorage;
+		// only get URL when necessary in case Blob.js hasn't defined it yet
+		//var text = nearStopsText;
+		var text_options_form = document.getElementById("text-options");
+		var text_filename = 'tpd_near_trainstop.html';
+	
+		text_options_form.addEventListener("submit", function(event) {
+			event.preventDefault();
+			//console.log(info._div.innerHTML);
+			var textString = '';
+			textString = info._div.innerHTML;
+			var BB = view.Blob;
+			saveAs(new BB([textString], {type: "text/plain;charset=" + document.characterSet}), text_filename);
+		}, false);
+
+	}(self));
+
+	// get color depending on value
+	function getColor(d) {
+		return  d >= 1200 ? '#006837' :
+				d >= 240 ? '#1a9850' :
+				d >= 120 ? '#66bd63' :
+				d >= 80 ? '#a6d96a' :
+				d >= 60 ? '#d9ef8b' :
+				d >= 40 ? '#ffffbf' :
+				d >= 30 ? '#fee08b' :
+				d >= 20 ? '#fdae61' :
+				d >= 10 ? '#f46d43' :
+				d >= 0  ? '#d73027' :
+				'#a50026';
+	}
+
+	// get pane depending on value
+	function getPane(d) {
+		return  d >= 1200 ? 'pane10' :
+				d >= 240 ? 'pane9' :
+				d >= 120 ? 'pane8' :
+				d >= 80 ? 'pane7' :
+				d >= 60 ? 'pane6' :
+				d >= 40 ? 'pane5' :
+				d >= 30 ? 'pane4' :
+				d >= 20 ? 'pane3' :
+				d >= 10 ? 'pane2' :
+				d >= 0  ? 'pane1' :
+				'pane0';
+	}
+
+	var stopswtpdLayer;
+	var freezHighlight = false;
+	
+	function highlightFeature(e) {
+		if (!freezHighlight) {
+			var layer = e.target;
+			layer.setStyle({
+				weight: 6,
+				color: '#666',
+				opacity: 1
+			});
+			if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+				layer.bringToFront();
+			}
+			info.update(layer.feature.properties);
+			//console.log('******');
+		}
+	}
+
+	function resetHighlight(e) {
+		if (!freezHighlight) {
+			stopswtpdLayer.resetStyle(e.target);
+			info.update();
+		}
+	}
+	
+	var frozenLayer;
+	var both_tpdperline = [];
+	function clickHandler(e) {
+		freezHighlight = !freezHighlight; // toggle freezHighlight
+		if (freezHighlight) {
+			frozenLayer = e.target;
+			//console.log(s_tpdperline, ts_tpdperline);
+			both_tpdperline = [];
+			ts_tpdperline.forEach(function(ts_tpdline) {
+				s_tpdperline.forEach(function(s_tpdline) {
+					if (ts_tpdline.line_name == s_tpdline.line_name) { 
+						//both_tpdperline.push(s_tpdline.tpd < ts_tpdline.tpd ? s_tpdline : ts_tpdline); // use min tpd
+						both_tpdperline.push(ts_tpdline); // use neartrainstop tpd
+					}
+				});
+			});
+			//console.log(both_tpdperline);
+			
+			var totaltpd = 0;
+			var displaystring = '';
+			both_tpdperline.sort(function(a, b){return b.tpd - a.tpd});
+			both_tpdperline.forEach(dispFunction);
+			//var html = '<div style="height: 400px; overflow: auto;">tpd' + ' : ' + 'line' + ' - ' + 'agency' + "<br>" + displaystring + "<br><br>Total tpd: "+ totaltpd.toString()+'</div>';
+			var html = '<h3>Trips Between<br>PoI and<br>Train Station</h3>'+'<div>tpd' + ' : ' + 'line' + ' - ' + 'agency' + "<br>" + displaystring + "<br><br>Total tpd: "+ totaltpd.toString()+'</div>';
+
+			popup
+				.setLatLng(e.latlng)
+				//.setContent(e.latlng.toString()+'<br>'+html)
+				.setContent(html)
+				.openOn(map);
+		}
+		if (!freezHighlight) {
+			stopswtpdLayer.resetStyle(frozenLayer);
+			highlightFeature(e);
+		}
+
+		function dispFunction(linetpd){
+			//console.log(linetpd);
+			var agency_id = linetpd["line_name"].split('-')[0];
+			var route_short_name = linetpd["line_name"].split('-')[1];
+			var tpd = linetpd["tpd"]
+			totaltpd += tpd;
+			displaystring += '<br>' + agencies[agency_id] + ' - ' + route_short_name + ' : ' + tpd;
+		}
+	}
+	
+	function onEachFeature(feature, layer) {
+		layer.on({
+			click: clickHandler,
+			mouseover: highlightFeature,
+			mouseout: resetHighlight
+		});
+	}
+
+	function allstopOptions(feature) {
+		return {
+			pane: getPane(-1),
+			radius: 25,
+			fillColor: feature.properties.ts_id != "0" ? "red" : "white",
+			color: "black",
+			weight: 0.5,
+			opacity: 0.5,
+			fillOpacity: 0.4
+		};
+	}
+
+	function stopOptions(feature) {
+		//tpd = feature.properties.train_tpd + feature.properties.total_bus_tpd;
+		tpd = feature.properties.train_tpd;
+		return {
+		pane: getPane(tpd),
+			radius: 500,
+			fillColor: getColor(tpd),
+			color: "black",
+			weight: 0.5,
+			opacity: 0.5,
+			fillOpacity: 0.6
+		};
+	}
+	
+	var i;
+	for (i = 0; i < 11; i++) { 
+		map.createPane('pane'+i);
+		map.getPane('pane'+i).style.zIndex = 400+i;
+		map.getPane('pane'+i).style['mix-blend-mode'] = 'normal';
+		//console.log('pane'+i, 400+i)
+	}
+
+	stopswtpdLayer = L.geoJson(stopsWtpdperline, {
+		pointToLayer: function (feature, latlng) {
+			return L.circle(latlng, stopOptions(feature));
+		},
+		onEachFeature: onEachFeature
+	}).addTo(map);
+	
+		allstopsLayer = L.geoJson(stopsWtrainstopid, {
+		pointToLayer: function (feature, latlng) {
+			return L.circle(latlng, allstopOptions(feature));
+		}
+	}).addTo(map);
+
+	map.attributionControl.addAttribution('TransitScore data &copy; <a href="http://miu.org.il/">Merhav</a>');
+	
+	var circle;
+	var popup = L.popup();
+	var neartrainstop = false;
+	function onMapClick(e) {
+		var maxDistance = 0.5 // Km
+		var point = e.latlng;
+		var pt1 = turf.point([point.lng,point.lat]);
+		//console.log(pt1);
+		//var circle;
+		//if (typeof circle !== 'undefined') {circle.removeFrom(map);}
+		var intersectingFeatures = [];
+		map.eachLayer(function(layer){
+			if (typeof layer.feature !== 'undefined') {
+				//console.log(stopswtpdLayer.hasLayer(layer), layer.feature.properties);
+				var stoploc = layer.feature.geometry.coordinates;
+				var pt2 = turf.point([stoploc[0],stoploc[1]]);
+				//console.log(pt1, pt2);
+				var distance = turf.distance(pt1, pt2);
+				//console.log(distance);
+				if (distance < maxDistance) { 
+					//console.log(layer.feature.properties, distance);
+					if (allstopsLayer.hasLayer(layer)) {intersectingFeatures.push(layer);} // collect only if near and stop feature not trainstop feature
+					if (stopswtpdLayer.hasLayer(layer)) {neartrainstop = true;}
+					//layer.setStyle({ weight: 6, color: '#666', opacity: 1 });
+				}
+			} 
+		});
+		if (!neartrainstop) {
+			if (typeof circle !== 'undefined') {circle.removeFrom(map);}
+			circle = L.circle([point.lat,point.lng], { color: 'red', fillOpacity: 0, radius: maxDistance * 1000 }).addTo(map); 
+			// if at least one feature found, show it
+			if (intersectingFeatures.length) {
+				//console.log(intersectingFeatures[0].feature.properties);
+				var totaltpd = 0;
+				var tpdperlinearray = intersectingFeatures.map(function(o) {
+				  totaltpd += o.feature.properties.maxtpdperroute;
+				  return o.feature.properties.maxdaytpdperline_dict
+				})
+				//console.log(tpdperlinearray);
+				// merge per stop tpdperline dict to one dict
+				var tpdperlinemergeddict = {}
+				//tpdperlinemergeddict = tpdperlinearray[0] // placeholder for testing without merge
+				tpdperlinearray.forEach(function(tpdperlinedict) {
+					if (typeof tpdperlinedict !== 'undefined') {
+						Object.entries(tpdperlinedict).forEach(entry => 
+							{ let key = entry[0]; let value = entry[1];
+								if (key in tpdperlinemergeddict) {
+									tpdperlinemergeddict[key] = Math.max(value, tpdperlinemergeddict[key]); // if line already in merged dict then just update tpd to max
+								} else {
+									tpdperlinemergeddict[key] = value; // // if line not in merged dict then just add it to merged dict
+								}
+							});
+					}
+				});
+				s_tpdperline = []
+				var displaystring = '';
+				Object.entries(tpdperlinemergeddict).forEach(entry => 
+					{ let key = entry[0]; let value = entry[1];
+						s_tpdperline.push({line_name:key, tpd:value});
+					});
+				//console.log(s_tpdperline);
+				s_tpdperline.sort(function(a, b){return b.tpd - a.tpd});
+				s_tpdperline.forEach(dispFunction);
+				var html = '<h3>Trips Near<br>Point of Interest<br>(PoI)</h3>'+'Trips per Day' + ' : ' + 'line' + ' - ' + 'agency' + "<br/>" + displaystring;
+			}
+			function dispFunction(linetpd){
+				//console.log(linetpd);
+				var agency_id = linetpd["line_name"].split('-')[0];
+				var route_short_name = linetpd["line_name"].split('-')[1];
+				var tpd = linetpd["tpd"]
+				displaystring += '<br>' + agencies[agency_id] + ' - ' + route_short_name + ' : ' + tpd;
+			}
+			popup
+				.setLatLng(e.latlng)
+				.setContent('<div style="height: 400px; overflow: auto;">'+e.latlng.toString()+'<br>'+html+'</div>')
+				.openOn(map);
+		}
+		neartrainstop = false;
+	}
+
+	map.on('click', onMapClick);
+
+	
+	var legend = L.control({position: 'bottomleft'});
+	legend.onAdd = function (map) {
+		var div = L.DomUtil.create('div', 'legend'),
+			grades = [0, 10, 20, 30, 40, 60, 80, 120, 240, 1200],
+			labels = [],
+			from, to;
+		for (var i = 0; i < grades.length; i++) {
+			from = grades[i];
+			to = grades[i + 1];
+			labels.push(
+				'<i style="background:' + getColor(from) + '"> </i> ' +
+				from + (to ? '&ndash;' + to : '+'));
+		}
+		div.innerHTML = '<h3>Train tpd at Stops</h3>'+labels.join('<br>');
+		return div;
+	};
+	legend.addTo(map);
+
+</script>
+<script src="../docs/transitanalystisrael_config.js" ></script>
+<script src="../docs/tool_descriptions_e.js" ></script>
+<script src="../docs/tool_descriptions_h.js" ></script>
+<script>
+	document.getElementById("aboutE").innerHTML = descEtool9 + servicePeriodE + logos;
+	//console.log(document.getElementById("aboutE").innerHTML)
+	document.getElementById("aboutH").innerHTML = descHtool9 + servicePeriodH + logos;
+</script>
+
+</body>
+</html>
