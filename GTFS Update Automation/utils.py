@@ -10,9 +10,6 @@ import time
 import zipfile
 import tarfile
 import re
-
-
-
 from io import BytesIO
 from dateutil import parser
 import gtfs2transfers
