@@ -7,9 +7,9 @@ import transitanalystisrael_config as cfg
 import shutil
 import os
 
-no_data_dir = cfg.websitelocalpath[:-1]+'_no_data'+'\\'
-current_dir = cfg.websitelocalpath[:-1]+'_current'+'\\'
-past_dir = cfg.websitelocalpath[:-1]+'_past'+'\\'
+no_data_dir = cfg.websitelocalnodatapath
+current_dir = cfg.websitelocalcurrentpath
+past_dir = cfg.websitelocalpastpath
 
 srcdir = cfg.processedpath
 dstdir = current_dir
@@ -47,6 +47,7 @@ print os.listdir(dstdir)
 #
 # now add the data files from processed dir and change names to remove dates
 #
+
 '''
 toolslist = ['lines_on_street', 'line_freq', 'muni_fairsharescore', 'muni_score_lists_and_charts', 'muni_tpd_per_line', 'muni_transitscore', 'stops_near_trainstops_editor', 'tpd_at_stops_per_line', 'tpd_near_trainstops_per_line', 'transitscore']
 for tooldir in toolslist:
@@ -66,6 +67,7 @@ for tooldir in toolslist:
 			shutil.copyfile(filein,fileout)
 			#print 'shutil.copyfile(srcdir+"',filename,'",dstdir+"',tooldir,'"+"//"+"',filenameout,'")'
 '''
+
 print 'date to remove from file names : ', cfg.gtfsdate
 #  lines_on_street
 shutil.copyfile(srcdir+"agency_"+cfg.gtfsdate+".js",dstdir+"lines_on_street"+"//"+"agency.js")
@@ -113,4 +115,37 @@ shutil.copyfile(srcdir+"ts_lookup_israel"+cfg.gtfsdate+".js",dstdir+"transitscor
 shutil.copyfile(srcdir+"ts_rendered_israel"+cfg.gtfsdate+".png",dstdir+"transitscore"+"//"+"ts_rendered.png")
 
 print os.listdir(dstdir)
+
+#
+# curent_or_past is changed to past in the js config file that was moved to website_past. TTM needs this to point the client to the correct server
+#
+jsfile = 'docs\\'+'transitanalystisrael_config.js'
+tempjsfile = 'docs\\'+'temp_config.js'
+in_dir = past_dir
+out_dir = past_dir
+maxfilelinecount = 2000
+print 'input from ', in_dir+jsfile
+print 'output to ', out_dir+tempjsfile
+filein = open(in_dir+jsfile, 'r')
+fileout = open(out_dir+tempjsfile, 'w')
+count = 0
+sline = filein.readline()
+while ((count < maxfilelinecount) and (sline != '')):
+	if sline.find('var cfg_current_or_past') == 0 : 
+		postsline = sline.replace("'current'","'past'")
+		fileout.write(postsline)
+	else :
+		postsline = sline
+		fileout.write(postsline)
+	#print len(sline), sline
+	count +=1
+	sline = filein.readline()
+print '------------------'
+print ' infile line count ',count
+filein.close()
+fileout.close()
+print 'closed ', in_dir+jsfile
+print 'closed ', out_dir+tempjsfile
+shutil.copyfile(out_dir+tempjsfile,out_dir+jsfile)
+os.remove(out_dir+tempjsfile)
 

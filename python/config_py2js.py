@@ -9,11 +9,11 @@ import os
 pyfile = 'transitanalystisrael_config.py'
 jsfile = 'docs\\'+'transitanalystisrael_config.js'
 
-out_dir = cfg.websitelocalpath[:-1]+'_no_data'+'\\'
+out_dir = cfg.websitelocalnodatapath
 
 maxfilelinecount = 2000
 print 'input from ', cfg.pythonpath+pyfile
-print 'output to ', cfg.websitelocalpath+jsfile
+print 'output to ', out_dir+jsfile
 filein = open(cfg.pythonpath+pyfile, 'r')
 fileout = open(out_dir+jsfile, 'w')
 count = 0

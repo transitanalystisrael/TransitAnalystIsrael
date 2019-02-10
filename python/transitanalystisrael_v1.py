@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 # 
 
+# get gtfs files
+
 # process gtfs files to create files in processed dir for use by js in website tools
-'''
 import gtfs_preprocessing 
 import transitscore_israel # check that long processing steps (2 hours)are not commented out in imported file
 import muni_scores
@@ -11,7 +12,6 @@ import high_freq_lines_israel
 import lines_on_street
 import tpd_at_stops_israel
 import stops_in_muni_pre_edit
-
 import stops_in_muni_pre2post_edit # you can also manually edit the pre file to create the post file and rerun the script with this commented out
 import tpd_in_muni_per_line
 import stops_near_trainstops_pre_edit
@@ -27,7 +27,7 @@ import copyprocessed2website
 
 # gzip big data files for upload to cloud
 import gzip_big_files
-'''
+
 # upload files to cloud website dir from local website dir
 import upload2aws_s3
 
