@@ -9,14 +9,10 @@ import os
 import boto3
 
 print '********** upload to AWS S3 cloud *************'
-current_localdir = cfg.websitelocalpath[:-1]+'_current'
-past_localdir = cfg.websitelocalpath[:-1]+'_past'
-no_data_localdir = cfg.websitelocalpath[:-1]+'_no_data'
-for_testing_upload_localdir = cfg.websitelocalpath[:-1]+'_for_testing_upload'
+current_localdir = cfg.websitelocalcurrentpath[:-1]
+temp_localdir = cfg.temppath
 print 'current_localdir : ',current_localdir
-print 'past_localdir : ',past_localdir
-print 'no_data_localdir : ',no_data_localdir
-print 'for_testing_upload_localdir : ',for_testing_upload_localdir
+
 os.chdir(current_localdir)
 print os.listdir(current_localdir)
 
@@ -169,25 +165,53 @@ delete_all_objects('transitanalystisrael-current')
 upload_localdir_w_gzip_to_bucket(current_localdir, 'transitanalystisrael-current')
 print_objects('transitanalystisrael-current')
 
-'''
-toolslist = ['lines_on_street', 'line_freq', 'muni_fairsharescore', 'muni_score_lists_and_charts', 'muni_tpd_per_line', 'muni_transitscore', 'stops_near_trainstops_editor', 'tpd_at_stops_per_line', 'tpd_near_trainstops_per_line', 'transitscore']
-for tooldir in toolslist:
-	print '# ',tooldir
-	tooldirfilelist = os.listdir(current_localdir+tooldir)
-	for filename in tooldirfilelist :
-		print filename
-		filepath = current_localdir+tooldir+'\\'+filename
-		filesize = os.path.getsize(filepath)
-		if (filename.endswith(".js") and filesize <= cfg.bigjssize2gzip) or (filename.endswith(".html") or filename.endswith(".png")):
-			print '  ',filepath, filesize
-		elif filename.endswith(".gz") :
-			print '  GZIP-> ',filepath, filesize
-'''
-
 print '------------------------------------------------------------'
 # Call S3 to list current buckets
 for bucket in s3.buckets.all():
 	print(bucket.name)
 #	for key in bucket.objects.all():
 #		print(key.key)
+
+#
+# change current_or_past in js config file to past in transitanalystisrael-past bucket
+# this enables the TTM client to point to the correct server
+#
+# download js config file to temp dir, edit file, then upload
+#download
+s3.Bucket('transitanalystisrael-past').download_file('docs/transitanalystisrael_config.js', temp_localdir+'transitanalystisrael_config.js')
+#edit
+jsfile = 'transitanalystisrael_config.js'
+tempjsfile = 'temp_config.js'
+in_dir = temp_localdir
+out_dir = temp_localdir
+maxfilelinecount = 2000
+print 'input from ', in_dir+jsfile
+print 'output to ', out_dir+tempjsfile
+filein = open(in_dir+jsfile, 'r')
+fileout = open(out_dir+tempjsfile, 'w')
+count = 0
+sline = filein.readline()
+while ((count < maxfilelinecount) and (sline != '')):
+	if sline.find('var cfg_current_or_past') == 0 : 
+		postsline = sline.replace("'current'","'past'")
+		fileout.write(postsline)
+	else :
+		postsline = sline
+		fileout.write(postsline)
+	#print len(sline), sline
+	count +=1
+	sline = filein.readline()
+print '------------------'
+print ' infile line count ',count
+filein.close()
+fileout.close()
+print 'closed ', in_dir+jsfile
+print 'closed ', out_dir+tempjsfile
+shutil.copyfile(out_dir+tempjsfile,out_dir+jsfile)
+os.remove(out_dir+tempjsfile)
+#upload
+with open(out_dir+jsfile, 'rb') as data:
+	s3.Bucket('transitanalystisrael-past').put_object(Key='docs/transitanalystisrael_config.js', Body=data, ContentType='application/javascript')
+	print 'uploaded : ', out_dir+jsfile
+
 
