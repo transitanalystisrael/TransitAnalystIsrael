@@ -32,14 +32,14 @@ import os
 import datetime
 
 
-if __name__== "__main__":
+def main():
     # Get logger
     update_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
     _log = utils.get_logger()
 
     # config variables to be moved to config-file downstrem
     default_coverage_name, secondary_custom_coverage_name, gtfs_url, gtfs_file_name_on_mot_server, osm_url, \
-        navitia_docker_compose_file_path, navitia_docker_compose_file_name = utils.get_config_params()
+    navitia_docker_compose_file_path, navitia_docker_compose_file_name = utils.get_config_params()
 
     try:
         # Get the docker service client
@@ -80,7 +80,8 @@ if __name__== "__main__":
 
         # Validate the conversion process takes place by ensuring tyr_beat is up
         utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_custom_coverage_name,
-                                                               navitia_docker_compose_file_path, navitia_docker_compose_file_name)
+                                                               navitia_docker_compose_file_path,
+                                                               navitia_docker_compose_file_name)
 
         # After 20 minutes - test that both osm and gtfs conversions are done
         success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 20)
@@ -95,7 +96,8 @@ if __name__== "__main__":
 
         # Re-start Navitia to make sure all changes are applied with default and custom coverages
         utils.stop_all_containers(docker_client)
-        is_up = utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name)
+        is_up = utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
+                                                 navitia_docker_compose_file_name)
 
         # If it's up - delete the old gtfs and osm files
         if is_up:
@@ -103,7 +105,8 @@ if __name__== "__main__":
             utils.delete_file_from_host(gtfs_file_name)
 
         # Validate new data is accessible via default and the old data is accessible via secondary
-        utils.validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name, default_cov_eos_date)
+        utils.validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name,
+                                             default_cov_eos_date)
 
         # Send e-mail everything is completed - only on automatic script on AWS
         # On local Windows machine, there's no need.
@@ -116,4 +119,8 @@ if __name__== "__main__":
     except Exception as e:
         _log.exception("Done with errors - see Exception stacktrace")
         utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Failed - see logs")
+
+
+if __name__== "__main__":
+    main()
 

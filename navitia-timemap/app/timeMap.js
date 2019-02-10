@@ -22,7 +22,13 @@ var default_starting_zoom = 13;
 var goToHeatLayerButtonDiv;
 
 // var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/default";
-var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/secondary-cov";
+var navitia_server_url= "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/";
+// Load from transitanalystisrael_config the data version: current or past
+if (cfg_current_or_past == "current") {
+    navitia_server_url = navitia_server_url + "default"
+} else {
+    navitia_server_url = navitia_server_url + "secondary-cov"
+}
 var navitia_server_url_heat_maps = navitia_server_url +  "/heat_maps"
 var resolution = "750";
 var date_time_picker;
