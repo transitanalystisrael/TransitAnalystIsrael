@@ -669,7 +669,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 		maxday_i = 0
 		for line_name_i, [tpw, tpdlist] in tpdperline_dict.iteritems() :
 			tpwatstop += tpw
-			if line_name_i == '2-' : train_tpw += tpw
+			if line_name_i[:2] == '2-' : train_tpw += tpw
 			for i in range(len(tpdlist)) : tpdatstoplist[i] += tpdlist[i]
 		for i in range(len(tpdatstoplist)) :
 			if tpdatstoplist[i] > tpdatstoplist[maxday_i] : maxday_i = i
@@ -677,7 +677,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 		averagetpdatstop = tpwatstop/daysofservicetocount
 		for line_name_i, [tpw, tpdlist] in tpdperline_dict.iteritems() :
 			maxdaytpdperline_dict[line_name_i] = tpdlist[maxday_i]
-			if line_name_i == '2-' : train_maxdaytpd = tpdlist[maxday_i]
+			if line_name_i[:2] == '2-' : train_maxdaytpd += tpdlist[maxday_i]
 		stop_lat = stops_dict[stop_id][0]
 		stop_lon = stops_dict[stop_id][1]
 		stopsforoutput_dict[stop_id] = [stop_lat, stop_lon, tpwatstop, maxdaytpdatstop, averagetpdatstop, maxdaytpdperline_dict, train_maxdaytpd, train_tpw]
