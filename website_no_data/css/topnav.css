@@ -1,40 +1,60 @@
 .topnav {
   overflow: hidden;
-  background-color: #333;
+  background-color: #9CA3A0;
   height: 5%;
+  display: flex;
+  justify-content: flex-end;
 }
 
-.topnav a, button {
-  float: left;
-  color: #f2f2f2;
-  background-color: #333;
+.topnav button {
+  /*float: left;*/
   border-style: none;
   outline: none;
   text-align: center;
   padding: 8px 8px;
   text-decoration: none;
-  font-size: 16px;
-}
-
-.topnav a:hover, button:hover {
-  background-color: #ddd;
+  height: 100%;
   color: black;
+  background-color: #9CA3A0;
+  border-style: none;
+  font-size: 1em;
+  font-weight: bolder;
+  cursor: pointer;
+
 }
 
-.topnav a.active {
-  background-color: #4CAF50;
+.main-button {
+  height: 100%;
+}
+.topnav .main-button button{
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  background-color: #45a31f;;
+  font-size: 1.2em;
+  font-weight: bold;
+  }
+
+.topnav button:hover {
+  /*background-color: #ddd;*/
   color: white;
 }
+
+.topnav .main-button :hover {
+  color: black
+}
+
 .topnavh {
   overflow: hidden;
-  background-color: #333;
+  color: #333;
   height: 5%;
 }
 
 .topnavh a, button {
   float: right;
   color: #f2f2f2;
-  background-color: #333;
+  /*background-color: #333;*/
   border-style: none;
   outline: none;
   text-align: center;
@@ -43,13 +63,8 @@
   font-size: 16px;
 }
 
-.topnavh a:hover, button:hover {
-  background-color: #ddd;
-  color: black;
-}
-
 .topnavh a.active {
-  background-color: #4CAF50;
+  /*background-color: #4CAF50;*/
   color: white;
 }
 #about { padding: 8px 20px; font: 18px/20px Arial, Helvetica, sans-serif; background: white; border-radius: 5px; }
