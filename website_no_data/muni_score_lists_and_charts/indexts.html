@@ -136,6 +136,7 @@ td {
 	align-content: center;
 }
 .sort:hover {
+	cursor: pointer;
 	text-decoration: none;
 	background-color:#1b8aba;
 }
@@ -239,9 +240,9 @@ td {
 <script type="text/javascript" src=muni_transitscore_xy.js></script>
 
 <div class="topnav">
-	<button type="button" onclick="display_transit_score()">מדד תחבורה ציבורית</button>
+	<button type="button" onclick="display_built_den_score()">מדד צפיפות בנייה</button>
 	<button type="button" onclick="display_fair_share_score()">מדד חלוקה הוגנת</button>
-	<button type="button" onclick="display_built_den_score()">מדד צפיפות בנויה</button>
+	<button type="button" onclick="display_transit_score()">מדד תחבורה ציבורית</button>
 </div>
 
 <div class="row">
@@ -413,9 +414,9 @@ td {
 	</div>
 	<div class="column side">
 		<div id="users">
-			<input class="search" placeholder="חיפוש" />
+			<input class="search" placeholder="חפשו או לחצו על הכפתורים למיון" />
 			<button class="sort" data-sort="name">
-				שם הרשות
+				שם הישוב
 			</button>
 			<button class="sort" data-sort="TransitScore">
 				מדד תח"צ
