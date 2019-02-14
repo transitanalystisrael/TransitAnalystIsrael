@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,7 +11,7 @@
   gtag('config', 'UA-130620396-1');
 </script>
 
-	<title>Frequent Service Lines</title>
+	<title>קווי תחבורה ציבורית תדירים</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +32,7 @@
 	<style>
 		#map { width: 100%; height: 95%; }
 
-		.info { height: 400px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+		.info { height: 500px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
 		.info h4 { margin: 0 0 5px; color: #777; }
 
 		.legend { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
@@ -41,37 +40,6 @@
 
 		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
 		.savefilecontrol i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
-	</style>
-
-	<style>
-		.freq-list {
-			direction: rtl;
-			text-align: center;
-		}
-		.zui-table {
-			text-align: right;
-			direction: rtl;
-			border: solid 1px #DDEEEE;
-			border-collapse: collapse;
-			border-spacing: 0;
-			font: normal 13px Arial, sans-serif;
-		}
-		.zui-table thead th {
-			text-align: center;
-			background-color: #DDEFEF;
-			border: solid 1px #DDEEEE;
-			color: #336B6B;
-			padding: 10px;
-			text-shadow: 1px 1px 1px #fff;
-		}
-		.zui-table tbody td {
-			border: solid 1px #DDEEEE;
-			color: #333;
-			padding: 2px;
-			text-shadow: 1px 1px 1px #fff;
-			word-wrap: break-word;
-			max-width: 100px;
-		}
 	</style>
 
 	<link rel="stylesheet" href="leaflet-slider-master/dist/leaflet-slider.css"/>
@@ -172,20 +140,16 @@
 	};
 
 	info.update = function () {
-		// this._div.innerHTML = '<h4>Route Frequency Israel</h4>' +
-		// 	'<p>' + linesShownCount +' lines with tpd >=' + slidervalue + '</p>' +
-		// 	'<p>' + 'Trips per day' + ' : ' + 'line' + ' - ' + 'agency' + '</p>'
-		// 	+ displaystring;
 		this._div.innerHTML =
 			'<div class="freq-list">' +
 			'<h4>תדירות קווי אוטובוס בישראל</h4>' +
             '<h5>' + linesShownCount + ' קווים עם יותר מ-' + slidervalue + ' נסיעות' + '</h5>' +
-			'<table class="zui-table">' +
+			'<table class="freq-table">' +
             '    <thead>' +
             '        <tr>' +
             '            <th>מפעילה</th>' +
             '            <th>מספר קו</th>' +
-            '            <th>נסיעות ליום</th>' +
+            '            <th>נסיעות ליום (לכיוון)</th>' +
             '        </tr>' +
             '    </thead>' +
 			'    <tbody>' +
@@ -193,7 +157,6 @@
             '    </tbody>' +
             '</table>' +
 			'</>'
-
 	};
 
 	info.addTo(map);
@@ -310,27 +273,44 @@
 		var tpdperlinearray = intersectingFeatures.map(function(o) {
 			totaltpd += o.feature.properties.maxtpdperroute;
 			return (o.feature.properties.maxtpdperroute >= slidervalue) ?
-				[o.feature.properties.maxtpdperroute, ' : <b>' + o.feature.properties.route_short_name + ' - ' + agencies[o.feature.properties.agency_id]+'</b>']:
-				[o.feature.properties.maxtpdperroute, ' : ' + o.feature.properties.route_short_name + ' - ' + agencies[o.feature.properties.agency_id]];
-/*			return //{(o.feature.properties.maxtpdperroute >= slidervalue) ?
-				//[o.feature.properties.maxtpdperroute, '<b>'+' : ' + o.feature.properties.route_short_name + ' - ' + agencies[o.feature.properties.agency_id]+'</b>'] :
-				[o.feature.properties.maxtpdperroute, ' : ' + o.feature.properties.route_short_name + ' - ' + agencies[o.feature.properties.agency_id]]
-			//};
-*/
+				[o.feature.properties.maxtpdperroute, o.feature.properties.route_short_name, agencies[o.feature.properties.agency_id]]:
+				[o.feature.properties.maxtpdperroute, o.feature.properties.route_short_name, agencies[o.feature.properties.agency_id]];
 		})
-
-
-
-
 
 
 		//console.log(tpdperlinearray);
 
 		tpdperlinearray.sort(function(a, b){return b[0] - a[0]});
-		//console.log(tpdperlinearray);
-		var displayarray = tpdperlinearray.map(function(o) {return[String(o[0])+o[1]]});
-		//console.log(displayarray);
-		var html = 'Trips per day' + ' : ' + 'line' + ' - ' + 'agency' + "<br/>" + displayarray.join('<br/>')+'<br/>total tpd:'+ totaltpd + '<br/>'+'<br/>average trips per hour per direction:'+ '<br/>' + Math.round(10*totaltpd/2/20)/10;
+        var displaystring = "";
+        tpdperlinearray.forEach(dispFunction);
+        function dispFunction(linetpd){
+            var tpd = linetpd[0]
+            var route_short_name = linetpd[1];
+            var agency_name = linetpd[2];
+            displaystring +=
+                '<tr>' +
+                '	<td>' + agency_name + '</td>' +
+                '	<td>' + route_short_name + '</td>' +
+                '   <td>' + tpd + '</td>' +
+                '</tr>'
+            };
+        var html =
+              '<div class="freq-list popup-list">' +
+              '<table class="freq-table">' +
+              '    <thead>' +
+              '        <tr>' +
+              '            <th>מפעילה</th>' +
+              '            <th>מספר קו</th>' +
+              '            <th>נסיעות ליום (לכיוון)</th>' +
+              '        </tr>' +
+              '    </thead>' +
+              '    <tbody>' +
+            displaystring +
+              '    </tbody>' +
+              '</table>' +
+             '<br/>ממוצע מספר הנסיעות לשעה לכיוון:'+ '<br/>' + Math.round(10*totaltpd/2/20)/10 +
+              '</>';
+
 
 		map.openPopup(html, e.latlng, {
 		  offset: L.point(0, 0)

@@ -16,7 +16,6 @@
   height: 100%;
   color: black;
   background-color: #9CA3A0;
-  border-style: none;
   font-size: 1em;
   font-weight: bolder;
   cursor: pointer;
@@ -68,3 +67,39 @@
   color: white;
 }
 #about { padding: 8px 20px; font: 18px/20px Arial, Helvetica, sans-serif; background: white; border-radius: 5px; }
+
+.freq-list {
+  direction: rtl;
+  text-align: center;
+}
+
+.freq-list.popup-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.freq-table {
+  text-align: right;
+  direction: rtl;
+  border: solid 1px #DDEEEE;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font: normal 13px Arial, sans-serif;
+}
+.freq-table thead th {
+  text-align: center;
+  background-color: #DDEFEF;
+  border: solid 1px #DDEEEE;
+  color: #336B6B;
+  padding: 10px;
+  text-shadow: 1px 1px 1px #fff;
+  max-width: 40px;
+}
+.freq-table tbody td {
+  border: solid 1px #DDEEEE;
+  color: #333;
+  padding: 2px;
+  text-shadow: 1px 1px 1px #fff;
+  word-wrap: break-word;
+  max-width: 40px;
+}
