@@ -88,7 +88,7 @@ function makeTileLayers() {
                 'Transit data provided by <a href="http://miu.org.il/">Merhav</a>' +
                 ' and processed by <a href="https://github.com/CanalTP/navitia">Navitia</a> '
         }),
-        '(OSM) רקע שחור-לבן':
+        '(OSM) רקע צבעוני':
             L.tileLayer.provider('OpenStreetMap.Mapnik', {
                 attribution: 'Map tiles & data  &copy;' +
                     ' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' +
@@ -96,7 +96,7 @@ function makeTileLayers() {
                     'Transit data provided by <a href="http://miu.org.il/">Merhav</a>' +
                     ' and processed by <a href="https://github.com/CanalTP/navitia">Navitia</a> '
             }),
-        '(OSM) רקע צבעוני':
+        '(OSM) רקע שחור-לבן':
             L.tileLayer.provider('OpenStreetMap.BlackAndWhite', {
                 attribution: 'Map tiles & data  &copy;' +
                     ' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' +
