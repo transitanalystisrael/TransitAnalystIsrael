@@ -1,7 +1,7 @@
 // #!/usr/bin/env python
 // # -*- coding: utf-8 -*-
 // #
-// # config file for the 9 of 10 transitanalystisrael tools (TTM is seperate) 
+// # config file for the 9 of 10 transitanalystisrael tools (TTM is seperate)
 // #
 // print '----------------- transitanalystisrael config file loading --------------------------'
 // import time
@@ -21,6 +21,7 @@ var cfg_sstarttimeall = '00:00:00' ;
 var cfg_sstoptimeall = '24:00:00' ;
 var cfg_bigjs2gzip = 500000 ;
 
+cfg_current_or_past="current"
 // # line_freq config
 var cfg_freqtpdmin = 60 ;
 
@@ -37,7 +38,7 @@ var cfg_areatpdmin = 10 ;
 
 // # tpd_at_stops_per_line config
 
-// # tpd_near_trainstops_per_line config 
+// # tpd_near_trainstops_per_line config
 var cfg_neartrainstop = 500.0 ; // meters for stop to be considered near trainstop before editing ;
 
 // # transitscore config

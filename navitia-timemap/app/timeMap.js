@@ -74,12 +74,12 @@ function createMap() {
 
 
 function getDefaultLayerName() {
-    return 'Stamen Toner Light';
+    return '(Stamen Toner Lite) רקע שחור-לבן';
 };
 
 function makeTileLayers() {
     return {
-        'Stamen Toner Light':
+        '(Stamen Toner Lite) רקע שחור-לבן':
             L.tileLayer.provider('Stamen.TonerLite', {
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>,' +
                 ' <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy;' +
@@ -88,7 +88,7 @@ function makeTileLayers() {
                 'Transit data provided by <a href="http://miu.org.il/">Merhav</a>' +
                 ' and processed by <a href="https://github.com/CanalTP/navitia">Navitia</a> '
         }),
-        'OpenStreetMap Mapnik':
+        '(OSM) רקע שחור-לבן':
             L.tileLayer.provider('OpenStreetMap.Mapnik', {
                 attribution: 'Map tiles & data  &copy;' +
                     ' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' +
@@ -96,7 +96,7 @@ function makeTileLayers() {
                     'Transit data provided by <a href="http://miu.org.il/">Merhav</a>' +
                     ' and processed by <a href="https://github.com/CanalTP/navitia">Navitia</a> '
             }),
-        'OpenStreetMap BlackAndWhite':
+        '(OSM) רקע צבעוני':
             L.tileLayer.provider('OpenStreetMap.BlackAndWhite', {
                 attribution: 'Map tiles & data  &copy;' +
                     ' <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' +
@@ -142,18 +142,18 @@ function handleMarkerDrag(latLng) {
 
 function invalidateRunButton() {
     $('#runButton').addClass("invalidated");
-    runButton.text("Run");
+    runButton.text("חשב");
 }
 
 
 /**
  * Recenter button when results are loaded
  */
-var goToHeatLayerButton = L.control({position: 'bottomleft'});
+var goToHeatLayerButton = L.control({position: 'bottomright'});
 goToHeatLayerButton.onAdd = function (map) {
     goToHeatLayerButtonDiv = L.DomUtil.create('input', 'go-to-button');
     goToHeatLayerButtonDiv.type="button";
-    goToHeatLayerButtonDiv.value="There are new results \n Click here to re-center map"
+    goToHeatLayerButtonDiv.value="חזרו תוצאות חדשות לחצו כאן"
     goToHeatLayerButtonDiv.onclick = function(e){
         map.eachLayer(function(layer){
             if (layer._leaflet_id === heatMapLayerId) {
@@ -317,8 +317,8 @@ function loadHeatMap(heatMatrix) {
 function makePixel (PolygonCoords, color, duration) {
     var summary = 'not accessible';
     if (duration !== null) {
-        summary = sprintf('Duration: %s <br/> <p class="popup-link">Click to set the starting location marker ' +
-            'here</p>', durationToString(duration));
+        summary = sprintf('זמן הגעה: %s <br/> <p class="popup-link"> לחצו בכדי לקבוע את נקודת המוצא ' +
+            '</p>', durationToString(duration));
     }
     return L.rectangle(PolygonCoords, {
         smoothFactor: 0,
@@ -337,10 +337,10 @@ function durationToString (duration) {
     var hours = Math.floor(duration / (60 * 60)) % 24;
     var days = Math.floor(duration / (24 * 60 * 60));
 
-    if (days !== 0) { res += sprintf('%s days, ', days); }
-    if (hours !== 0) { res += sprintf('%s hrs,  ', hours); }
-    if (minutes !== 0) { res += sprintf('%s min. ', minutes); }
-    if (seconds !== 0) { res += sprintf('and %s sec.', seconds); }
+    if (days !== 0) { res += sprintf('%s ימים, ', days); }
+    if (hours !== 0) { res += sprintf('%s שעות,  ', hours); }
+    if (minutes !== 0) { res += sprintf('%s דקות ', minutes); }
+    if (seconds !== 0) { res += sprintf('ו-%s שניות', seconds); }
 
     if (! res) {
         return '0s';
@@ -354,8 +354,8 @@ function durationToString (duration) {
 $('#switchButton').toggles({
     click: true, // allow clicking on the toggle
     text: {
-        on: 'FROM', // text for the ON position
-        off: 'TO' // and off
+        on: 'מוצא', // text for the ON position
+        off: 'יעד' // and off
     },
     on:true,
     type: 'select',
@@ -435,7 +435,7 @@ var timeSlider = $('#timeSlider').slider({
 function generateHeatMap() {
     //Mark button as running
     runButton.removeClass("invalidated");
-    runButton.text("Running...");
+    runButton.text("מחשב...");
     //Show spinner
     $('#spinner').show();
     //Remove the "Take me to the heat map" button
@@ -536,14 +536,14 @@ $('#selfBtn').on("click", function(){
 });
 
 //Legend
-var legend = L.control({position: 'bottomright'});
+var legend = L.control({position: 'bottomleft'});
 
 legend.onAdd = function (map) {
 
     var div = L.DomUtil.create('div', 'legend'),
         time_intervals  = [0, 15, 30, 45, 60, 75, 90, 120],
         labels = [];
-    div.innerHTML = "<p>Minutes to arrive</p>"
+    div.innerHTML = "<h3>זמן הגעה בדקות</h3>"
     // loop through our time intervals and generate a label with a colored square for each interval
     for (var i = 0; i < time_intervals.length-1; i++) {
         div.innerHTML +=

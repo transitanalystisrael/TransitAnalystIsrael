@@ -103,3 +103,7 @@
   word-wrap: break-word;
   max-width: 40px;
 }
+
+#towns {
+  direction: rtl;
+}
