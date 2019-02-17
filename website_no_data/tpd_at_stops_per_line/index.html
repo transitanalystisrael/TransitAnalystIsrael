@@ -11,17 +11,17 @@
 
   gtag('config', 'UA-130620396-1');
 </script>
-	
-	<title>Accessible level of service at stops</title>
+
+	<title>נגישות לשירותי תחבורה ציבורית בתחנות</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	
+
 	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
 
     <link rel="stylesheet" href="../dist/leaflet.css" />
     <script src="../dist/leaflet.js" ></script>
-	
+
 	<style>
 		html, body {
 			height: 100%;
@@ -31,17 +31,20 @@
 
 	<style>
 		#map { width: 100%; height: 95%; }
-		
-		.info { height: 600px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } 
+
+		.info { max-height: 500px; max-width: 250px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
 		.info h4 { margin: 0 0 5px; color: #777; }
-		
-		.legend { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
-		.legend i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
-		
-		.stopStyle { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
+		.freq-table tbody td { text-align: center;}
+
+		.legend { height: auto; max-width: 100px; text-align: center; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
+		.legend i { width: 18px; height: 18px; float:left; margin-right: 4px; opacity: 1.0; }
+		.legend h3 {margin: 0px 0px 5px 0px;}
+
+		.stopStyle { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
 		.stopStyle i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
-		
-		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;} 
+		.stopStyle  h3 {margin: 0px 0px 5px 0px;}
+
+		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
 		.savefilecontrol i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 		</style>
 
@@ -66,20 +69,22 @@
 </script>
 
 <div class="topnav">
-  <a class="active" href="index.html"><b style="font-size: 20px;">Accessible level of service at stops</b></a>
-  <a href="../index.html">Home</a>
-  <button type="button" onclick="displayAbout()">About - אודות</button>
+	<button type="button" onclick="displayAbout()">About - אודות</button>
+	<button type="button" onclick="displayHome()">דף הבית</button>
+	<div class="main-button">
+		<button type="button" onclick="displaySelf()">נגישות לשירותי תחבורה ציבורית בתחנות</button>
+	</div>
 </div>
 
 <div id="about" style="display: none;">
 	<table style="width:100%">
 	  <tr>
 		<th id="aboutE" style="width:50%; text-align: left; font-weight: normal;">***</th>
-		<th id="aboutH" style="width:50%; text-align: right; font-weight: normal; direction: rtl;">***</th> 
+		<th id="aboutH" style="width:50%; text-align: right; font-weight: normal; direction: rtl;">***</th>
 	  </tr>
 	</table>
 </div>
-		
+
 
 <script src="leaflet-slider-master/dist/leaflet-slider.js"></script>
 
@@ -94,8 +99,8 @@
 <script type="text/javascript">
 
 	var map = L.map('map').setView([32.11057,34.83797], 11);
-	
-		
+
+
 	var tpdLevels = [0, 10, 20, 30, 40, 60, 80, 120, 240, 1200];
 	var initslidervalue = 5;
 	var slidervalue = tpdLevels[initslidervalue];
@@ -107,25 +112,25 @@
 		maxZoom: 18,
 		ext: 'png'
 	}).addTo(map);
-	
+
 	var OpenStreetMap_BlackAndWhite = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
 		maxZoom: 18,
 		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 	});
-	
+
 	var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 19,
 		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 	});
-	
-	var baseMaps = {
-		"Stamen_TonerLite": Stamen_TonerLite,
-		"OSM_B&W": OpenStreetMap_BlackAndWhite,
-		"OSM": OpenStreetMap_Mapnik
-	};
-	
+
+    var baseMaps = {
+        "(Stamen Toner Lite) רקע שחור-לבן": Stamen_TonerLite,
+        "(OSM) רקע שחור-לבן": OpenStreetMap_BlackAndWhite,
+        "(OSM) רקע צבעוני": OpenStreetMap_Mapnik
+    };
+
 	L.control.layers(baseMaps).addTo(map);
-	
+
 	// control that shows state info on hover
 	var info = L.control();
 
@@ -146,7 +151,7 @@
 		display_maxtpdatstop = '';
 		var tpdperline = [];
 		if (props) {
-			Object.entries(props.maxdaytpdperline_dict).forEach(entry => 
+			Object.entries(props.maxdaytpdperline_dict).forEach(entry =>
 				{ let key = entry[0]; let value = entry[1];
 					tpdperline.push({line_name:key, tpd:value});
 				});
@@ -157,24 +162,57 @@
 			display_averagetpdatstop = props.averagetpdatstop;
 			display_maxtpdatstop = props.maxtpdatstop;
 		}
-		this._div.innerHTML = '<h3>Trips per Day (tpd) at Stop</h3>' 
-			+'<br>'+'stop id' + ' : ' + 'average tpd' + ' , ' + 'max tpd' + '<br>'
+		this._div.innerHTML =
+            '<div class="freq-list">' +
+			'<h4>תדירות נסיעות יומית בתחנה</h4>'
 			+  (props ?
-				'<b>' + props.stop_id + ' : ' + props.averagetpdatstop + ' , ' + props.maxtpdatstop + '</b>' + 
-				'<br><br>tpd : line-agency' + 
-				displaystring
-				: 'Hover over a stop');
+            '<table class="freq-table">' +
+            '    <thead>' +
+            '        <tr>' +
+            '            <th>מזהה תחנה</th>' +
+            '            <th>ממוצע נסיעות יומי</th>' +
+            '            <th>סך נסיעות יומי</th>' +
+            '        </tr>' +
+            '    </thead>' +
+            '    <tbody>' +
+					'<tr>' +
+					'   <td>' + display_maxtpdatstop + '</td>' +
+					'	<td>' +  display_averagetpdatstop + '</td>' +
+					'	<td>' + display_stop_id + '</td>' +
+					'</tr>' +
+            '    </tbody>' +
+            '</table>' +
+			'</br>' +
+            '<table class="freq-table">' +
+            '    <thead>' +
+            '        <tr>' +
+            '            <th>מפעילה</th>' +
+            '            <th>מספר קו</th>' +
+            '            <th>נסיעות ליום (לכיוון)</th>' +
+            '        </tr>' +
+            '    </thead>' +
+            '    <tbody>' +
+					displaystring +
+            '    </tbody>' +
+            '</table>' +
+            '</>'
+			: 'השתמשו בעכבר על מנת להציג נתונים על תחנה');
 
 		function dispFunction(linetpd){
 			var agency_id = linetpd["line_name"].split('-')[0];
 			var route_short_name = linetpd["line_name"].split('-')[1];
 			var tpd = linetpd["tpd"]
-			displaystring += '<br>' + agencies[agency_id] + ' - ' + route_short_name + ' : ' + tpd;
+			displaystring +=
+                '<tr>' +
+                '	<td>' + agencies[agency_id] + '</td>' +
+                '	<td>' + route_short_name + '</td>' +
+                '   <td>' + tpd + '</td>' +
+                '</tr>'
 		}
 	};
 
 	info.addTo(map);
-	
+
 	var savefilecontrol = L.control({position: 'bottomright'});
 	savefilecontrol.onAdd = function (map) {
 		var div3 = L.DomUtil.create('div', 'savefilecontrol');
@@ -192,7 +230,7 @@
 		//var text = nearStopsText;
 		var text_options_form = document.getElementById("text-options");
 		var text_filename = 'tpd_at_stop.html';
-	
+
 		text_options_form.addEventListener("submit", function(event) {
 			event.preventDefault();
 			//console.log(info._div.innerHTML);
@@ -236,7 +274,7 @@
 
 	var stopswtpdLayer;
 	var freezHighlight = false;
-	
+
 	function highlightFeature(e) {
 		if (!freezHighlight) {
 			var layer = e.target;
@@ -259,10 +297,10 @@
 			info.update();
 		}
 	}
-	
+
 	var frozenLayer;
 	var stopStyleValue = 'walkingdistance';
-	
+
 	function clickHandler(e) {
 		freezHighlight = !freezHighlight; // toggle freezHighlight
 		if (freezHighlight) frozenLayer = e.target;
@@ -271,16 +309,16 @@
 			highlightFeature(e);
 		}
 	}
-	
+
 	function stopStyleChange(v) {
 		//console.log(v);
 		stopStyleValue = v;
 		if (stopStyleValue == 'walkingdistance') {
-			stopswtpdLayer.eachLayer(function (layer) { 
+			stopswtpdLayer.eachLayer(function (layer) {
 				layer.setRadius(355);
 			});
 		} else {
-			stopswtpdLayer.eachLayer(function (layer) { 
+			stopswtpdLayer.eachLayer(function (layer) {
 				layer.setRadius(35);
 			});
 		}
@@ -308,7 +346,7 @@
 	}
 
 	var i;
-	for (i = 0; i < 11; i++) { 
+	for (i = 0; i < 11; i++) {
 		map.createPane('pane'+i);
 		map.getPane('pane'+i).style.zIndex = 400+i;
 		map.getPane('pane'+i).style['mix-blend-mode'] = 'normal';
@@ -324,7 +362,7 @@
 			filter : function(feature, layer) {return (feature.properties.maxtpdatstop >= slidervalue);}
 		}).addTo(map);
 	}
-	
+
 	//stopswtpdLayer = addStoplayertomap()
 	/*
 	stopswtpdLayer = L.geoJson(stopsWtpdperline, {
@@ -337,7 +375,7 @@
 */
 	map.attributionControl.addAttribution('TransitScore data &copy; <a href="http://miu.org.il/">Merhav</a>');
 
-	
+
 	function sliderChange(x) {
 		if (stopswtpdLayer) {stopswtpdLayer.remove()};
 		stopswtpdLayer = addStoplayertomap();
@@ -349,7 +387,7 @@
 			slidervalue = sliderChange(tpdLevels[value]);
 			//console.log(slidervalue);
 		}, {
-		position: 'bottomleft',
+		position: 'topleft',
 		max: 9,
 		min: 0,
 		value: initslidervalue,
@@ -362,22 +400,24 @@
 		syncSlider: true,
 		id: 'slider'
 	}).addTo(map);
-	
+
 	var legend = L.control({position: 'bottomleft'});
-	legend.onAdd = function (map) {
-		var div = L.DomUtil.create('div', 'legend'),
-			grades = tpdLevels,
-			labels = [],
-			from, to;
-		for (var i = 0; i < grades.length; i++) {
-			var j = grades.length-i-1;
-			from = grades[j];
-			to = grades[j + 1];
-			labels.push(
-				'<i style="background:' + getColor(from) + '"> </i> ' +
-				from + (to ? '&ndash;' + to : '+'));
-		}
-		div.innerHTML = '<h3>tpd at Stops</h3>'+labels.join('<br>');
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend'),
+        	grades = tpdLevels,
+            // grades = [60, 80, 120, 240],
+            labels = [],
+            from, to;
+
+        for (var i = 0; i < grades.length; i++) {
+            from = grades[i];
+            to = grades[i + 1];
+
+            labels.push(
+                '<i style="background:' + getColor(from) + '"> </i> ' +
+                from + (to ? '&ndash;' + to : '+'));
+        }
+		div.innerHTML = '<h3>תדירות נסיעות יומית בתחנה</h3>'+labels.join('<br>');
 		return div;
 	};
 	legend.addTo(map);
@@ -385,10 +425,10 @@
 	var stopStyle = L.control({position: 'bottomleft'});
 	stopStyle.onAdd = function (map) {
 		var div2 = L.DomUtil.create('div', 'stopStyle');
-		div2.innerHTML = '<h3>Display Style Select</h3>'
+		div2.innerHTML = '<h3>תצוגת תחנה</h3>'
 			+'<form onclick="stopStyleChange(stopstyle.value)">'
-				+'<input type="radio" name="stopstyle" value="walkingdistance" checked>WalkingDistanceCircle<br>'
-				+'<input type="radio" name="stopstyle" value="stop">StopMarker'
+				+'<input type="radio" name="stopstyle" value="walkingdistance" checked>עיגול ברדיוס הליכה<br>'
+				+'<input type="radio" name="stopstyle" value="stop">אייקון תחנה'
 			+'</form>';
 		return div2;
 	};
