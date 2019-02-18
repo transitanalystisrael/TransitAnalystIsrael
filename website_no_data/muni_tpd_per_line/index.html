@@ -33,8 +33,8 @@
 	<style>
 		#map { width: 100%; height: 95%; }
 
-		.info { direction: rtl; align-content: center; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
-		.info h4 { text-align: center; margin: 0 0 5px; color: #777; }
+		.info { direction: rtl; max-height: 500px; max-width: 230px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+		.info h4 { margin: 0 0 5px; color: #777; }
 
 		.legend { max-width: 100px; text-align: center; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
 		.legend i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
@@ -60,6 +60,7 @@
 			showAbout = true;
 		};
 	}
+
     function displayHome() {
         window.location.href="../index.html";
     }
@@ -150,7 +151,25 @@
 		}
 		this._div.innerHTML = '<h4>מדד תחבורה ציבורית לישוב<br>ותדירות יומית של כל הקווים בישוב</h4>'
 			+  (props ?
-                '<div class="freq-list popup-list">' +
+                // props.muni_name + ' - ' + props.transitscore + ' , ' + munisWtpdperline[props.muni_id].maxday_muni_tpd+'</b>'
+                '<div class="freq-list ">' +
+				'<table class="freq-table">' +
+                '    <thead>' +
+                '        <tr>' +
+                '            <th>ישוב</th>' +
+                '            <th>מדד עוצמת תח"צ בישוב</th>' +
+                '            <th>סך נסיעות אוטובוסים יומי</th>' +
+                '        </tr>' +
+                '    </thead>' +
+                '    <tbody>' +
+                '<tr>' +
+                '	<td>' + props.muni_name_h  + '</td>' +
+                '	<td>' +   props.transitscore + '</td>' +
+                '   <td>' + munisWtpdperline[props.muni_id].maxday_muni_tpd + '</td>' +
+                '</tr>' +
+                '    </tbody>' +
+                '</table>' +
+                '</br>' +
                 '<table class="freq-table">' +
                 '    <thead>' +
                 '        <tr>' +
@@ -167,12 +186,6 @@
 				: 'הציבו את הסמן מעל ישוב ולחצו לבחירה');
 
 		function dispFunction(linetpd){
-		    // console.log(linetpd)
-			// var agency_id = linetpd["line_name"].split('-')[0];
-			// var route_short_name = linetpd["line_name"].split('-')[1];
-			// var tpd = linetpd["tpd"]
-			// displaystring += '<br>' + agencies[agency_id] + ' - ' + route_short_name + ' : ' + tpd;
-		// }
             var agency_id = linetpd["line_name"].split('-')[0];
             var route_short_name = linetpd["line_name"].split('-')[1];
             var tpd = linetpd["tpd"]
@@ -192,7 +205,7 @@
 	savefilecontrol.onAdd = function (map) {
 		var div3 = L.DomUtil.create('div', 'savefilecontrol');
 		div3.innerHTML = ''
-			+ '<form id="text-options"><input type="submit" value="Save"></input></form>'
+			+ '<form id="text-options"><input type="submit" value="ייצוא הנתונים"></input></form>'
 		return div3;
 	};
 	savefilecontrol.addTo(map);

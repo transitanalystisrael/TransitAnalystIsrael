@@ -132,7 +132,7 @@
 
     info.update = function (props) {
         this._div.innerHTML = '<h4>מדד השקעה בתח"צ בישוב</h4>' +
-			(props ? '' + props.muni_name + ' - ' + Number(props.fairsharescore).toFixed(0) + '%'
+			(props ? '' + props.muni_name_h + ' - ' + Number(props.fairsharescore).toFixed(0) + '%'
                 : 'השתמשו בסמן להצגת פרטים על כל איזור<br>' +
 					'או לחצו על איזור השיפוט של מספר ישובים להשוואה');
     };
@@ -203,7 +203,7 @@
 			closeOnClick: false
 		});
 		//console.log(e.target.feature.properties.muni_name);
-		var muni_name = e.target.feature.properties.muni_name;
+		var muni_name = e.target.feature.properties.muni_name_h;
 		var fss = e.target.feature.properties.fairsharescore;
 		fss =Number(fss).toFixed(0);
 		map.addLayer(popup

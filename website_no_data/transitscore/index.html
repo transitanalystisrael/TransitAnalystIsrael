@@ -53,13 +53,20 @@
 			showAbout = true;
 		};
 	}
+    function displayHome() {
+        window.location.href="../index.html";
+    }
+
+    function displaySelf() {
+        window.location.href="index.html";
+    }
 </script>
 
 <div class="topnav">
 	<button type="button" onclick="displayAbout()">About - אודות</button>
 	<button type="button" onclick="displayHome()">דף הבית</button>
 	<div class="main-button">
-		<button type="button" onclick="displayParent()">מדד עוצמת תחבורה ציבורית לפי מיקום</button>
+		<button type="button" onclick="displaySelf()">מדד עוצמת תחבורה ציבורית לפי מיקום</button>
 	</div>
 </div>
 
@@ -113,9 +120,9 @@
 	};
 
 	info.update = function (props) {
-		muniName = (props ? props.muni_name : '');
+		muniName = (props ? props.muni_name_h : '');
 		this._div.innerHTML = '<h3>מדד עוצמת תחבורה ציבורית לפי מיקום</h3>' +  (props ?
-			'<b>' + muniName + '</b>'
+			'<b> בישוב ' + muniName + '</b>'
 			: 'השתמשו בעכבר על מנת להציג את מדד עוצמת התח"צ במיקום ספציפי');
 	};
 

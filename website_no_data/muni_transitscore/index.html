@@ -58,6 +58,13 @@
 			showAbout = true;
 		};
 	}
+    function displayHome() {
+        window.location.href="../index.html";
+    }
+
+    function displaySelf() {
+        window.location.href="index.html";
+    }
 </script>
 
 <div class="topnav">
@@ -126,7 +133,7 @@
 
 	info.update = function (props) {
         this._div.innerHTML = '<h4>מדד עוצמת תח"צ בישוב</h4>' +  (props ?
-			'<b>' + props.muni_name + ' - ' + props.transitscore + '</b>'
+			'<b>' + props.muni_name_h + ' - ' + props.transitscore + '</b>'
             : 'השתמשו בסמן להצגת פרטים על כל ישוב<br>' +
             'או לחצו על איזור השיפוט של מספר ישובים להשוואה');
 	};
@@ -197,7 +204,7 @@
 			closeOnClick: false
 		});
 		//console.log(e.target.feature.properties.muni_name);
-		var muni_name = e.target.feature.properties.muni_name;
+		var muni_name = e.target.feature.properties.muni_name_h;
 		var ts = e.target.feature.properties.transitscore;
 		ts =Number(ts).toFixed(0);
 		map.addLayer(popup

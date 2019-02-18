@@ -66,6 +66,14 @@
 			showAbout = true;
 		};
 	}
+
+    function displayHome() {
+        window.location.href="../index.html";
+    }
+
+    function displaySelf() {
+        window.location.href="index.html";
+    }
 </script>
 
 <div class="topnav">
@@ -217,7 +225,7 @@
 	savefilecontrol.onAdd = function (map) {
 		var div3 = L.DomUtil.create('div', 'savefilecontrol');
 		div3.innerHTML = ''
-			+ '<form id="text-options"><input type="submit" value="Save"></input></form>'
+			+ '<form id="text-options"><input type="submit" value="ייצוא הנתונים"></input></form>'
 		return div3;
 	};
 	savefilecontrol.addTo(map);

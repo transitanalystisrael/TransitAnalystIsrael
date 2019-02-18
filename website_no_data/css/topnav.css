@@ -44,28 +44,10 @@
   color: black
 }
 
-.topnavh {
-  overflow: hidden;
-  color: #333;
-  height: 5%;
+.topnav.english {
+  direction: rtl;
 }
 
-.topnavh a, button {
-  float: right;
-  color: #f2f2f2;
-  /*background-color: #333;*/
-  border-style: none;
-  outline: none;
-  text-align: center;
-  padding: 8px 8px;
-  text-decoration: none;
-  font-size: 16px;
-}
-
-.topnavh a.active {
-  /*background-color: #4CAF50;*/
-  color: white;
-}
 #about { padding: 8px 20px; font: 18px/20px Arial, Helvetica, sans-serif; background: white; border-radius: 5px; }
 
 .freq-list {
@@ -93,7 +75,7 @@
   color: #336B6B;
   padding: 10px;
   text-shadow: 1px 1px 1px #fff;
-  max-width: 40px;
+  max-width: 45px;
 }
 .freq-table tbody td {
   border: solid 1px #DDEEEE;
@@ -101,7 +83,7 @@
   padding: 2px;
   text-shadow: 1px 1px 1px #fff;
   word-wrap: break-word;
-  max-width: 40px;
+  max-width: 45px;
 }
 
 #towns {
