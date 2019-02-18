@@ -12,11 +12,11 @@ import zipfile
 import tarfile
 import re
 from io import BytesIO
-import gtfs2transfers
-import send_email
+# import gtfs2transfers
+# import send_email
 import logger
-
-import data_utils
+import boto3
+# import data_utils
 _log = logger.get_logger()
 
 
@@ -529,3 +529,21 @@ def get_logger():
     Get a logger that outputs info and error messages to the console and a log file
     """
     return _log
+
+
+def setup_ec2_from_ami():
+    client = boto3.client('ec2',region_name='eu-central-1')
+    # Start an AWS EC2 instance based on the production instance with the ssh-http security group
+    ec2_details = client.run_instances(ImageId='ami-0b4e92633ceee7442', MinCount=1, MaxCount=1, InstanceType='t2.micro',
+                               SecurityGroupIds=['sg-0bb9c869758f719eb'])
+
+    instance_id = ec2_details['Instances'][0]['InstanceId']
+    session = boto3.session.Session(region_name='eu-central-1')
+    ec2 = session.resource('ec2').Instance(instance_id)
+
+    #waiting 30 seconds for public ip address assiging
+    time.sleep(30)
+    print(ec2.public_ip_address)
+
+if __name__ == '__main__':
+    setup_ec2_from_ami()

@@ -4,11 +4,17 @@ import sys
 from dateutil import parser
 import utils
 import requests
+import datetime
+import boto3
+import logger
+
+omd_url = "https://api.transitfeeds.com/v1/getFeedVersions?key="
+
+def get_osm_latest_version(url):
+    return get_file_from_url_http(url, "israel-and-palestine-latest.osm.pbf")
 
 
-# _log = utils.get_logger()
-
-def get_file_from_url_http(url):
+def get_file_from_url_http(url, local_dest_file_name):
     """
     Downloads a file to the working directory
     :param url: HTTP utl to downloads from - not an FTP URL
@@ -16,10 +22,10 @@ def get_file_from_url_http(url):
     """
 
     # Preparing file for fetching
-    _log.info("Going to download the latest osm from %s", url)
+    _log = get_logger()
+    _log.info("Going to download the latest %s from %s", local_dest_file_name, url)
     r = requests.get(url, stream=True)
-    local_file_name = "israel-and-palestine-latest.osm.pbf"
-    file = open(local_file_name, 'wb')
+    file = open(local_dest_file_name, 'wb')
 
     # Creating a progress bar
     size = int(r.headers['Content-Length'])
@@ -33,8 +39,8 @@ def get_file_from_url_http(url):
             size_iterator += 1
     file.close()
     pbar.finish()
-    _log.info("Finished loading latest OSM to: %s", local_file_name)
-    return local_file_name
+    _log.info("Finished downloading: %s", local_dest_file_name)
+    return local_dest_file_name
 
 
 def createProgressBar(file_size, action='Downloading: '):
@@ -67,6 +73,7 @@ def get_gtfs_file_from_url_ftp(url, file_name_on_server):
     :param file_name_on_server: The file name on the FTP server
     :return: file name of the downloaded content in the working directory
     """
+    _log = get_logger()
     _log.info("Going to download the latest GTFS from %s", url)
     try:
         # Connect to FTP
@@ -119,12 +126,49 @@ def get_gtfs_list_from_omd():
     """
     :return: List of dates indicating different versions of GTFS by starting date
     """
-    # _log.info("Retrieving list of available GTFS versions from OpenMobilityData")
-    url="https://api.transitfeeds.com/v1/getFeedVersions?key=5bbfcb92-9c9f-4569-9359-0edc6e765e9f&feed=ministry-of-transport-and-road-safety%2F820&page=1&limit=500&err=1&warn=1"
-    r = requests.get(url, stream=True)
+    _log = get_logger()
+    _log.info("Retrieving list of available GTFS versions from OpenMobilityData")
+    omd_list_of_feeds_url = omd_url + get_omd_api_key() +'&feed=ministry-of-transport-and-road-safety%2F820&page=1&limit=500&err=1&warn=1'
+    r = requests.get(omd_list_of_feeds_url, stream=True)
     response = r.json()
-    print(response.status)
+    # Building a list of start production dates for each GTFS version
+    gtfs_dates_and_urls = []
+    if response['status'] == "OK":
+        versions = response['results']['versions']
+        for version in versions:
+            version_entry = {}
+            version_entry['date'] = datetime.datetime.strptime(version['d']['s'], '%Y%m%d')
+            version_entry['url'] = version['url']
+            gtfs_dates_and_urls.append(version_entry)
+        return gtfs_dates_and_urls
+    else:
+        _log.error("OMD (TransitFeeds) isn't available")
+
+
+def get_gtfs_from_omd(url, date):
+    """
+    Get GTFS file from OMD according to given url
+    :return: local file name of downlaoded GTFS
+    """
+    local_file_name = get_file_from_url_http(url, "GTFS-"+date)
+    return local_file_name
+
+
+def get_omd_api_key():
+    # s3 = boto3.resource('s3')
+    # keys_buckets = s3.Bucket('transit-analyst-key-bucket')
+    omd_api_key = 'omd_api_key.txt'
+    # keys_buckets.download_file(omd_api_key, omd_api_key)
+    omd_api_key = open(omd_api_key, 'rb').read()
+
+    omd_api_key = '5bbfcb92-9c9f-4569-9359-0edc6e765e9f'
+    return omd_api_key
+
+
+def get_logger():
+    return utils.get_logger()
 
 
 if __name__ == '__main__':
-    get_gtfs_list_from_omd()
+    # main()
+    pass

@@ -28,6 +28,7 @@ At the end: The default coverage shows the new GTFS & OSM and the previous defau
 """
 
 import utils
+import data_utils
 import os
 import datetime
 
@@ -55,8 +56,8 @@ def main():
         utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
 
         # Download GTFS & OSM
-        gtfs_file_name = utils.get_gtfs_file_from_url_ftp(gtfs_url, gtfs_file_name_on_mot_server)
-        osm_file_name = utils.get_file_from_url_http(osm_url)
+        gtfs_file_name = data_utils.get_gtfs_file_from_url_ftp(gtfs_url, gtfs_file_name_on_mot_server)
+        osm_file_name = data_utils.get_file_from_url_http(osm_url)
 
         # Generate the Transfers file required for Navitia and add to GTFS
         gtfs_file_name = utils.generate_gtfs_with_transfers(gtfs_file_name, os.getcwd())

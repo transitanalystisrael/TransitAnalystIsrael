@@ -12,7 +12,7 @@ There are 5 different options:
 import navitia_monthly_update_routine
 import utils
 import data_utils
-
+import boto3
 
 def trigger_monthly_update():
     """
@@ -31,11 +31,32 @@ def trigger_monthly_update():
 
 
 def prepare_od_machine_on_aws():
-    should_start = input("Going to prepare an On-demand machine on a new AWS EC2, would you like to start it once "
-                         "finished? [Y/N]")
-    data_utils.get_gtfs_list_from_omd()
-    gtfs_version_number = input("Please select a GTFS version to compile")
-    pass
+    # should_start = input("Going to prepare an On-demand machine on a new AWS EC2, would you like to start it once "
+    #                      "finished? [Y/N]")
+    gtfs_dates_and_urls = data_utils.get_gtfs_list_from_omd()
+    dates_for_print= []
+    for idx, version_entry in enumerate(gtfs_dates_and_urls ):
+        dates_for_print.append(str(idx+1) + ". " + version_entry['date'].strftime('%d/%m/%Y'))
+    print(*dates_for_print, sep="\n")
+    first_version_number = int(input("Please select 2 versions of GTFS data to compile - enter the code of the first "
+                               "version\n"))
+    second_version_number = int(
+        input("Enter the code of the secondversion\n"))
+
+    _log.info("Going to prepare On-Demand machine on EC2 with GTFS with \"current\" service start date of: %s "
+              "and \"past\" service start date of: %s",
+              gtfs_dates_and_urls[first_version_number-1]['date'].strftime('%d/%m/%Y'),
+              gtfs_dates_and_urls[second_version_number - 1]['date'].strftime('%d/%m/%Y'))
+
+    current_gtfs_file_name  = data_utils.get_gtfs_from_omd(gtfs_dates_and_urls[first_version_number-1]['url'],
+                                 gtfs_dates_and_urls[first_version_number-1]['date'].strftime('%d%m%Y'))
+
+    past_gtfs_file_name = data_utils.get_gtfs_from_omd(gtfs_dates_and_urls[second_version_number - 1]['url'],
+                                                          gtfs_dates_and_urls[second_version_number - 1][
+                                                              'date'].strftime('%d%m%Y'))
+
+    utils.setup_ec2_from_ami()
+
 
 def start_an_existing():
     pass
@@ -93,5 +114,6 @@ def main():
 
 
 if __name__== "__main__":
-    main()
-
+    # main()
+    _log = utils.get_logger()
+    prepare_od_machine_on_aws()
