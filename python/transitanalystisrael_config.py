@@ -9,12 +9,11 @@ import time
 print "Local current time :", time.asctime( time.localtime(time.time()) )
 
 # common config
-#gtfsdate = '20181021'
-#serviceweekstartdate = '20181021'
 gtfsdate = '20190202'
 serviceweekstartdate = '20190202'
 gtfsdirbase = 'israel'
 gtfspath = 'C:\\transitanalyst\\gtfs\\'
+osmpath = 'C:\\transitanalyst\\osm\\’
 processedpath = 'C:\\transitanalyst\\processed\\'
 #processedpath = 'C:\\transitanalyst\\temp\\'
 temppath = 'C:\\transitanalyst\\temp\\'
@@ -25,6 +24,7 @@ pythonpath = 'C:\\git\\TransitAnalystIsrael\\python\\'
 sstarttimeall = '00:00:00'
 sstoptimeall = '24:00:00'
 bigjs2gzip = 500000
+language = 'hebrew'
 
 # line_freq config
 freqtpdmin = 60
@@ -44,6 +44,7 @@ areatpdmin = 10
 
 # tpd_near_trainstops_per_line config 
 neartrainstop = 500.0 # meters for stop to be considered near trainstop before editing
+autoeditrefdate = '20181021'
 
 # transitscore config
 
