@@ -3,10 +3,12 @@
 # 
 
 # get gtfs files and osm file
-gtfs_osm_download.py
+import gtfs_osm_download.py
+
+# copy static files to processed dir
+import load_static_files.py
 
 # process gtfs files to create files in processed dir for use by js in website tools
-
 import gtfs_preprocessing 
 import transitscore_israel # check that long processing steps (2 hours)are not commented out in imported file
 import muni_scores
