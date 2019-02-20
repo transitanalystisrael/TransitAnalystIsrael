@@ -8,3 +8,4 @@ website_no_data - with data/
 GTFS Update Automation/assets/token.json
 GTFS Update Automation/assets/credentials.json
 *.pem
+*.pyc
