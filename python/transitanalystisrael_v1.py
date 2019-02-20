@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 # 
 
-# get gtfs files
+# get gtfs files and osm file
+gtfs_osm_download.py
 
 # process gtfs files to create files in processed dir for use by js in website tools
+
 import gtfs_preprocessing 
 import transitscore_israel # check that long processing steps (2 hours)are not commented out in imported file
 import muni_scores
@@ -31,3 +33,5 @@ import gzip_big_files
 # upload files to cloud website dir from local website dir
 import upload2aws_s3
 
+#process TTM files
+import navitia_update.py
