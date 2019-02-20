@@ -14,6 +14,7 @@ serviceweekstartdate = '20190202'
 gtfsdirbase = 'israel'
 gtfspath = 'C:\\transitanalyst\\gtfs\\'
 osmpath = 'C:\\transitanalyst\\osm\\’
+staticpath = 'C:\\git\\TransitAnalystIsrael\\static_data\\' 
 processedpath = 'C:\\transitanalyst\\processed\\'
 #processedpath = 'C:\\transitanalyst\\temp\\'
 temppath = 'C:\\transitanalyst\\temp\\'
