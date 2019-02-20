@@ -12,7 +12,7 @@
 </script>
 
 	<meta charset="utf-8" />
-	<title>TransitAnalystIsrael</title>
+	<title>Transit Analyst Israel</title>
 	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
@@ -21,18 +21,18 @@
 	}
 
 	body {
-		font-family: Arial, Helvetica, sans-serif; 
+		font-family: Arial, Helvetica, sans-serif;
 	}
-	
+
 	a:link {
 		text-decoration: none;
 	}
-	
+
 	/* Style the header */
 	header {
 		background-color: #666;
 		width: 100%;
-		height: 5%; 
+		height: 5%;
 		padding: 0px;
 		text-align: left;
 		font-size: 24px;
@@ -89,25 +89,49 @@
 </head>
 
 <body>
+<script>
+    function displayHome() {
+        window.location.href="index.html";
+    }
 
-<div class="topnav">
-	<a class="active" href="index.html"><b style="font-size: 20px;">Transit Analyst Israel</b></a>
-	<a href="docs/credits.html" target="_blank">credits</a>
-	<a href="docs/faqs.html" target="_blank">FAQs</a>
-	<a href="mailto:transitanalystisrael@gmail.com?Subject=Contact%20from%20website">contact-us</a>
-	<a href="indexh.html" >עברית</a>
+    function displayFaq() {
+        window.open("docs/faqs.html",'_blank');
+    }
+
+    function contact() {
+        window.location.href="mailto:transitanalystisrael@gmail.com?Subject=Contact%20from%20website";
+    }
+
+    function displayCreds() {
+        window.open("docs/credits.html",'_blank');
+    }
+
+    function displayHebrew() {
+        window.open("indexh.html",'_blank');
+    }
+</script>
+
+
+<div class="topnav english">
+    <button type="button" onclick="displayHebrew()">עברית</button>
+    <button type="button" onclick="contact()">Contact us</button>
+    <button type="button" onclick="displayFaq()">FAQs</button>
+    <button type="button" onclick="displayCreds()">Credits</button>
+    <div class="main-button">
+        <button type="button" onclick="displayHome()">Transit Analyst Israel</button>
+    </div>
 </div>
 
 <section>
   <nav>
-	<a href="transitscore/index.html" target="_blank"><img src="docs/images/tool1.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>		
+	<a href="transitscore/index.html" target="_blank"><img src="docs/images/tool1.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>
   </nav>
   <article>
 	<a href="transitscore/index.html" target="_blank"><p id="desc_e_tool1">***</p></a>
   </article>
 
   <nav>
-	<a href="muni_transitscore/index.html" target="_blank"><img src="docs/images/tool2.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>		
+	<a href="muni_transitscore/index.html" target="_blank"><img src="docs/images/tool2.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>
   </nav>
   <article>
 	<a href="muni_transitscore/index.html" target="_blank"><p id="desc_e_tool2">***</p></a>
@@ -116,14 +140,14 @@
 
 <section>
   <nav>
-	<a href="muni_fairsharescore/index.html" target="_blank"><img src="docs/images/tool3.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>		
+	<a href="muni_fairsharescore/index.html" target="_blank"><img src="docs/images/tool3.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>
   </nav>
   <article>
 	<a href="muni_fairsharescore/index.html" target="_blank"><p id="desc_e_tool3">***</p></a>
   </article>
 
   <nav>
-	<a href="muni_score_lists_and_charts/index.html" target="_blank"><img src="docs/images/tool4.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>		
+	<a href="muni_score_lists_and_charts/index.html" target="_blank"><img src="docs/images/tool4.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>
   </nav>
   <article>
 	<a href="muni_score_lists_and_charts/index.html" target="_blank"><p id="desc_e_tool4">***</p></a>
@@ -132,14 +156,14 @@
 
 <section>
   <nav>
-	<a href="muni_tpd_per_line/index.html" target="_blank"><img src="docs/images/tool5.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>		
+	<a href="muni_tpd_per_line/index.html" target="_blank"><img src="docs/images/tool5.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>
   </nav>
   <article>
 	<a href="muni_tpd_per_line/index.html" target="_blank"><p id="desc_e_tool5">***</p></a>
   </article>
 
   <nav>
-	<a href="line_freq/index.html" target="_blank"><img src="docs/images/tool6.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>		
+	<a href="line_freq/index.html" target="_blank"><img src="docs/images/tool6.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>
   </nav>
   <article>
 	<a href="line_freq/index.html" target="_blank"><p id="desc_e_tool6">***</p></a>
@@ -148,14 +172,14 @@
 
 <section>
   <nav>
-	<a href="lines_on_street/index.html" target="_blank"><img src="docs/images/tool7.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>		
+	<a href="lines_on_street/index.html" target="_blank"><img src="docs/images/tool7.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>
   </nav>
   <article>
 	<a href="lines_on_street/index.html" target="_blank"><p id="desc_e_tool7">***</p></a>
   </article>
 
   <nav>
-	<a href="tpd_at_stops_per_line/index.html" target="_blank"><img src="docs/images/tool8.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>		
+	<a href="tpd_at_stops_per_line/index.html" target="_blank"><img src="docs/images/tool8.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>
   </nav>
   <article>
 	<a href="tpd_at_stops_per_line/index.html" target="_blank"><p id="desc_e_tool8">***</p></a>
@@ -164,14 +188,14 @@
 
 <section>
   <nav>
-	<a href="tpd_near_trainstops_per_line/index.html" target="_blank"><img src="docs/images/tool9.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>		
+	<a href="tpd_near_trainstops_per_line/index.html" target="_blank"><img src="docs/images/tool9.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>
   </nav>
   <article>
 	<a href="tpd_near_trainstops_per_line/index.html" target="_blank"><p id="desc_e_tool9">***</p></a>
   </article>
 
   <nav>
-	<a href="transit_time_map/index.html" target="_blank"><img src="docs/images/tool10.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>		
+	<a href="transit_time_map/index.html" target="_blank"><img src="docs/images/tool10.jpg" alt="TransitAnalystIsrael tool" style="width:160px;height:160px;"></a>
   </nav>
   <article>
 	<a href="transit_time_map/index.html" target="_blank"><p id="desc_e_tool10">***</p></a>

@@ -17,11 +17,13 @@
 
     html,
     body{
+        direction: rtl;
         margin: 0;
         height: 100%;
         width: 100%;
         font-size: $general-font-size;
         font-weight: 500;
+        font-family: Arial, Helvetica, sans-serif;
         color: $font-color;
     }
 
@@ -41,7 +43,7 @@
                 .nav-button-container {
                     display: grid;
                     height: 100%;
-                    grid-template-columns: 4fr 3fr;
+                    grid-template-columns: 4fr 4fr;
                     .home-about-container {
                         display: grid;
                         height: 100%;
@@ -77,6 +79,7 @@
             }
             .about-container {
                 #about {
+                    direction: ltr;
                     padding: 8px 20px;
                     font: 18px/20px Arial, Helvetica, sans-serif;
                     background: white;
@@ -92,7 +95,7 @@
                     display: block;
                     margin: auto;
                     &.minutes {
-                        margin-left: 0px;
+                        margin-right: 0px;
                         padding-bottom: 0.5em;
                     }
                 }
@@ -111,6 +114,7 @@
                         }
                     }
                     &.slider{
+                        direction: rtl;
                         margin: 0 2em 0 0em;
                         display: flex;
                         flex-direction: column;
@@ -184,6 +188,7 @@
                     }
                 }
                 #datetimepicker {
+                    direction: ltr;
                     justify-self: center;
 
                 }
@@ -195,15 +200,23 @@
             height: 100% !important;
         }
         .legend {
+            direction: ltr;
+            //line-height: 18px;
+            //color: #555;
+            //background-color: white;
+            border: solid 1px;
+            height: auto;
+            max-width: 100px;
+            text-align: center;
             line-height: 18px;
             color: #555;
-            background-color: white;
-            border: solid 1px;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            padding: 6px 8px;
+            border-radius: 5px;
         }
-        .legend p {
-            font-weight: bold;
-            margin: 0px;
-        }
+
+            .legend h3 {margin: 0px 0px 5px 0px;}
         .legend i {
             width: 1.2em;
             height: 1.2em;
@@ -213,7 +226,7 @@
         }
 
         .go-to-button {
-            width: 12em;
+            width: 10em;
             height: 6em;
             background-color: $primary-color;
             font-weight: bolder;

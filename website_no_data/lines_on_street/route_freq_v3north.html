@@ -11,12 +11,12 @@
 
   gtag('config', 'UA-130620396-1');
 </script>
-	
-	<title>Route Frequency on street</title>
+
+	<title>תדירות יומית ברחוב נבחר - צפון ישראל</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	
+
 	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
 
     <link rel="stylesheet" href="../dist/leaflet.css" />
@@ -33,16 +33,60 @@
 
 	<style>
 		#map { width: 100%; height: 95%; }
-		
-		.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } 
+
+		.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
 		.info h4 { margin: 0 0 5px; color: #777; }
-		
-		.legend { text-align: left; line-height: 18px; color: #555; } 
+		.info h3 { margin: 0 0 5px; color: #777; }
+
+		.legend { height: auto; max-width: 100px; text-align: center; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
 		.legend i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
+		.legend h3 {margin: 0px 0px 5px 0px;}
 	</style>
-	
+
+	<link rel="stylesheet" href="../css/topnav.css"/>
+
 </head>
 <body>
+
+<script>
+    var showAbout = true;
+    //console.log(showAbout);
+    function displayAbout(){
+        //console.log(showAbout);
+        if (showAbout) {
+            document.getElementById('about').style.display='block';
+            showAbout = false;
+        } else {
+            document.getElementById('about').style.display='none';
+            showAbout = true;
+        };
+    }
+
+    function displayHome() {
+        window.location.href="../index.html";
+    }
+
+    function displayParent() {
+        window.location.href="index.html";
+    }
+</script>
+
+<div class="topnav">
+	<button type="button" onclick="displayAbout()">About - אודות</button>
+	<button type="button" onclick="displayHome()">דף הבית</button>
+	<div class="main-button">
+		<button type="button" onclick="displayParent()">תדירות יומית ברחוב נבחר</button>
+	</div>
+</div>
+
+<div id="about" style="display: none;">
+	<table style="width:100%">
+		<tr>
+			<th id="aboutE" style="width:50%; text-align: left; font-weight: normal;">***</th>
+			<th id="aboutH" style="width:50%; text-align: right; font-weight: normal; direction: rtl;">***</th>
+		</tr>
+	</table>
+</div>
 
 <div id='map'></div>
 
@@ -52,7 +96,7 @@
 <script type="text/javascript">
 
 	var map = L.map('map').setView([32.781, 35.161], 12);
-	
+
 	var Stamen_TonerLite = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
 		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 		subdomains: 'abcd',
@@ -60,23 +104,23 @@
 		maxZoom: 18,
 		ext: 'png'
 	}).addTo(map);
-	
+
 	var OpenStreetMap_BlackAndWhite = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
 		maxZoom: 18,
 		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 	});
-	
+
 	var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 19,
 		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 	});
-	
-	var baseMaps = {
-		"Stamen_TonerLite": Stamen_TonerLite,
-		"OSM_B&W": OpenStreetMap_BlackAndWhite,
-		"OSM": OpenStreetMap_Mapnik
-	};
-	
+
+    var baseMaps = {
+        "(Stamen Toner Lite) רקע שחור-לבן": Stamen_TonerLite,
+        "(OSM) רקע שחור-לבן": OpenStreetMap_BlackAndWhite,
+        "(OSM) רקע צבעוני": OpenStreetMap_Mapnik
+    };
+
 	L.control.layers(baseMaps).addTo(map);
 
 		// control that shows state info on hover
@@ -88,17 +132,40 @@
 		return this._div;
 	};
 
-	info.update = function (props) {
-		//toscore = (props ? props.maxtpdperroute + 9 : 0);
-		this._div.innerHTML = '<h4>Route Frequency Israel</h4>' +
-			'<p>' + 'Trips per Day' + ' : ' + 'line number' + ' - ' + 'agency' + '</p>'
-			+  (props ?
-				'<b>' + props.maxtpdperroute + ' : ' + props.route_short_name + ' - ' + agencies[props.agency_id] + '</b>'
-				: 'Hover over a route');
-	};
+    info.update = function (props) {
+        //toscore = (props ? props.maxtpdperroute + 9 : 0);
+        this._div.innerHTML =
+            props ?
+                '<div class="freq-list">' +
+                '<h4>תדירות יומית ברחוב נבחר</h4>' +
+                '<table class="freq-table">' +
+                '    <thead>' +
+                '        <tr>' +
+                '            <th>מפעילה</th>' +
+                '            <th>מספר קו</th>' +
+                '            <th>נסיעות ליום (לכיוון)</th>' +
+                '        </tr>' +
+                '    </thead>' +
+                '    <tbody>' +
+                '<tr>' +
+                '	<td>' + agencies[props.agency_id] + '</td>' +
+                '	<td>' + props.route_short_name + '</td>' +
+                '   <td>' + props.maxtpdperroute + '</td>' +
+                '</tr>' +
+                '    </tbody>' +
+                '</table>' +
+                '</div>'
+                :
+                '<div class="freq-list">' +
+                '<h3>תדירות יומיות ברחוב נבחר - צפון ישראל</h3>' +
+                'הציבו את הסמן מעל קו תחבורה ציבורית להצגת נתוני הקו<br>' +
+                'או לחצו על רחוב להצגת כל נתוני הקווים ברחוב זה' +
+                '</div>'
 
-	info.addTo(map);
-	
+    };
+
+    info.addTo(map);
+
 	// get color depending on tripsperday value
 	function getColor(d) {
 		return  d >= 240 ? '#006837' :
@@ -120,7 +187,7 @@
 				d >= 80 ? 4 :
 				d >= 60 ? 2 :
 				1;
-	}	
+	}
 	function style(feature) {
 		var tpd = feature.properties.maxtpdperroute;
 		return {
@@ -130,7 +197,7 @@
 			stroke : (tpd >= 10)
 		};
 	}
-	
+
 	var circle;
 	function clickHandler(e) {
 	  //var pt = turf.point([0, 0]);
@@ -145,7 +212,7 @@
 	  //console.log(pt);
 	  //var circle;
 	  if (typeof circle !== 'undefined') {circle.removeFrom(map);}
-	  circle = L.circle([point.lat,point.lng], { color: 'red', radius: maxDistance * 1000 }).addTo(map); 
+	  circle = L.circle([point.lat,point.lng], { color: 'red', radius: maxDistance * 1000 }).addTo(map);
 	  var intersectingFeatures = [];
 	  map.eachLayer(function(layer){
 		if (typeof layer.feature !== 'undefined') {
@@ -158,29 +225,55 @@
 				intersectingFeatures.push(layer);
 				//layer.setStyle({ weight: 6, color: '#666', opacity: 1 });
 			}
-		} 
+		}
       })
-	  // if at least one feature found, show it
-	  if (intersectingFeatures.length) {
-		//console.log(intersectingFeatures[0].feature.properties.maxtpdperroute);
-		var totaltpd = 0;
-		var tpdperlinearray = intersectingFeatures.map(function(o) {
-		  totaltpd += o.feature.properties.maxtpdperroute;
-		  return [o.feature.properties.maxtpdperroute, ' : ' + o.feature.properties.route_short_name + ' - ' + agencies[o.feature.properties.agency_id]]
-		})
-		//console.log(tpdperlinearray);
+        // if at least one feature found, show it
+        if (intersectingFeatures.length) {
+            //console.log(intersectingFeatures[0].feature.properties.maxtpdperroute);
+            var totaltpd = 0;
+            var tpdperlinearray = intersectingFeatures.map(function(o) {
+                totaltpd += o.feature.properties.maxtpdperroute;
+                return [o.feature.properties.maxtpdperroute, o.feature.properties.route_short_name,agencies[o.feature.properties.agency_id]]
+            })
+            //console.log(tpdperlinearray);
 
-		tpdperlinearray.sort(function(a, b){return b[0] - a[0]});
-		//console.log(tpdperlinearray);
-		var displayarray = tpdperlinearray.map(function(o) {return[String(o[0])+o[1]]});
-		var html = 'Trips per Day' + ' : ' + 'line number' + ' - ' + 'agency' + "<br/>" + displayarray.join('<br/>')+'<br/>total tpd:'+ totaltpd + '<br/>'+'<br/>average trips per hour per direction:'+ '<br/>' + Math.round(10*totaltpd/2/20)/10;
-
+            tpdperlinearray.sort(function(a, b){return b[0] - a[0]});
+            //console.log(tpdperlinearray);
+            var displaystring = "";
+            tpdperlinearray.forEach(dispFunction);
+            function dispFunction(linetpd){
+                var tpd = linetpd[0]
+                var route_short_name = linetpd[1];
+                var agency_name = linetpd[2];
+                displaystring +=
+                    '<tr>' +
+                    '	<td>' + agency_name + '</td>' +
+                    '	<td>' + route_short_name + '</td>' +
+                    '   <td>' + tpd + '</td>' +
+                    '</tr>'
+            };
+            var html =
+                '<div class="freq-list popup-list">' +
+                '<table class="freq-table">' +
+                '    <thead>' +
+                '        <tr>' +
+                '            <th>מפעילה</th>' +
+                '            <th>מספר קו</th>' +
+                '            <th>נסיעות ליום (לכיוון)</th>' +
+                '        </tr>' +
+                '    </thead>' +
+                '    <tbody>' +
+                displaystring +
+                '    </tbody>' +
+                '</table>' +
+                '<br/>מספר נסיעות מוערך לכיוון בשעת שיא:'+ '<br/>' + Math.round(10*totaltpd/2/10)/10 +
+                '</>';
 		map.openPopup(html, e.latlng, {
 		  offset: L.point(0, 0)
 		});
 	  }
 	}
-	
+
 	function highlightFeature(e) {
 		var layer = e.target;
 
@@ -244,13 +337,25 @@
 				from + (to ? '&ndash;' + to : '+'));
 		}
 
-		div.innerHTML = labels.join('<br>');
+        div.innerHTML = '<h3>תדירות נסיעות יומית לכיוון</h3>'+labels.join('<br>');
 		return div;
 	};
 
 	legend.addTo(map);
 
 </script>
+
+
+<script src="../docs/transitanalystisrael_config.js" ></script>
+<script src="../docs/tool_descriptions_e.js" ></script>
+<script src="../docs/tool_descriptions_h.js" ></script>
+<script>
+    document.getElementById("aboutE").innerHTML = descEtool7 + servicePeriodE + logos;
+    //console.log(document.getElementById("aboutE").innerHTML)
+    document.getElementById("aboutH").innerHTML = descHtool7 + servicePeriodH + logos;
+</script>
+
+
 
 </body>
 </html>
