@@ -9,3 +9,4 @@ GTFS Update Automation/assets/token.json
 GTFS Update Automation/assets/credentials.json
 *.pem
 AWS Lambda function/myDeploymentPackage.zip
+*.pyc
