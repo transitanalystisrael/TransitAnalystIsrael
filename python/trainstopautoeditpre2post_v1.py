@@ -4,7 +4,7 @@
 # find what stops need to be removed in new file by collecting the stops removed in the manual edit of stopsneartrainstop_pre_edit_20181021
 #
 print '----------------- stops near train station auto editor pre to post txt file --------------------------'
-
+import transitanalystisrael_config as cfg
 from datetime import date
 from datetime import timedelta
 import time
@@ -13,9 +13,9 @@ print "Local current time :", time.asctime( time.localtime(time.time()) )
 #_________________________________
 #
 # input:
-parent_path = 'C:\\transitanalyst\\processed\\'
-servicedate = '20190202'
-refservicedate = '20181021'
+parent_path = cfg.processedpath
+servicedate = cfg.gtfsdate
+refservicedate = cfg.autoeditrefdate
 ref_post_txt_filein = 'stopsneartrainstop_post_edit'+'_'+refservicedate+'.txt'
 ref_pre_txt_filein = 'stopsneartrainstop_pre_edit'+'_'+refservicedate+'.txt'
 pre_txt_filein = 'stopsneartrainstop_pre_edit'+'_'+servicedate+'.txt'
