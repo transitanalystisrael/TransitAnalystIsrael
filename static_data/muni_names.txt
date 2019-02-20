@@ -1,0 +1,202 @@
+﻿muni_id,muni_name_h,muni_name_e
+1061,נצרת עילית,Nazerat Illit
+1247,חריש,Qazir-Harish
+3780,ביתר עילית,Betar Illit
+6700,טבריה,Tiberias
+2500,נשר,Nesher
+7700,עפולה,Afula
+3797,מודיעין עילית,Modi'in Illit
+4000,חיפה,Haifa
+2640,ראש העין,Rosh HaAyin
+565,אזור,Azor
+5000,תל אביב -יפו,Tel Aviv - Yafo
+31,אופקים,Ofaqim
+3570,אריאל,Ari'el
+9500,קריית ביאליק,Qiryat Bialik
+2610,בית שמש,Bet Shemesh
+3000,ירושלים,Jerusalem
+3616,מעלה אדומים,Ma'ale Adummim
+6800,קריית אתא,Qiryat Atta
+1309,אלעד,El'ad
+1015,מבשרת ציון,Mevasseret Ziyyon
+240,יקנעם עילית,Yoqne'am Illit
+1139,כרמיאל,Karmi'el
+874,מגדל העמק,Migdal HaEmeq
+26,ראש פינה,Rosh Pinna
+2300,קריית טבעון,Qiryat Tiv'on
+7300,נצרת,Nazareth
+267,כפר שמריהו,Kefar Shemaryahu
+922,רכסים,Rekhasim
+246,נתיבות,Netivot
+587,סביון*,Savyon
+8000,צפת,Zefat
+8600,רמת גן,Ramat Gan
+1020,אור עקיבא,Or Aqiva
+2560,ערד,Arad
+7900,פתח תקווה,Petah Tiqwa
+1031,שדרות,Sederot
+494,דאלית אל-כרמל,Daliyat Al-Karmel
+9000,באר שבע,Be'er Sheva
+6200,בת ים,Bat Yam
+65,מגדל,Migdal
+6500,חדרה,Hadera
+2620,קריית אונו,Qiryat Ono
+6100,בני ברק,Bene Beraq
+9800,בנימינה-גבעת עדה*,Binyamina-Giv'at Ada
+3730,גבעת זאב,Giv'at Ze'ev
+1063,מעלות-תרשיחא,Ma'alot-Tarshiha
+812,שלומי,Shelomi
+2660,יבנה,Yavne
+2100,טירת כרמל,Tirat Karmel
+6600,חולון,Holon
+1161,רהט,Rahat
+7100,אשקלון,Ashqelon
+7600,עכו,Akko
+99,מצפה רמון,Mizpe Ramon
+7800,פרדס חנה-כרכור,Pardes Hanna-Karkur
+2200,דימונה,Dimona
+2650,רמת השרון,Ramat HaSharon
+681,גבעת שמואל,Giv'at Shemu'el
+1137,קריית יערים,Kiryat Yearim
+7000,לוד,Lod
+9600,קריית ים,Qiryat Yam
+8300,ראשון לציון,Rishon LeZiyyon
+9200,בית שאן,Bet She'an
+3660,עמנואל,Immanu'el
+3611,קריית ארבע,Kiryat Arba
+2630,קריית גת,Qiryat Gat
+534,עספיא,Isifya
+4100,קצרין,Qazrin
+6400,הרצלייה,Herzliyya
+6900,כפר סבא,Kefar Sava
+666,עומר,Omer
+499,יפיע,Yafi
+70,אשדוד,Ashdod
+229,גני תקווה,Ganne Tiqwa
+975,זרזיר,Zarzir
+8200,קריית מוצקין,Qiryat Motzkin
+8500,רמלה,Ramla
+8400,רחובות,Rehovot
+469,קריית עקרון,Qiryat Eqron
+29,יסוד המעלה,Yesud HaMa'ala
+7400,נתניה,Netanya
+9100,נהרייה,Nahariyya
+1200,מודיעין-מכבים-רעות*,Modi'in-Makkabbim-Re'ut
+8700,רעננה,Ra'annana
+3557,קדומים,Qedumim
+9400,יהוד,Yehud
+3608,מעלה אפרים,Maale Efraim
+195,קדימה-צורן,Qadima- Zoran
+1304,שוהם,Shoham
+2800,קריית שמונה,Qiryat Shemona
+831,ירוחם,Yeroham
+6300,גבעתיים,Giv'atayim
+543,ראמה,Rame
+2530,באר יעקב,Be'er Ya'aqov
+9700,הוד השרון,Hod HaSharon
+7500,סח'נין,Sakhnin
+509,כפר כנא,Kafar Kanna
+1263,כפר ורדים,Kefar Weradim
+168,כפר יונה,Kefar Yona
+2400,אור יהודה,Or Yehuda
+8800,שפרעם,Shefar'am
+654,כפר קרע,Kafar Qara
+47,כפר תבור,Kefar Tavor
+466,בית דגן,Bet Dagan
+2600,אילת,Elat
+2034,חצור הגלילית,Hazor HaGelilit
+9300,זכרון יעקב,Zikhron Ya'aqov
+504,כאבול,Kabul
+3650,אפרת,Efrata
+182,אבן יהודה,Even Yehuda
+166,גן יבנה,Gan Yavne
+483,בענה,Bi'ne
+2550,גדרה,Gedera
+3574,בית אל,Bet El
+1271,להבים,Lehavim
+496,חורפיש,Hurfeish
+28,מזכרת בתיה,Mazkeret Batya
+171,פרדסייה,Pardesiyya
+473,אבו סנאן,Abu Sinan
+628,ג'ת,Jatt
+1034,קריית מלאכי,Qiryat Mal'akhi
+634,כפר קאסם,Kafar Qasem
+4502,עין קנייא,Ein Qiniyye
+1290,זמר,Zemer
+536,פקיעין (בוקייעה),Peqi'in (Buqei'a)
+913,שבלי - אום אל-גנם,Shibli-Umm Al-Ghanam
+537,פוריידיס,Fureidis
+530,עיילבון,Eilabun
+1268,מיתר,Metar
+46,יבנאל,Yavne'el
+1066,בני עי''ש,Bnei Aish
+492,דייר חנא,Deir Hanna
+41,אליכין,Elyakhin
+7200,נס ציונה,Nes Ziyyona
+3640,קרני שומרון,Qarne Shomeron
+542,ריינה,Reine
+8900,טמרה,Tamra
+998,ביר אל-מכסור,Bir El-Maksur
+944,בסמת טבעון,Basmat Tab'un
+505,כאוכב אבו אל-היג'א,Kaokab Abu Al-Hija
+122,רמת ישי,Ramat Yishay
+529,אעבלין,I'billin
+2720,טירה,Tire
+485,ג'ולס,Julis
+1295,יאנוח-ג'ת,Yanuh-Jat
+508,כפר כמא,Kafar Kama
+525,סאג'ור,Sajur
+535,פסוטה,Fassuta
+516,מג'ד אל-כרום,Majd al-Krum
+532,עין מאהל,Ein Mahel
+2710,אום אל-פחם,Umm Al-Fahm
+6000,באקה אל-גרביה,Baqa
+517,מזרעה,Mizra
+3760,אורנית,Oranit
+490,דייר אל-אסד,Deir al-Asad
+3750,אלפי מנשה,Alfe Menashe
+507,כפר יאסיף,Kafar Yasif
+43,מטולה,Metula
+481,מגאר,Mughar
+498,טורעאן,Tur'an
+502,ירכא,Yirka
+480,בית ג'ן,Beit Jann
+511,עילוט,Ilut
+978,כעביה-טבאש-חג'אג'רה,Ka'abiyye-Tabbash-Hajajre
+4203,מסעדה,Mas'ade
+3769,הר אדר,Har Adar
+637,ערערה,Ar'ara
+522,נחף,Nahef
+520,משהד,Meshhed
+1292,ג'דיידה-מכר,Judeide-Maker
+478,אכסאל,Iksal
+1296,כסרא-סמיע,Kisra-Sumei
+154,תל מונד,Tel Mond
+4001,בוקעאתא,Buq'ata
+510,כפר מנדא,Kafar Manda
+2730,טייבה,Tayibe
+1224,כוכב יאיר,Kokhav Ya'ir
+531,עראבה,Arrabe
+472,אבו גוש,Abu Ghosh
+518,מעיליא,Mi'elya
+538,שעב,Sha'ab
+489,דבורייה,Daburiyya
+1060,לקיה,Laqye
+1303,חורה,Hura
+638,קלנסווה,Qalansawe
+1192,ערערה-בנגב,Ar'ara-BaNegev
+1286,שגב-שלום,Segev-Shalom
+3652,בית אריה,Bet Arye
+4201,מג'דל שמס,Majdal Shams
+633,כפר ברא,Kafar Bara
+3560,אלקנה,Elkana
+627,ג'לג'וליה,Jaljulye
+962,טובא-זנגרייה,Tuba-Zangariyye
+1327,מעלה עירון,Ma'ale Iron
+1326,בסמ''ה,Basma
+1059,כסיפה,Kuseife
+482,בועיינה-נוג'ידאת,Bu'eine-Nujeidat
+541,ג'סר א-זרקא,Jisr Az-Zarqa
+1054,תל שבע,Tel Sheva
+487,ג'ש (גוש חלב),Jish(Gush Halav)
+4501,ע'ג'ר,Ghajar
