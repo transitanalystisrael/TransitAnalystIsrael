@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 #--------------------------------------------------
 # Create transitscore files from GTFS for all of Israel
-# input GTFS dir israelyyyymmdd is expected in transitanalyst\\gtfs directory  
 #------------------------------------------------------------------------------------------
 import os
 import sys
@@ -10,6 +9,7 @@ from datetime import timedelta
 import time
 import copy
 import math
+import csv
 import gtfs_config as gtfscfg
 
 print '# input GTFS dir israelyyyymmdd is expected in transitanalyst\\gtfs directory  '
@@ -237,8 +237,23 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	for [dayofservice, trips_s, trips_m, trips_l, trips_total] in tripsperdaylist:
 		print dayofservice, trips_s, trips_m, trips_l, trips_total
 
+	# >>> load routes file
+	txtfilein = 'routes.txt'
+	pathin = gtfsdirin
+	routes_dict = {}
+	with open(pathin+txtfilein, 'rb') as f:
+		reader = csv.reader(f)
+		header = reader.next() # [route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_color]
+		print header
+		for row in reader:
+			#print row
+			routes_dict[row[0]] = row[1] # route_id : agency_id
+	#print routes_dict[:4]
+	print 'routes_dict loaded. routes count ', len(routes_dict)
+
 	#
-	# scan trips.txt to create trips dict keyed on trip_id and includes service_id and route_id
+	# scan trips.txt to create trips dict keyed on trip_id and includes service_id and route_id and trip_type_weight based on agency_id
+	# trip_type_weight added to enable higher scores per trip for train, lrt, brt - e.g. 10x, 5x, 3x vs bus 1x
 	#
 	maxfilelinecount = gtfscfg.MAX_TRIPS_COUNT
 	gtfspath = gtfsdirin
@@ -266,11 +281,18 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 		#print slinelist
 		in_id = slinelist[inid_index]
 		# print in_id
-		trips_dict[in_id] = [slinelist[service_id_i], slinelist[route_id_i]]
+		trips_dict[in_id] = [slinelist[service_id_i], slinelist[route_id_i], 1] # default trip_type_weight is 1x for bus
+		agency_id = routes_dict[slinelist[route_id_i]] # get agency_id from routes_dict
+		if agency_id == '2' : trip_type_weight = 10 # train
+		elif agency_id == '21' : trip_type_weight = 5 # lrt
+		elif agency_id == '30' : trip_type_weight = 3 # brt
+		else : trip_type_weight = 1 # bus
+		trips_dict[in_id][2] = trip_type_weight
 		count += 1
 		sline = filein.readline()
 	print '------------------'
 	#print trips_dict
+	print 'trip_id, trips_dict[in_id] last one : ', in_id, trips_dict[in_id]
 	print 'trips lines scanned ', count 
 	filein.close()
 
@@ -299,6 +321,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 			newcount +=1
 			grid_dict[grid_key] = [set([stop_id]), tripset, copy.deepcopy(tripsperdaylist), 0]
 	#for grid_key, [stopset, tripset, tpdlist] in grid_dict.iteritems(): print grid_key, list(stopset)[:1], list(tripset)[:1], tpdlist[:][1][0:2]
+	print 'last one grid_key, grid_dict[grid_key] : ', grid_key, grid_dict[grid_key]
 	print 'count, newcount ', count, newcount
 
 	#
@@ -356,6 +379,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 		for trip_id in tripset:
 			tripcount +=1
 			service_id = trips_dict[trip_id][0]
+			trip_type_weight = trips_dict[trip_id][2]
 			slinelist = calendar_dict[service_id] # use service_id from line in trips.txt to look up calendar line list
 			sstartcalendardate = slinelist[start_date_i]
 			sendcalendardate = slinelist[end_date_i]
@@ -370,9 +394,9 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 				if tpdlist[(calendardate-startservicedate).days][0] != calendardate :
 					print '******error**************'
 					print tpdlist[(calendardate-startservicedate).days][0], calendardate 
-				tpdlist[(calendardate-startservicedate).days][1] += int(slinelist[dayofweek[calendardayofweek]]) # add to trip count for that day
-				maxtripsperday_s = max(maxtripsperday_s, tpdlist[(calendardate-startservicedate).days][1])
-				tpdlist[(calendardate-startservicedate).days][4] += int(slinelist[dayofweek[calendardayofweek]]) # and add to total trips
+				tpdlist[(calendardate-startservicedate).days][1] += int(slinelist[dayofweek[calendardayofweek]])*trip_type_weight # add to trip count for that day
+				#maxtripsperday_s = max(maxtripsperday_s, tpdlist[(calendardate-startservicedate).days][1])
+				tpdlist[(calendardate-startservicedate).days][4] += int(slinelist[dayofweek[calendardayofweek]])*trip_type_weight # and add to total trips
 				maxtripsperday_total = max(maxtripsperday_total, tpdlist[(calendardate-startservicedate).days][4])
 				rawtransitscore += weight_s*int(slinelist[dayofweek[calendardayofweek]]) # and add to raw transit score after applying weight
 		# collect the trips around the grid_key
@@ -391,6 +415,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 		for trip_id in tripset_m_s:
 			tripcount +=1
 			service_id = trips_dict[trip_id][0]
+			trip_type_weight = trips_dict[trip_id][2]
 			slinelist = calendar_dict[service_id] # use service_id from line in trips.txt to look up calendar line list
 			sstartcalendardate = slinelist[start_date_i]
 			sendcalendardate = slinelist[end_date_i]
@@ -404,8 +429,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 				if tpdlist[(calendardate-startservicedate).days][0] != calendardate :
 					print '******error**************'
 					print tpdlist[(calendardate-startservicedate).days][0], calendardate 
-				tpdlist[(calendardate-startservicedate).days][2] += int(slinelist[dayofweek[calendardayofweek]]) # add to trip count for that day
-				tpdlist[(calendardate-startservicedate).days][4] += int(slinelist[dayofweek[calendardayofweek]]) # and add to total trips
+				tpdlist[(calendardate-startservicedate).days][2] += int(slinelist[dayofweek[calendardayofweek]])*trip_type_weight # add to trip count for that day
+				tpdlist[(calendardate-startservicedate).days][4] += int(slinelist[dayofweek[calendardayofweek]])*trip_type_weight # and add to total trips
 		# collect the trips around the grid_key at the second level
 		tripset_l_m = set([])
 		grid_key_list_l =[]
@@ -423,6 +448,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 		for trip_id in tripset_l_m:
 			tripcount +=1
 			service_id = trips_dict[trip_id][0]
+			trip_type_weight = trips_dict[trip_id][2]
 			slinelist = calendar_dict[service_id] # use service_id from line in trips.txt to look up calendar line list
 			sstartcalendardate = slinelist[start_date_i]
 			sendcalendardate = slinelist[end_date_i]
@@ -436,8 +462,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 				if tpdlist[(calendardate-startservicedate).days][0] != calendardate :
 					print '******error**************'
 					print tpdlist[(calendardate-startservicedate).days][0], calendardate 
-				tpdlist[(calendardate-startservicedate).days][3] += int(slinelist[dayofweek[calendardayofweek]]) # add to trip count for that day
-				tpdlist[(calendardate-startservicedate).days][4] += int(slinelist[dayofweek[calendardayofweek]]) # and add to total trips
+				tpdlist[(calendardate-startservicedate).days][3] += int(slinelist[dayofweek[calendardayofweek]])*trip_type_weight # add to trip count for that day
+				tpdlist[(calendardate-startservicedate).days][4] += int(slinelist[dayofweek[calendardayofweek]])*trip_type_weight # and add to total trips
 				
 		rawtransitscore = 0.0
 		for [dayofservice, trips_s, trips_m, trips_l, trips_total] in tpdlist:
