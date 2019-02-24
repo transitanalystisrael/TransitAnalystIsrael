@@ -1,0 +1,10 @@
+*.pyc
+AWS Lambda function/
+root/omd_api_key.txt
+root/transitanalystisrael.pem
+root/assets/token.json
+root/assets/credentials.json
+root/assets/transitanalystisrael.pem
+root/logs/
+root/venv/
+website_no_data - with data/
