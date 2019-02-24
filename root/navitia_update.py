@@ -46,7 +46,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
     worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
 
     # Clearing the worker log to make sure we're monitoring updated logs
-    utils.clear_container_logs(worker_con)
+    utils.clear_container_logs(worker_con) - THIS IS NOT WORKING ON WINDOWS!!!!
 
     # Copy OSM & GTFS to the default coverage input folder on the worker container
     utils.copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name)
