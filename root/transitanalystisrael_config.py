@@ -53,5 +53,9 @@ autoeditrefdate = '20181021'
 # curent_or_past is changed to past in the js config file by copyprocessed2website.py when moving website_current to website_past
 current_or_past = 'current'
 
+# transit_time_map url config - local or AWS API Getway for Transit Analyst production
+# local address should be: "http://localhost:9191"
+time_map_server_url = "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/"
+
 #
 print "Local current time :", time.asctime( time.localtime(time.time()) )
