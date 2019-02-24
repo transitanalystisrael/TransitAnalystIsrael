@@ -10,3 +10,9 @@ GTFS Update Automation/assets/credentials.json
 *.pem
 AWS Lambda function/myDeploymentPackage.zip
 *.pyc
+root/venv/
+root/logs/
+AWS Lambda function/
+root/assets/token.json
+root/assets/credentials.json
+root/omd_api_key.txt
