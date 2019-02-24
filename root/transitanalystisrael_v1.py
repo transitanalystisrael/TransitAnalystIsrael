@@ -3,10 +3,10 @@
 # 
 
 # get gtfs files and osm file
-import gtfs_osm_download.py
+import gtfs_osm_download
 
 # copy static files to processed dir
-import load_static_files.py
+import load_static_files
 
 # process gtfs files to create files in processed dir for use by js in website tools
 import gtfs_preprocessing 
@@ -36,4 +36,4 @@ import gzip_big_files
 import upload2aws_s3
 
 #process TTM files
-import navitia_update.py
+import navitia_update

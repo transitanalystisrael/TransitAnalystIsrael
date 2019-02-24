@@ -1,8 +1,5 @@
 import docker
-import ftplib
 import progressbar
-import sys
-from dateutil import parser
 import json
 import os
 import requests
@@ -12,12 +9,12 @@ import zipfile
 import tarfile
 import re
 from io import BytesIO
-import gtfs2transfers
+import generate_transfers_table
 import send_email
 import logger
+import transitanalystisrael_config as cfg
 
-import data_utils
-_log = logger.get_logger()
+_log = logger.get_logger("navitia_data_process_")
 
 
 def get_config_params():
@@ -25,25 +22,13 @@ def get_config_params():
     Reads monthly_update_config_params.conf file and returns the configuration parameters
     :return: configuration parameters
     """
-    with open('assets/monthly_update_config_params.conf') as f:
-        params = {}
-
-        # Read file
-        lines = f.readlines()
-        for line in lines:
-            pair = line.strip().split("=")
-            params[pair[0]] = pair[1]
-
-        # Get parameters
-        default_coverage_name = params['default_coverage_name']
-        secondary_custom_coverage_name = params['secondary_custom_coverage_name']
-        gtfs_url = params['gtfs_url']
-        gtfs_file_name_on_mot_server = params['gtfs_file_name_on_mot_server']
-        osm_url = params['osm_url']
-        navitia_docker_compose_file_path = params['navitia_docker_compose_file_path']
-        navitia_docker_compose_file_name = params['navitia_docker_compose_file_name']
-        return default_coverage_name, secondary_custom_coverage_name, gtfs_url, gtfs_file_name_on_mot_server, osm_url, \
-                    navitia_docker_compose_file_path, navitia_docker_compose_file_name
+    # Get parameters
+    default_coverage_name = cfg.default_coverage_name
+    secondary_custom_coverage_name = cfg.secondary_custom_coverage_name
+    navitia_docker_compose_file_path = cfg.navitia_docker_compose_file_path
+    navitia_docker_compose_file_name = cfg.navitia_docker_compose_file_name
+    return default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_file_path, \
+           navitia_docker_compose_file_name
 
 
 
@@ -59,7 +44,7 @@ def copy_file_into_docker(container, dest_path, file_path, file_name):
     _log.info("Going to copy %s to %s at %s", file_name, container.name, dest_path)
 
     # Read the file
-    file = open(file_path + '/' + file_name, 'rb')
+    file = open(os.path.join(file_path, file_name), 'rb')
     file = file.read()
 
     try:
@@ -198,9 +183,9 @@ def start_navitia_with_default_coverage(navitia_docker_compose_file_path, extend
 
     # run the docker- compose and redirect logs to prevent from printing in the output
     navitia_docker_start_command = ["docker-compose", "up"]
-
-    subprocess.Popen(navitia_docker_start_command, cwd=navitia_docker_compose_file_path, stderr=subprocess.DEVNULL,
-                     stdout=subprocess.DEVNULL)
+    compose_file_path = os.path.join(os.getcwd(), navitia_docker_compose_file_path)
+    subprocess.Popen(navitia_docker_start_command, shell=True, cwd=compose_file_path,
+                    stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
     # Longer wait time is required because images are being re-downloaded
     if extend_wait_time:
@@ -233,7 +218,7 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_co
 
     # Verifying the custom file has another coverage named secondary_custom_coverage_name which isn't "default"
     _log.info("Attempting to start Navitia with default coverage and %s coverage", secondary_custom_coverage_name)
-    navitia_docker_compose_file = open(navitia_docker_compose_file_path + navitia_docker_compose_file_name, mode='r')
+    navitia_docker_compose_file = open(os.path.join(navitia_docker_compose_file_path,navitia_docker_compose_file_name), mode='r')
     navitia_docker_compose_file_contents = navitia_docker_compose_file.read()
     navitia_docker_compose_file.close()
 
@@ -268,7 +253,7 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_co
     return True
 
 
-def move_one_graph_to_secondary(container, source_cov_name, dest_cov_name):
+def move_current_to_past(container, source_cov_name, dest_cov_name):
     """
     Move the Navitia graph of the source coverage to the destination coverage so in next re-start changes are applied
     :param container: the worker container of Navitia
@@ -285,7 +270,7 @@ def move_one_graph_to_secondary(container, source_cov_name, dest_cov_name):
     return True
 
 
-def copy_graph_to_local_host(container, coverage_name):
+def backup_past_coverage(container, coverage_name):
     """
     Copy a given coverage graph to the local host running this script
     :param container: Navitia worker container
@@ -293,20 +278,20 @@ def copy_graph_to_local_host(container, coverage_name):
     """
     # Create a local file for writing the incoming graph
     _log.info("Going to copy %s.nav.lz4 to %s on local host", coverage_name, os.getcwd())
-    local_graph_file = open('./' + coverage_name + '.nav.lz4', 'wb')
+    local_graph_file = open(os.path.join(os.getcwd(), coverage_name + '.nav.lz4'), 'wb')
 
     # Fetch the graph file
     bits, stat = container.get_archive('/srv/ed/output/' + coverage_name + '.nav.lz4')
     size = stat["size"]
 
     # Generate a progress bar
-    pbar = data_utils.createProgressBar(size, action="Transferring")
+    pbar = createProgressBar(size, action="Transferring")
 
     # Fetch
     size_iterator = 0
     for chunk in bits:
         if chunk:
-            data_utils.file_write_update_progress_bar(chunk, local_graph_file, pbar, size_iterator)
+            file_write_update_progress_bar(chunk, local_graph_file, pbar, size_iterator)
             size_iterator += 1
     local_graph_file.close()
     pbar.finish()
@@ -358,7 +343,7 @@ def stop_all_containers(docker_client):
     _log.info("Stopped all Docker containers")
 
 
-def generate_transfers_file(gtfs_file_name):
+def generate_transfers_file(gtfs_file_path):
     """
     Generate a transfers table compatible with Navitia's server requirements for extending transfers between stops in
     graph calculation. Default values are used:
@@ -366,10 +351,7 @@ def generate_transfers_file(gtfs_file_name):
     :param gtfs_file_name: Name of GTFS zip file containing a stops.txt file with list of stops and their coordinates
     :return: the full path of the generated transfers.txt file
     """
-    # Unzip GTFS to get the stops.txt for processing
-    with zipfile.ZipFile(gtfs_file_name, 'r') as zip_ref:
-        zip_ref.extract(member="stops.txt")
-    output_full_path = gtfs2transfers.generate_transfers(os.getcwd() + "/stops.txt")
+    output_full_path = generate_transfers_table.generate_transfers(os.path.join(gtfs_file_path,"stops.txt"))
     return output_full_path
 
 
@@ -381,14 +363,13 @@ def generate_gtfs_with_transfers(gtfs_file_name, gtfs_file_path):
     :param gtfs_file_path: GTFS zip file path
     :return: the name of the GTFS file
     """
-    file = open(gtfs_file_path + '/' + gtfs_file_name, 'rb')
+    gtfs_file_path_name = os.path.join(gtfs_file_path, gtfs_file_name)
 
     _log.info("Extracting stops.txt and computing transfers.txt")
-    output_file_full_path = generate_transfers_file(gtfs_file_name)
-    with zipfile.ZipFile(gtfs_file_name, 'a') as zip_ref:
+    output_file_full_path = generate_transfers_file(gtfs_file_path)
+    with zipfile.ZipFile(gtfs_file_path_name, 'a') as zip_ref:
         zip_ref.write(output_file_full_path, os.path.basename(output_file_full_path))
-    _log.info("Added transfers.txt to %s", gtfs_file_name)
-    return gtfs_file_name
+    _log.info("Added transfers.txt to %s", gtfs_file_path_name)
 
 
 def copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name):
@@ -524,8 +505,44 @@ def is_aws_machine():
         return False
 
 
+def createProgressBar(file_size, action='Downloading: '):
+    """
+    Craeting a progress bar for continious tasks like downloading file or processing data
+    :param file_size: the total size of the file to set the 100% of the bar
+    :param action: type of action for the progress bar description, default is "Downloading: "
+    :return: a progress bar object
+    """
+    widgets = [action, progressbar.Percentage(), ' ',
+               progressbar.Bar(marker='#', left='[', right=']'),
+               ' ', progressbar.ETA(), ' ', progressbar.FileTransferSpeed()]
+    pbar = progressbar.ProgressBar(widgets=widgets, maxval=file_size)
+    pbar.start()
+    return pbar
+
+
+def file_write_update_progress_bar(data, dest_file, pbar, size_iterator):
+    """
+    Call back for writing fetched or processed data from FTP while updating the progress bar
+    """
+    dest_file.write(data)
+    pbar.update(size_iterator)
+
+
+
+def get_gtfs_list_from_omd():
+    """
+    :return: List of dates indicating different versions of GTFS by starting date
+    """
+    # _log.info("Retrieving list of available GTFS versions from OpenMobilityData")
+    url="https://api.transitfeeds.com/v1/getFeedVersions?key=5bbfcb92-9c9f-4569-9359-0edc6e765e9f&feed=ministry-of-transport-and-road-safety%2F820&page=1&limit=500&err=1&warn=1"
+    r = requests.get(url, stream=True)
+    response = r.json()
+    print(response.status)
+
+
 def get_logger():
     """
     Get a logger that outputs info and error messages to the console and a log file
     """
     return _log
+

@@ -11,3 +11,5 @@ GTFS Update Automation/assets/credentials.json
 AWS Lambda function/myDeploymentPackage.zip
 *.pyc
 AWS Lambda function/function_with_details1.py
+root/venv/
+root/logs/

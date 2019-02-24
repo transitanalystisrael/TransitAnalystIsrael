@@ -3,17 +3,25 @@
 #
 # config file for transitanalystisrael tools  
 #
-print '----------------- transitanalystisrael config file loading --------------------------'
+print ('----------------- transitanalystisrael config file loading --------------------------')
 import time
+import os
 #
-print "Local current time :", time.asctime( time.localtime(time.time()) )
+print ("Local current time :", time.asctime( time.localtime(time.time()) ))
 
 # common config
 gtfsdate = '20190202'
 serviceweekstartdate = '20190202'
 gtfsdirbase = 'israel'
-gtfspath = 'C:\\transitanalyst\\gtfs\\'
-osmpath = 'C:\\transitanalyst\\osm\\'
+gtfs_url='gtfs.mot.gov.il'
+gtfs_file_name_on_mot_server='israel-public-transportation.zip' #on OTM (TransitFeeds) this can be left blank, e.g. ''
+# gtfspath = 'C:\\transitanalyst\\gtfs\\'
+gtfspath = os.path.join(os.pardir,'gtfs')
+gtfs_zip_file_name = 'gtfs_zipped.zip'
+# osmpath = 'C:\\transitanalyst\\osm\\'
+osmpath = os.path.join(os.pardir, 'osm')
+osm_url='https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf'
+osm_file_name = "israel-and-palestine-latest.osm.pbf"
 staticpath = 'C:\\git\\TransitAnalystIsrael\\static_data\\' 
 processedpath = 'C:\\transitanalyst\\processed\\'
 #processedpath = 'C:\\transitanalyst\\temp\\'
@@ -52,10 +60,13 @@ autoeditrefdate = '20181021'
 # transit_time_map config
 # curent_or_past is changed to past in the js config file by copyprocessed2website.py when moving website_current to website_past
 current_or_past = 'current'
-
+default_coverage_name='default'
+secondary_custom_coverage_name='secondary-cov'
+navitia_docker_compose_file_path='assets' #'/home/ec2-user/navitia-docker-compose/'
+navitia_docker_compose_file_name='docker-israel-custom-instances.yml'
 # transit_time_map url config - local or AWS API Getway for Transit Analyst production
 # local address should be: "http://localhost:9191"
 time_map_server_url = "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/"
 
 #
-print "Local current time :", time.asctime( time.localtime(time.time()) )
+print ("Local current time :", time.asctime( time.localtime(time.time())))
