@@ -7,11 +7,11 @@ def worker_handler(event, context):
     """
 
     # Prepare ssh object to conenct to the EC2
-    k = paramiko.RSAKey.from_private_key_file("transitanalystisrael.pem")
+    k = paramiko.RSAKey.from_private_key_file("<key-file>")
     c = paramiko.SSHClient()
     c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    host='172.31.12.186'
+    host='<EC2 private IP (not public one)>'
     print("Connecting to " + host)
     c.connect( hostname = host, username = "ec2-user", pkey = k )
     print ("Connected to " + host)

@@ -118,7 +118,7 @@ def main(gtfsdate, gtfsdirbase, processedpath):
 	#os.system("gdalinfo ts_unproj.tif ")
 	#------------------------------------------------------------------------
 	# translate in order to scale back to 0-100
-	old_ds = gdal.Open('ts_unproj.tif')
+	old_ds = gdal.Open(parent_path+'ts_unproj.tif')
 	if old_ds is None:
 		print 'Unable to open INPUT.tif'
 		sys.exit(1)
@@ -142,14 +142,14 @@ def main(gtfsdate, gtfsdirbase, processedpath):
 	old_ds = None
 
 	print '----------------------------------os.system("gdal_translate ts_unproj.tif ts_scaled.tif -scale 0 88 0 100")'
-	os.system("gdal_translate ts_unproj.tif ts_scaled.tif -scale "+minvalue+" "+maxvalue+" 0 100") #  scale 
+	os.system("gdal_translate "+parent_path+"ts_unproj.tif "+parent_path+"ts_scaled.tif -scale "+minvalue+" "+maxvalue+" 0 100") #  scale 
 
 	#----------------------------------------------------------------------------
 	# project ts_scaled.tif to 3857 and create ts.tif
 	srs = osr.SpatialReference()
 	#srs.SetWellKnownGeogCS('WGS84') # from sample in book
 	srs.ImportFromEPSG(3857)
-	old_ds = gdal.Open('ts_scaled.tif')
+	old_ds = gdal.Open(parent_path+'ts_scaled.tif')
 	if old_ds is None:
 		print 'Unable to open INPUT.tif'
 		sys.exit(1)
@@ -188,7 +188,7 @@ def main(gtfsdate, gtfsdirbase, processedpath):
 					stats[0], stats[1], stats[2], stats[3] )
 
 
-	dst_ds = gdal.GetDriverByName('GTiff').CreateCopy('ts.tif', vrt_ds)
+	dst_ds = gdal.GetDriverByName('GTiff').CreateCopy(parent_path+'ts.tif', vrt_ds)
 	#Properly close the datasets to flush to disk
 	old_ds = None
 	vrt_ds = None
@@ -203,7 +203,7 @@ def main(gtfsdate, gtfsdirbase, processedpath):
 	print 'use GDAL CreateCopy to convert ts.tif >>> to >>> ts.png'
 
 	#Open existing dataset
-	src_ds = gdal.Open( "ts.tif" )
+	src_ds = gdal.Open( parent_path+"ts.tif" )
 	if src_ds is None:
 		print 'Unable to open INPUT.tif'
 		sys.exit(1)
@@ -213,7 +213,7 @@ def main(gtfsdate, gtfsdirbase, processedpath):
 	driver = gdal.GetDriverByName( format )
 
 	#Output to new format
-	dst_ds = driver.CreateCopy( "ts.png", src_ds, 0 )
+	dst_ds = driver.CreateCopy( parent_path+"ts.png", src_ds, 0 )
 	print dst_ds.GetMetadata()
 
 	#Properly close the datasets to flush to disk
@@ -228,7 +228,7 @@ def main(gtfsdate, gtfsdirbase, processedpath):
 	#
 	print 'use GDAL gdaldem to convert ts.tif >>> to >>> ts_rendered.tif'
 
-	os.system("gdaldem color-relief ts.tif rgb_color.txt ts_rendered.tif")
+	os.system("gdaldem color-relief "+parent_path+"ts.tif "+parent_path+"rgb_color.txt "+parent_path+"ts_rendered.tif")
 	print '----------------------------------os.system("gdalinfo ts_rendered.tif")'
 	#os.system("gdalinfo ts_rendered.tif")
 
@@ -238,7 +238,7 @@ def main(gtfsdate, gtfsdirbase, processedpath):
 	print 'use GDAL CreateCopy to convert ts_rendered.tif >>> to >>> ts_rendered.png'
 
 	#Open existing dataset
-	src_ds = gdal.Open( "ts_rendered.tif" )
+	src_ds = gdal.Open( parent_path+"ts_rendered.tif" )
 	if src_ds is None:
 		print 'Unable to open INPUT.tif'
 		sys.exit(1)
@@ -248,13 +248,13 @@ def main(gtfsdate, gtfsdirbase, processedpath):
 	driver = gdal.GetDriverByName( format )
 
 	#Output to new format
-	dst_ds = driver.CreateCopy( 'ts_rendered_'+gtfsdir+'.png', src_ds, 0 )
+	dst_ds = driver.CreateCopy( parent_path+'ts_rendered_'+gtfsdir+'.png', src_ds, 0 )
 
 	#Properly close the datasets to flush to disk
 	dst_ds = None
 	src_ds = None
 
 	print '----------------------------------os.system("gdalinfo ts_rendered.png")'
-	os.system('gdalinfo ts_rendered_'+gtfsdir+'.png')
+	os.system('gdalinfo '+parent_path+'ts_rendered_'+gtfsdir+'.png')
 
 	print 'done'
