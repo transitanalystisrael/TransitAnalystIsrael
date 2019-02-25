@@ -71,7 +71,6 @@ for tooldir in toolslist:
 print 'date to remove from file names : ', cfg.gtfsdate
 #  lines_on_street
 shutil.copyfile(srcdir+"agency_"+cfg.gtfsdate+".js",dstdir+"lines_on_street"+"//"+"agency.js")
-shutil.copyfile(srcdir+"israel_regions.js",dstdir+"lines_on_street"+"//"+"israel_regions.js")
 shutil.copyfile(srcdir+"route_freq_at_0000-2400_"+cfg.gtfsdate+"jerusalem.js",dstdir+"lines_on_street"+"//"+"route_freq_jerusalem.js")
 shutil.copyfile(srcdir+"route_freq_at_0000-2400_"+cfg.gtfsdate+"north.js",dstdir+"lines_on_street"+"//"+"route_freq_north.js")
 shutil.copyfile(srcdir+"route_freq_at_0000-2400_"+cfg.gtfsdate+"south.js",dstdir+"lines_on_street"+"//"+"route_freq_south.js")
