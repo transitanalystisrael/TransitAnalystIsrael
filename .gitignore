@@ -13,3 +13,6 @@ AWS Lambda function/myDeploymentPackage.zip
 AWS Lambda function/function_with_details1.py
 root/venv/
 root/logs/
+root/omd_api_key.txt
+root/assets/token.json
+root/assets/credentials.json
