@@ -46,7 +46,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
     worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
 
     # Clearing the worker log to make sure we're monitoring updated logs
-    utils.clear_container_logs(worker_con) - THIS IS NOT WORKING ON WINDOWS!!!!
+    utils.clear_container_logs(worker_con)
 
     # Copy OSM & GTFS to the default coverage input folder on the worker container
     utils.copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name)
@@ -100,35 +100,15 @@ def main():
         default_cov_eos_date = utils.get_coverage_start_production_date(default_coverage_name)
 
         # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
-        # utils.backup_past_coverage(worker_con, secondary_custom_coverage_name)
-        # utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
-        ###########
-        ###########
-        ###########
-        # RETURN MEEEEEEEEE ABOVE
-        ###########
-        ###########
-        ###########
+        utils.backup_past_coverage(worker_con, secondary_custom_coverage_name)
+        utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
 
         # Generate the Transfers file required for Navitia and add to GTFS
-        # utils.generate_gtfs_with_transfers(cfg.gtfs_zip_file_name, cfg.gtfspath)
-        ###########
-        ###########
-        ###########
-        # RETURN MEEEEEEEEE ABOVE
-        ###########
-        ###########
-        ###########
+        utils.generate_gtfs_with_transfers(cfg.gtfs_zip_file_name, cfg.gtfspath)
 
         # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
-        # utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
-        ###########
-        ###########
-        ###########
-        # RETURN MEEEEEEEEE ABOVE
-        ###########
-        ###########
-        ###########
+        utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
+
         process_new_data_to_current_coverage(docker_client, cfg.navitia_docker_compose_file_path,
                                              cfg.osmpath, cfg.osm_file_name, cfg.gtfspath, cfg.gtfs_zip_file_name,
                                              secondary_custom_coverage_name, navitia_docker_compose_file_name,

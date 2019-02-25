@@ -389,11 +389,26 @@ def copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, g
 def clear_container_logs(con):
     """
     Clear the logs of a docker container running on the machine
+    If onWindows, we need to get a new minimal image that allows us to conenct to the docker vm and then delete the logs
     :param con: the container with logs to be cleared
     """
-    clear_log_command = "sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' " + con.name + ")"
-    subprocess.Popen(clear_log_command, shell=True)
-    _log.info("Cleared %s logs", con.name)
+    if is_aws_machine():
+        clear_log_command = "sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' " + con.name + ")"
+        subprocess.Popen(clear_log_command, shell=True)
+        _log.info("Cleared %s logs", con.name)
+    else:
+        _log.info("Going to create a minimal image for accessing the Dcoker VM and delete logs from there")
+        pull_img_cmd = "docker pull alpine"
+        subprocess.Popen(pull_img_cmd, shell=True)
+        _log.info("minimal image pulled")
+        connect_to_img = "docker run --net=host --ipc=host --uts=host --pid=host -it --security-opt=seccomp=unconfined " \
+                         "--privileged --rm -v /:/host alpine /bin/sh"
+        p = subprocess.Popen(connect_to_img, shell=True)
+        chg_permissions_cmd = "chroot /host"
+        p.communicate(chg_permissions_cmd)
+        delete_logs_cmd = "find /var/lib/docker/containers/ -type f -name '*.log' -delete"
+        p.communicate(delete_logs_cmd)
+        _log.info("Cleared %s logs", con.name)
 
 
 def validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, time_to_wait=20):
