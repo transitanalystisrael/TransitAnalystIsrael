@@ -3,10 +3,32 @@
 #
 # config file for transitanalystisrael tools  
 #
-print '----------------- transitanalystisrael config file loading --------------------------'
-import time
-#
-print "Local current time :", time.asctime( time.localtime(time.time()) )
+
+# product templates - not done yet....!!!!
+#Monthly auto update on AWS EC2 and S3
+#get_service_date = auto
+#python_processing = aws_ec2
+
+#Monthly auto update on local pc
+#get_service_date = auto
+#python_processing = local_pc
+
+#On demand date on AWS EC2 and S3
+#get_service_date = on_demand
+#python_processing = aws_ec2
+
+#On demand date on S3 only (no TTM)
+#get_service_date = on_demand
+#python_processing = local_pc
+
+#On demand date on local pc
+#get_service_date = on_demand
+#python_processing = local_pc
+
+#On demand date on local pc no TTM
+#get_service_date = on_demand
+#python_processing = local_pc
+
 
 # common config
 gtfsdate = '20190202'
@@ -58,4 +80,3 @@ current_or_past = 'current'
 time_map_server_url = "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/"
 
 #
-print "Local current time :", time.asctime( time.localtime(time.time()) )

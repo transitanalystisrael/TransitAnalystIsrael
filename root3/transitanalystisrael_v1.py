@@ -32,7 +32,7 @@ import copyprocessed2website
 import gzip_big_files
 
 # upload files to cloud website dir from local website dir
-import upload2aws_s3
+#import upload2aws_s3
 
 #process TTM files
-import navitia_update
+#import navitia_update
