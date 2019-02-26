@@ -21,3 +21,4 @@ root/logs/
 root/omd_api_key.txt
 root/assets/token.json
 root/assets/credentials.json
+root/assets/keys/
