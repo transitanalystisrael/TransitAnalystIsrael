@@ -28,10 +28,9 @@ At the end: The default coverage shows the new GTFS & OSM and the previous defau
 """
 
 import utils
-import os
 import datetime
 import transitanalystisrael_config as cfg
-
+import os
 
 def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path, osm_file_path, osm_file_name,
                                          gtfs_file_path, gtfs_file_name,
@@ -102,9 +101,8 @@ def main():
         # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
         utils.backup_past_coverage(worker_con, secondary_custom_coverage_name)
         utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
-
         # Generate the Transfers file required for Navitia and add to GTFS
-        utils.generate_gtfs_with_transfers(cfg.gtfs_zip_file_name, cfg.gtfspath)
+        utils.generate_gtfs_with_transfers(cfg.gtfs_zip_file_name, os.path.join(cfg.gtfspath,cfg.gtfsdirbase+cfg.gtfsdate))
 
         # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
         utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
@@ -129,6 +127,6 @@ def main():
         else:
             _log.exception("Done with errors - see Exception stacktrace")
 
-if __name__== "__main__":
-    main()
+
+main()
 

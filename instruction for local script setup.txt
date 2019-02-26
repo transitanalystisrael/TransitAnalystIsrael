@@ -1,0 +1,72 @@
+Start Docker Server with 2 covereges:
+=====================================
+
+1. Run Docker for Windows
+
+2. Go to the folder where you have the Navitia docker git project: ...\navitia-docker-compose
+
+3. run "Git Bash" and type: 
+$ git pull
+
+4. Once done, in the git bash terminal, run:
+$ docker-compose
+
+Don't close git bash!
+
+
+5. Once you see all containers started, open Windows Power Shell (not cmd!) - the path is not improtant and type:
+docker ps
+
+a list of docker containers should appear, copy the name of the worker container from the NAMES column, e.g. "navitia-docker-compose_tyr_worker_1"
+
+6. Type the following command in the power sheel in order to conenct to the worker container:
+docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
+
+7. Once in, type the following commands in order to have 2 coverages as a base setup:
+cd /srv/ed/output
+cp default.nav.lz4 secondary-cov.nav.lz4
+exit()
+
+8. Go back to Git Bash terminal with running log and press CTRL+C to stop the docker container.
+If, you closed the bash terminal, re-open it and type:
+$ docker stop $(docker ps -a -q)
+
+9. Start docker with 2 covereges by opening a Git Bash terminal at "...\TransitAnalystIsrael\root\assets" and running:
+$ docker-compose -f docker-compose.yml -f docker-israel-custom-instances.yml up
+
+10. Wait 2-3 minutes and then browse to "http://localhost:9191/v1/coverage/default" and "http://localhost:9191/v1/coverage/secondary-cov".
+    You should see "start_production_date:" field with an actual date (if you see "dead-socket" wait 1-2 min. more)
+	
+Dokcer Server is ready!
+
+Make sure you have the following python3(!) modules installed:
+==============================================================
+logger
+docker
+progressbar
+json
+requests
+subprocess
+zipfile
+tarfile
+re
+argparse
+csv
+math
+httplib2
+oauth2client
+base64
+mimetypes
+email
+apiclient
+boto3
+
+Config file: 
+============
+Remeber that GTFS is uploaded to MOT servers at 10pm, so gtfsdate date should be as in the MOT site ftp://gtfs.mot.gov.il
+
+
+Run transitanalystisrael_v1.py with python3
+
+
+
