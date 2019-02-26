@@ -1,13 +1,21 @@
+GTFS Update Automation/AWS Lambda function/
+GTFS Update Automation/omd_api_key.txt
+GTFS Update Automation/israel-and-palestine-latest.osm.pbf
+GTFS Update Automation/GTFS-04022019
+GTFS Update Automation/.idea/
+GTFS Update Automation/__pycache__/
+website_no_data - with data/
+GTFS Update Automation/assets/token.json
+GTFS Update Automation/assets/credentials.json
+*.pem
+AWS Lambda function/myDeploymentPackage.zip
 *.pyc
-AWS Lambda function/
+AWS Lambda function/function_with_details1.py
+processed/
+website_current/
 root/omd_api_key.txt
-root/transitanalystisrael.pem
 root/assets/token.json
 root/assets/credentials.json
-root/assets/transitanalystisrael.pem
-root/logs/
-root/venv/
-website_no_data - with data/
 root/venv/
 root/logs/
 root/omd_api_key.txt

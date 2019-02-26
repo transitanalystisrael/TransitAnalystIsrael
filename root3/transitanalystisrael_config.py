@@ -3,11 +3,32 @@
 #
 # config file for transitanalystisrael tools  
 #
-print ('----------------- transitanalystisrael config file loading --------------------------')
-import time
-import os
-#
-print ("Local current time :", time.asctime( time.localtime(time.time()) ))
+
+# product templates - not done yet....!!!!
+#Monthly auto update on AWS EC2 and S3
+#get_service_date = auto
+#python_processing = aws_ec2
+
+#Monthly auto update on local pc
+#get_service_date = auto
+#python_processing = local_pc
+
+#On demand date on AWS EC2 and S3
+#get_service_date = on_demand
+#python_processing = aws_ec2
+
+#On demand date on S3 only (no TTM)
+#get_service_date = on_demand
+#python_processing = local_pc
+
+#On demand date on local pc
+#get_service_date = on_demand
+#python_processing = local_pc
+
+#On demand date on local pc no TTM
+#get_service_date = on_demand
+#python_processing = local_pc
+
 
 # common config
 gtfsdate = '20190202'
@@ -53,13 +74,9 @@ autoeditrefdate = '20181021'
 # transit_time_map config
 # curent_or_past is changed to past in the js config file by copyprocessed2website.py when moving website_current to website_past
 current_or_past = 'current'
-default_coverage_name='default'
-secondary_custom_coverage_name='secondary-cov'
-navitia_docker_compose_file_path='assets' #'/home/ec2-user/navitia-docker-compose/'
-navitia_docker_compose_file_name='docker-israel-custom-instances.yml'
+
 # transit_time_map url config - local or AWS API Getway for Transit Analyst production
 # local address should be: "http://localhost:9191"
 time_map_server_url = "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/"
 
 #
-print ("Local current time :", time.asctime( time.localtime(time.time())))
