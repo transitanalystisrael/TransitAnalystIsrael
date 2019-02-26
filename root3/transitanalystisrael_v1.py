@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 # 
 
+import logger
+
+# get a log file
+_log = logger.get_logger("transit_analyst_")
+
 # get gtfs files and osm file
 import gtfs_osm_download
 
