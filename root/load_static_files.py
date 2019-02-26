@@ -6,6 +6,7 @@
 import transitanalystisrael_config as cfg
 import shutil
 import os
+import pathlib
 
 srcdir = cfg.staticpath
 dstdir = cfg.processedpath
@@ -15,6 +16,9 @@ print(srcdir)
 print(dstdir)
 print(os.listdir(srcdir))
 srcdirfilelist = os.listdir(srcdir)
+cwd = pathlib.Path.cwd()
+if not os.path.exists(cwd.parent / "processed"):
+	os.mkdir(cwd.parent / "processed")
 for filename in srcdirfilelist :
 	print(filename)
 	filein = srcdir+filename
