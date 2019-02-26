@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-
+import transitanalystisrael_config as cfg
 import logger
 
 # get a log file
 _log = logger.get_logger("transit_analyst_")
 
+if cfg.get_service_date == 'auto' :
 # get gtfs files and osm file
 import gtfs_osm_download
 
