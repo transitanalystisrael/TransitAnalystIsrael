@@ -1,0 +1,18 @@
+Instructions for starting local version of Israel Transit Analyst with running TimeMap Server
+=============================================================================================
+
+1. Run Docker for Windows
+
+2. Go to the folder where you have the TransitAnalyst Israel to the assets sub folder, e.g. ..\TransitAnalystIsrael\root\assets
+
+3. run "Git Bash" and type: 
+$ docker-compose up
+	
+4.Config file: 
+===============
+Remeber that GTFS is uploaded to MOT servers at 10pm, so gtfsdate date should be as in the MOT site ftp://gtfs.mot.gov.il
+
+5. Run transitanalystisrael_v1.py with python3
+
+
+

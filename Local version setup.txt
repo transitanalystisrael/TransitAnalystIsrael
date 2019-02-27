@@ -1,3 +1,11 @@
+Install required Software:
+==========================
+* Docker for Windows / Linux
+* GDAL for widnows: https://trac.osgeo.org/gdal/wiki/OSGeo4W ### For AWS: https://gist.github.com/mojodna/2f596ca2fca48f08438e
+* Gzip
+* Python3 
+* remove email from local setup
+
 Start Docker Server with 2 covereges:
 =====================================
 
@@ -48,7 +56,6 @@ docker
 progressbar
 json
 requests
-subprocess
 zipfile
 tarfile
 re
