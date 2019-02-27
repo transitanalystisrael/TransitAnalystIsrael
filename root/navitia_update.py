@@ -99,8 +99,9 @@ def main():
         default_cov_eos_date = utils.get_coverage_start_production_date(default_coverage_name)
 
         # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
-        utils.backup_past_coverage(worker_con, secondary_custom_coverage_name)
-        utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
+        if utils.is_cov_exists(worker_con, secondary_custom_coverage_name):
+            utils.backup_past_coverage(worker_con, secondary_custom_coverage_name)
+            utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
         # Generate the Transfers file required for Navitia and add to GTFS
         utils.generate_gtfs_with_transfers(cfg.gtfs_zip_file_name, os.path.join(cfg.gtfspath,cfg.gtfsdirbase+cfg.gtfsdate))
 

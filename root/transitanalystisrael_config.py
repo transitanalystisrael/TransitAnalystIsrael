@@ -31,8 +31,8 @@
 
 
 # common config
-gtfsdate = '20190225'
-serviceweekstartdate = '20190225'
+gtfsdate = '20190226'
+serviceweekstartdate = '20190226'
 gtfsdirbase = 'israel'
 gtfs_url='gtfs.mot.gov.il'
 gtfs_file_name_on_mot_server='israel-public-transportation.zip' #on OTM (TransitFeeds) this can be left blank, e.g. ''

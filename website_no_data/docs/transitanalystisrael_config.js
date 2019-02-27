@@ -3,16 +3,43 @@
 // #
 // # config file for transitanalystisrael tools  
 // #
-// print '----------------- transitanalystisrael config file loading --------------------------'
-// import time
-// #
-// print "Local current time :", time.asctime( time.localtime(time.time()) )
+
+// # product templates - not done yet....!!!!
+// #Monthly auto update on AWS EC2 and S3
+// #get_service_date = auto
+// #python_processing = aws_ec2
+
+// #Monthly auto update on local pc
+// #get_service_date = auto
+// #python_processing = local_pc
+
+// #On demand date on AWS EC2 and S3
+// #get_service_date = on_demand
+// #python_processing = aws_ec2
+
+// #On demand date on S3 only (no TTM)
+// #get_service_date = on_demand
+// #python_processing = local_pc
+
+// #On demand date on local pc
+// #get_service_date = on_demand
+// #python_processing = local_pc
+
+// #On demand date on local pc no TTM
+// #get_service_date = on_demand
+// #python_processing = local_pc
+
 
 // # common config
-var cfg_gtfsdate = '20190202' ;
-var cfg_serviceweekstartdate = '20190202' ;
+var cfg_gtfsdate = '20190226' ;
+var cfg_serviceweekstartdate = '20190226' ;
 var cfg_gtfsdirbase = 'israel' ;
+var cfg_gtfs_url='gtfs.mot.gov.il' ;
+var cfg_gtfs_file_name_on_mot_server='israel-public-transportation.zip' ; //on OTM (TransitFeeds) this can be left blank, e.g. '' ;
+var cfg_gtfs_zip_file_name=gtfsdirbase+gtfsdate+".zip" ;
 var cfg_gtfspath = '..\\gtfs\\' ;
+var cfg_osm_url='https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf' ;
+var cfg_osm_file_name = "israel-and-palestine-latest.osm.pbf" ;
 var cfg_osmpath = '..\\osm\\' ;
 var cfg_staticpath = '..\\static_data\\'  ;
 var cfg_processedpath = '..\\processed\\' ;
@@ -52,10 +79,12 @@ var cfg_autoeditrefdate = '20181021' ;
 // # transit_time_map config
 // # curent_or_past is changed to past in the js config file by copyprocessed2website.py when moving website_current to website_past
 var cfg_current_or_past = 'current' ;
-
+var cfg_default_coverage_name='default' ;
+var cfg_secondary_custom_coverage_name='secondary-cov' ;
+var cfg_navitia_docker_compose_file_path='assets' ; //'/home/ec2-user/navitia-docker-compose/' ;
+var cfg_navitia_docker_compose_file_name='docker-israel-custom-instances.yml' ;
 // # transit_time_map url config - local or AWS API Getway for Transit Analyst production
 // # local address should be: "http://localhost:9191"
-var cfg_time_map_server_url = "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/" ;
+// # time_map_server_url = "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/"
+var cfg_time_map_server_url = "http://localhost:9191/" ;
 
-// #
-// print "Local current time :", time.asctime( time.localtime(time.time()) )
