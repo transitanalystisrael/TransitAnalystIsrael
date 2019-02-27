@@ -145,8 +145,6 @@ def generate_transfers(input="stops.txt", output="transfers.txt", walking_speed=
     stops = read_file(input)
     transfers = calculate_transfers(stops, walking_speed, transfer_time, max_distance)
     write_file(output, transfers)
-    print("Finished generating the transfers.txt file")
-    return os.getcwd() + "/" + output
 
 
 def generate_transfers_from_command_line(argv):
