@@ -355,8 +355,9 @@ def generate_transfers_file(gtfs_file_path):
     :param gtfs_file_name: Name of GTFS zip file containing a stops.txt file with list of stops and their coordinates
     :return: the full path of the generated transfers.txt file
     """
-    output_full_path = generate_transfers_table.generate_transfers(os.path.join(gtfs_file_path,"stops.txt"))
-    return output_full_path
+    output_path = os.path.join(gtfs_file_path,"transfers.txt")
+    generate_transfers_table.generate_transfers(input=os.path.join(gtfs_file_path,"stops.txt"), output=output_path)
+    return output_path
 
 
 def generate_gtfs_with_transfers(gtfs_file_name, gtfs_file_path):
@@ -370,9 +371,9 @@ def generate_gtfs_with_transfers(gtfs_file_name, gtfs_file_path):
     gtfs_file_path_name = os.path.join(gtfs_file_path, gtfs_file_name)
 
     _log.info("Extracting stops.txt and computing transfers.txt")
-    output_file_full_path = generate_transfers_file(gtfs_file_path)
+    output_path = generate_transfers_file(os.path.join(gtfs_file_path,gtfs_file_name[:-4]))
     with zipfile.ZipFile(gtfs_file_path_name, 'a') as zip_ref:
-        zip_ref.write(output_file_full_path, os.path.basename(output_file_full_path))
+        zip_ref.write(output_path, arcname="transfers.txt")
     _log.info("Added transfers.txt to %s", gtfs_file_path_name)
 
 
