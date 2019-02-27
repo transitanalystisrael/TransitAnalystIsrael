@@ -113,18 +113,18 @@ def main():
         if utils.is_cov_exists(worker_con, default_coverage_name):
             utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
 
-        # process_new_data_to_current_coverage(docker_client, cfg.navitia_docker_compose_file_path,
-        #                                      cfg.osmpath, cfg.osm_file_name, cfg.gtfspath, cfg.gtfs_zip_file_name,
-        #                                      secondary_custom_coverage_name, navitia_docker_compose_file_name,
-        #                                      default_coverage_name, default_cov_eos_date, _log)
-        #
-        # # Send e-mail everything is completed - only on automatic script on AWS
-        # # On local Windows machine, there's no need.
-        # if utils.is_aws_machine():
-        #     utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
-        #     _log.info("Done without errors - log was sent to email")
-        # else:
-        #     _log.info("Done without errors - log is saved locally")
+        process_new_data_to_current_coverage(docker_client, cfg.navitia_docker_compose_file_path,
+                                             cfg.osmpath, cfg.osm_file_name, cfg.gtfspath, cfg.gtfs_zip_file_name,
+                                             secondary_custom_coverage_name, navitia_docker_compose_file_name,
+                                             default_coverage_name, default_cov_eos_date, _log)
+
+        # Send e-mail everything is completed - only on automatic script on AWS
+        # On local Windows machine, there's no need.
+        if utils.is_aws_machine():
+            utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
+            _log.info("Done without errors - log was sent to email")
+        else:
+            _log.info("Done without errors - log is saved locally")
 
     except Exception as e:
         if utils.is_aws_machine():
