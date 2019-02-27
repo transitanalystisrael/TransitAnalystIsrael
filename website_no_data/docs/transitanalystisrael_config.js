@@ -4,30 +4,50 @@
 // # config file for transitanalystisrael tools  
 // #
 
-// # product templates - not done yet....!!!!
+// # product templates - remove comment from one product
+// #
+
 // #Monthly auto update on AWS EC2 and S3
-// #get_service_date = auto
-// #python_processing = aws_ec2
+// #get_service_date = 'auto'
+// #python_processing = 'aws_ec2'
+// #ttm_graph_processing = 'aws_ec2'
+// #web_client_hosted_on = 'aws_s3'
+// #ttm_server_on = 'aws_ec2'
 
 // #Monthly auto update on local pc
-// #get_service_date = auto
-// #python_processing = local_pc
+var cfg_get_service_date = 'auto' ;
+var cfg_python_processing = 'local_pc' ;
+var cfg_ttm_graph_processing = 'local_pc' ;
+var cfg_web_client_hosted_on = 'local_pc' ;
+var cfg_ttm_server_on = 'local_pc' ;
 
 // #On demand date on AWS EC2 and S3
-// #get_service_date = on_demand
-// #python_processing = aws_ec2
+// #get_service_date = 'on_demand'
+// #python_processing = 'aws_ec2'
+// #ttm_graph_processing = 'aws_ec2'
+// #web_client_hosted_on = 'aws_s3'
+// #ttm_server_on = 'aws_ec2'
 
 // #On demand date on S3 only (no TTM)
-// #get_service_date = on_demand
-// #python_processing = local_pc
+// #get_service_date = 'on_demand'
+// #python_processing = 'local_pc'
+// #ttm_graph_processing = 'none'
+// #web_client_hosted_on = 'aws_s3'
+// #ttm_server_on = 'none'
 
 // #On demand date on local pc
-// #get_service_date = on_demand
-// #python_processing = local_pc
+// #get_service_date =ttm_graph_processing 'on_demand'
+// #python_processing = 'local_pc'
+// #ttm_graph_processing = 'local_pc'
+// #web_client_hosted_on = 'local_pc'
+// #ttm_server_on = 'local_pc'
 
 // #On demand date on local pc no TTM
-// #get_service_date = on_demand
-// #python_processing = local_pc
+// #get_service_date = 'on_demand'
+// #python_processing = 'local_pc'
+// #ttm_graph_processing = 'none'
+// #web_client_hosted_on = 'local_pc'
+// #ttm_server_on = 'none'
 
 
 // # common config
@@ -35,7 +55,8 @@ var cfg_gtfsdate = '20190226' ;
 var cfg_serviceweekstartdate = '20190226' ;
 var cfg_gtfsdirbase = 'israel' ;
 var cfg_gtfs_url='gtfs.mot.gov.il' ;
-var cfg_gtfs_file_name_on_mot_server='israel-public-transportation.zip' ; //on OTM (TransitFeeds) this can be left blank, e.g. '' ;
+// #on OTM (TransitFeeds) this can be left blank, e.g. ''
+var cfg_gtfs_file_name_on_mot_server='israel-public-transportation.zip'  ;
 var cfg_gtfs_zip_file_name=gtfsdirbase+gtfsdate+".zip" ;
 var cfg_gtfspath = '..\\gtfs\\' ;
 var cfg_osm_url='https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf' ;
@@ -48,6 +69,7 @@ var cfg_temppath = '..\\temp\\' ;
 var cfg_websitelocalcurrentpath = '..\\website_current\\' ;
 var cfg_websitelocalpastpath = '..\\website_past\\' ;
 var cfg_websitelocalnodatapath = '..\\website_no_data\\' ;
+var cfg_websitelocalondemandpath = '..\\website_yyyymmdd\\' ;
 var cfg_pythonpath = '..\\root\\' ;
 var cfg_sstarttimeall = '00:00:00' ;
 var cfg_sstoptimeall = '24:00:00' ;
