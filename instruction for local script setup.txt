@@ -9,7 +9,7 @@ Start Docker Server with 2 covereges:
 $ git pull
 
 4. Once done, in the git bash terminal, run:
-$ docker-compose
+$ docker-compose up
 
 Don't close git bash!
 
@@ -19,7 +19,7 @@ docker ps
 
 a list of docker containers should appear, copy the name of the worker container from the NAMES column, e.g. "navitia-docker-compose_tyr_worker_1"
 
-6. Type the following command in the power sheel in order to conenct to the worker container:
+6. Type the following command in the power shell in order to conenct to the worker container:
 docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
 
 7. Once in, type the following commands in order to have 2 coverages as a base setup:
