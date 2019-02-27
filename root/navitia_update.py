@@ -96,7 +96,11 @@ def main():
         # Get the worker container
         worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
         # Get the current start of production dates of default coverage for post-processing comparison
-        default_cov_eos_date = utils.get_coverage_start_production_date(default_coverage_name)
+        if utils.is_cov_exists(worker_con, default_coverage_name):
+            default_cov_eos_date = utils.get_coverage_start_production_date(default_coverage_name)
+        else:
+            # There is no default covereage yet, assiging old date
+            default_cov_eos_date = 19700101
 
         # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
         if utils.is_cov_exists(worker_con, secondary_custom_coverage_name):
@@ -106,20 +110,21 @@ def main():
         utils.generate_gtfs_with_transfers(cfg.gtfs_zip_file_name, os.path.join(cfg.gtfspath,cfg.gtfsdirbase+cfg.gtfsdate))
 
         # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
-        utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
+        if utils.is_cov_exists(worker_con, default_coverage_name):
+            utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
 
-        process_new_data_to_current_coverage(docker_client, cfg.navitia_docker_compose_file_path,
-                                             cfg.osmpath, cfg.osm_file_name, cfg.gtfspath, cfg.gtfs_zip_file_name,
-                                             secondary_custom_coverage_name, navitia_docker_compose_file_name,
-                                             default_coverage_name, default_cov_eos_date, _log)
-
-        # Send e-mail everything is completed - only on automatic script on AWS
-        # On local Windows machine, there's no need.
-        if utils.is_aws_machine():
-            utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
-            _log.info("Done without errors - log was sent to email")
-        else:
-            _log.info("Done without errors - log is saved locally")
+        # process_new_data_to_current_coverage(docker_client, cfg.navitia_docker_compose_file_path,
+        #                                      cfg.osmpath, cfg.osm_file_name, cfg.gtfspath, cfg.gtfs_zip_file_name,
+        #                                      secondary_custom_coverage_name, navitia_docker_compose_file_name,
+        #                                      default_coverage_name, default_cov_eos_date, _log)
+        #
+        # # Send e-mail everything is completed - only on automatic script on AWS
+        # # On local Windows machine, there's no need.
+        # if utils.is_aws_machine():
+        #     utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
+        #     _log.info("Done without errors - log was sent to email")
+        # else:
+        #     _log.info("Done without errors - log is saved locally")
 
     except Exception as e:
         if utils.is_aws_machine():
