@@ -14,7 +14,6 @@ AWS Lambda function/function_with_details1.py
 processed/
 website_current/
 website_past/
-
 root/venv/
 root/logs/
 root/assets/token.json
