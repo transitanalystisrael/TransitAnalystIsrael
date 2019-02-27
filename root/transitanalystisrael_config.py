@@ -4,35 +4,55 @@
 # config file for transitanalystisrael tools  
 #
 
-# product templates - not done yet....!!!!
+# product templates - remove comment from one product
+#
+
 #Monthly auto update on AWS EC2 and S3
-#get_service_date = auto
-#python_processing = aws_ec2
+#get_service_date = 'auto'
+#python_processing = 'aws_ec2'
+#ttm_graph_processing = 'aws_ec2'
+#web_client_hosted_on = 'aws_s3'
+#ttm_server_on = 'aws_ec2'
 
 #Monthly auto update on local pc
-#get_service_date = auto
-#python_processing = local_pc
+get_service_date = 'auto'
+python_processing = 'local_pc'
+ttm_graph_processing = 'local_pc'
+web_client_hosted_on = 'local_pc'
+ttm_server_on = 'local_pc'
 
 #On demand date on AWS EC2 and S3
-#get_service_date = on_demand
-#python_processing = aws_ec2
+#get_service_date = 'on_demand'
+#python_processing = 'aws_ec2'
+#ttm_graph_processing = 'aws_ec2'
+#web_client_hosted_on = 'aws_s3'
+#ttm_server_on = 'aws_ec2'
 
 #On demand date on S3 only (no TTM)
-#get_service_date = on_demand
-#python_processing = local_pc
+#get_service_date = 'on_demand'
+#python_processing = 'local_pc'
+#ttm_graph_processing = 'none'
+#web_client_hosted_on = 'aws_s3'
+#ttm_server_on = 'none'
 
 #On demand date on local pc
-#get_service_date = on_demand
-#python_processing = local_pc
+#get_service_date = 'on_demand'
+#python_processing = 'local_pc'
+#ttm_graph_processing = 'local_pc'
+#web_client_hosted_on = 'local_pc'
+#ttm_server_on = 'local_pc'
 
 #On demand date on local pc no TTM
-#get_service_date = on_demand
-#python_processing = local_pc
+#get_service_date = 'on_demand'
+#python_processing = 'local_pc'
+#ttm_graph_processing = 'none'
+#web_client_hosted_on = 'local_pc'
+#ttm_server_on = 'none'
 
 
 # common config
-gtfsdate = '20190226'
-serviceweekstartdate = '20190226'
+gtfsdate = '20190225'
+serviceweekstartdate = '20190225'
 gtfsdirbase = 'israel'
 gtfs_url='gtfs.mot.gov.il'
 gtfs_file_name_on_mot_server='israel-public-transportation.zip' #on OTM (TransitFeeds) this can be left blank, e.g. ''
