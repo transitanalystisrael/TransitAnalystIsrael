@@ -66,7 +66,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
         _log.error("After 45 minutes - tasks aren't completed - connect to server for manual inspection")
         raise Exception
 
-    # Re-start Navitia to make sure all changes are applied with default and custom coverages
+    # Re-start Navitia to make sure all changesgtfs_zip_file_name are applied with default and custom coverages
     utils.stop_all_containers(docker_client)
     is_up = utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
                                              navitia_docker_compose_file_name)
@@ -107,14 +107,15 @@ def main():
             utils.backup_past_coverage(worker_con, secondary_custom_coverage_name)
             utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
         # Generate the Transfers file required for Navitia and add to GTFS
-        utils.generate_gtfs_with_transfers(cfg.gtfs_zip_file_name, os.path.join(cfg.gtfspath))
+        gtfs_zip_file_name = cfg.gtfsdirbase+ cfg.gtfsdate+".zip"
+        utils.generate_gtfs_with_transfers(gtfs_zip_file_name, os.path.join(cfg.gtfspath))
 
         # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
         if utils.is_cov_exists(worker_con, default_coverage_name):
             utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
 
         process_new_data_to_current_coverage(docker_client, cfg.navitia_docker_compose_file_path,
-                                             cfg.osmpath, cfg.osm_file_name, cfg.gtfspath, cfg.gtfs_zip_file_name,
+                                             cfg.osmpath, cfg.osm_file_name, cfg.gtfspath, gtfs_zip_file_name,
                                              secondary_custom_coverage_name, navitia_docker_compose_file_name,
                                              default_coverage_name, default_cov_eos_date, _log)
 

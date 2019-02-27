@@ -57,7 +57,7 @@ gtfsdirbase = 'israel'
 gtfs_url='gtfs.mot.gov.il'
 #on OTM (TransitFeeds) this can be left blank, e.g. ''
 gtfs_file_name_on_mot_server='israel-public-transportation.zip' 
-gtfs_zip_file_name=gtfsdirbase+gtfsdate+".zip"
+
 gtfspath = '..\\gtfs\\'
 osm_url='https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf'
 osm_file_name = "israel-and-palestine-latest.osm.pbf"
