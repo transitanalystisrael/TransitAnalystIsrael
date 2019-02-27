@@ -8,7 +8,9 @@ Start Docker Server with 2 covereges:
 3. run "Git Bash" and type: 
 $ git pull
 
-4. Once done, in the git bash terminal, run:
+4. Once done Change directory to "\TransitAnalystIsrael\root\assets":
+$ cd "C:\Dev\TransitAnalystIsrael\root\assets" 
+and type:
 $ docker-compose up
 
 Don't close git bash!

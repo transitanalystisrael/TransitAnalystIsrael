@@ -269,6 +269,11 @@ def move_current_to_past(container, source_cov_name, dest_cov_name):
     _log.info("Changed the name of %s.nav.lz4 to %s.nav.lz4", source_cov_name, dest_cov_name)
     return True
 
+def is_cov_exists(container, coverage_name):
+    _log.info("Checking if %s exists in /srv/ed/output of %s", coverage_name, container)
+    file_list_command = "/bin/sh -c \"ls\""
+    exit_code, output = container.exec_run(cmd=file_list_command, stdout=True, workdir="/srv/ed/output/")
+    return coverage_name in str(output)
 
 def backup_past_coverage(container, coverage_name):
     """
@@ -314,7 +319,6 @@ def delete_file_from_container(container, file_name):
     :param file_name: the name of the file to be removed
     """
     delete_command= "/bin/sh -c \"rm " + file_name + "\""
-    print(delete_command)
     exit_code, output = container.exec_run(cmd=delete_command,  stdout=True, workdir="/srv/ed/output/")
     if exit_code != 0:
         _log.error("Couldn't delete %s graph", file_name)
