@@ -8,9 +8,9 @@ import logger
 _log = logger.get_logger("transit_analyst_")
 
 if cfg.get_service_date == 'auto' :
-# get gtfs files and osm file
-_log.info("Download OSM & GTFS")
-# import gtfs_osm_download
+	# get gtfs files and osm file
+	_log.info("Download OSM & GTFS")
+	# import gtfs_osm_download
 
 # copy static files to processed dir
 _log.info("Loading static files")
@@ -54,10 +54,12 @@ import copyprocessed2website
 _log.info("Gzip big files")
 import gzip_big_files
 
-# upload files to cloud website dir from local website dir
-# _log.info("Upload website to AWS S3")
-#import upload2aws_s3
+if cfg.web_client_hosted_on == 'aws_s3' :
+	# upload files to cloud website dir from local website dir
+	# _log.info("Upload website to AWS S3")
+	#import upload2aws_s3
 
-#process TTM files
-_log.info("Update Navitia Time Map server")
-import navitia_update
+if cfg.ttm_graph_processing != 'none' :
+	#process TTM files
+	_log.info("Update Navitia Time Map server")
+	import navitia_update
