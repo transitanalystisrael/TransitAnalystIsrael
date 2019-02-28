@@ -6,23 +6,23 @@
 import transitanalystisrael_config as cfg
 import shutil
 import os
-import pathlib
+from pathlib import Path
 
-srcdir = cfg.staticpath
-dstdir = cfg.processedpath
+cwd = Path.cwd()
+srcdir = cwd.parent / cfg.staticpath
+dstdir = cwd.parent / cfg.processedpath
 
 os.chdir(srcdir)
 print(srcdir)
 print(dstdir)
 print(os.listdir(srcdir))
 srcdirfilelist = os.listdir(srcdir)
-cwd = pathlib.Path.cwd()
-if not os.path.exists(cwd.parent / "processed"):
-	os.mkdir(cwd.parent / "processed")
+if not os.path.exists(dstdir):
+	os.mkdir(dstdir)
 for filename in srcdirfilelist :
 	print(filename)
-	filein = srcdir+filename
-	fileout = dstdir+filename
+	filein = srcdir / filename
+	fileout = dstdir / filename
 	shutil.copyfile(filein,fileout)
 print(os.listdir(dstdir))
 

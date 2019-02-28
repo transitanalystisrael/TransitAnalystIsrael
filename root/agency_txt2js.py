@@ -5,19 +5,22 @@
 # output js array for agency name lookup from agency_id in client js application - agency.js
 #
 import gtfs_config as gtfscfg
+from pathlib import Path
+
+cwd = Path.cwd()
 
 def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	
 	# input:
-	parent_path = gtfsparentpath
+	parent_path = cwd.parent / gtfsparentpath
 	gtfsdir = gtfsdirbase+gtfsdate
 	
 	# output:
 	jsfileout = 'agency'+'_'+gtfsdate+'.js'
 	
-	gtfspathin = parent_path+gtfsdir+'\\'
+	gtfspathin = parent_path / gtfsdir
 	gtfspath = gtfspathin
-	gtfspathout = pathout
+	gtfspathout = cwd.parent / pathout
 	
 	maxfilelinecount = gtfscfg.MAX_AGENCY_COUNT
 	gtfspath = gtfspathin
@@ -25,8 +28,8 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	inid = 'agency_id'
 	agency_dict = {}
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	print(slinelist)
@@ -53,7 +56,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	#
 	# output js file with array for agency name lookup from agency_id in client js application
 	#
-	fileout = open(gtfspathout+jsfileout, 'w', encoding="utf8") # save results in file
+	fileout = open(gtfspathout / jsfileout, 'w', encoding="utf8") # save results in file
 	postsline = 'var agencies = [];\n'
 	print(postsline)
 	fileout.write(postsline)
@@ -62,7 +65,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		print(postsline)
 		fileout.write(postsline)
 	fileout.close()
-	print(gtfspathout+jsfileout)
+	print(gtfspathout / jsfileout)
 	print('count ', count)
 
 

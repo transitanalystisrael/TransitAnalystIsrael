@@ -28,13 +28,15 @@ import os
 import json
 from shapely.geometry import shape, Point, Polygon, MultiPolygon
 import gtfs_config as gtfscfg
-#import math
+from pathlib import Path
+
+cwd = Path.cwd()
 
 def main(gtfsdate, processedpath, serviceweekstartdate):
 	# input:
 	sserviceweekstartdate = serviceweekstartdate
-	pathin = processedpath
-	pathout = processedpath
+	pathin = cwd.parent / processedpath
+	pathout = cwd.parent / processedpath
 	stopsfilein = 'stopswtpdand10xforrail'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # txt file with average tpd per stop and top location
 	cityfilein = 'israel_city_boarders.geojson'
 	townfilein = 'israel_town_boarders.geojson' # moatzot mekomiyot
@@ -71,8 +73,8 @@ def main(gtfsdate, processedpath, serviceweekstartdate):
 
 	munistops_dict = {}
 	slinelist=[]
-	print(pathin+stopsfilein)
-	filein = open(gtfspathin+stopsfilein, 'r', encoding="utf8")
+	print(gtfspathin / stopsfilein)
+	filein = open(gtfspathin / stopsfilein, 'r', encoding="utf8")
 	sline = filein.readline()
 	keylinelen = len(sline)
 	slinelist=sline[:-1].split(",")
@@ -86,7 +88,7 @@ def main(gtfsdate, processedpath, serviceweekstartdate):
 	maxfilelinecount = gtfscfg.MAX_STOPS_COUNT
 	count = 0
 	sline = filein.readline()
-	fileinlines = (os.path.getsize(gtfspathin+stopsfilein)-keylinelen)/len(sline)
+	fileinlines = (os.path.getsize(gtfspathin / stopsfilein)-keylinelen)/len(sline)
 	# scan stopsfilein
 	while ((count < maxfilelinecount) and (sline != '')):
 		slinelist=sline[:-1].split(",")
@@ -108,13 +110,13 @@ def main(gtfsdate, processedpath, serviceweekstartdate):
 	filein.close()
 
 	# >>> load city boarders 
-	with open(pathin+cityfilein) as cf:
+	with open(pathin / cityfilein) as cf:
 		city_geo = json.load(cf)
 	print('loaded city geo, feature count: ', len(city_geo['features']))
 	#print city_geo
 
 	# >>> load town boarders 
-	with open(pathin+townfilein) as tf:
+	with open(pathin / townfilein) as tf:
 		town_geo = json.load(tf)
 	print('loaded town geo, feature count: ', len(town_geo['features']))
 	#print town_geo
@@ -130,7 +132,7 @@ def main(gtfsdate, processedpath, serviceweekstartdate):
 	#   output muni opd to txt file
 	#
 
-	fileout = open(pathout+munifileout, 'w', encoding="utf8") # open file to save results 
+	fileout = open(pathout / munifileout, 'w', encoding="utf8") # open file to save results 
 	postsline = 'municode,muni_name,opdinmuni,stopinmunicount\n'
 	fileout.write(postsline)
 

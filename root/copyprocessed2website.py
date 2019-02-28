@@ -6,11 +6,14 @@
 import transitanalystisrael_config as cfg
 import shutil
 import os
+from pathlib import Path
 
-no_data_dir = cfg.websitelocalnodatapath
-current_dir = cfg.websitelocalcurrentpath
-past_dir = cfg.websitelocalpastpath
-on_demand_dir = cfg.websitelocalondemandpath.replace('yyyymmdd', cfg.gtfsdate)
+cwd = Path.cwd()
+
+no_data_dir = cwd.parent / cfg.websitelocalnodatapath
+current_dir = cwd.parent / cfg.websitelocalcurrentpath
+past_dir = cwd.parent / cfg.websitelocalpastpath
+on_demand_dir = cwd.parent / cfg.websitelocalondemandpath.replace('yyyymmdd', cfg.gtfsdate)
 print ('no_data_dir = ',no_data_dir)
 print ('current_dir = ',current_dir)
 print ('past_dir = ',past_dir)
@@ -18,7 +21,7 @@ print ('on_demand_dir = ',on_demand_dir)
 print ('cfg.get_service_date = ',cfg.get_service_date)
 
 
-srcdir = cfg.processedpath
+srcdir = cwd.parent / cfg.processedpath
 if cfg.get_service_date == 'auto' : 
 	dstdir = current_dir
 
@@ -74,48 +77,48 @@ else : # on_demand date
 
 print('date to remove from file names : ', cfg.gtfsdate)
 #  lines_on_street
-shutil.copyfile(srcdir+"agency_"+cfg.gtfsdate+".js",dstdir+"lines_on_street"+"//"+"agency.js")
-shutil.copyfile(srcdir+"route_freq_at_0000-2400_"+cfg.gtfsdate+"jerusalem.js",dstdir+"lines_on_street"+"//"+"route_freq_jerusalem.js")
-shutil.copyfile(srcdir+"route_freq_at_0000-2400_"+cfg.gtfsdate+"north.js",dstdir+"lines_on_street"+"//"+"route_freq_north.js")
-shutil.copyfile(srcdir+"route_freq_at_0000-2400_"+cfg.gtfsdate+"south.js",dstdir+"lines_on_street"+"//"+"route_freq_south.js")
-shutil.copyfile(srcdir+"route_freq_at_0000-2400_"+cfg.gtfsdate+"telavivmetro.js",dstdir+"lines_on_street"+"//"+"route_freq_telavivmetro.js")
+shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "lines_on_street" / "agency.js")
+shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+cfg.gtfsdate+"jerusalem.js"),dstdir / "lines_on_street" / "route_freq_jerusalem.js")
+shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+cfg.gtfsdate+"north.js"),dstdir / "lines_on_street" / "route_freq_north.js")
+shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+cfg.gtfsdate+"south.js"),dstdir / "lines_on_street" / "route_freq_south.js")
+shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+cfg.gtfsdate+"telavivmetro.js"),dstdir / "lines_on_street" / "route_freq_telavivmetro.js")
 #line_freq
-shutil.copyfile(srcdir+"agency_"+cfg.gtfsdate+".js",dstdir+"line_freq"+"//"+"agency.js")
-shutil.copyfile(srcdir+"route_freq_at_0000-2400_"+cfg.gtfsdate+".js",dstdir+"line_freq"+"//"+"route_freq.js")
+shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "line_freq" / "agency.js")
+shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+cfg.gtfsdate+".js"),dstdir / "line_freq" / "route_freq.js")
 #muni_fairsharescore
-shutil.copyfile(srcdir+"israel_city_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js",dstdir+"muni_fairsharescore"+"//"+"israel_city_boarders_w_properties.js")
-shutil.copyfile(srcdir+"israel_town_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js",dstdir+"muni_fairsharescore"+"//"+"israel_town_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("israel_city_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_fairsharescore" / "israel_city_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("israel_town_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_fairsharescore" / "israel_town_boarders_w_properties.js")
 #muni_score_lists_and_charts
-shutil.copyfile(srcdir+"muni_builtdensityscore_xy.js",dstdir+"muni_score_lists_and_charts"+"//"+"muni_builtdensityscore_xy.js")
-shutil.copyfile(srcdir+"muni_fairsharescore_xy.js",dstdir+"muni_score_lists_and_charts"+"//"+"muni_fairsharescore_xy.js")
-shutil.copyfile(srcdir+"muni_transitscore_xy.js",dstdir+"muni_score_lists_and_charts"+"//"+"muni_transitscore_xy.js")
+shutil.copyfile(srcdir / ("muni_builtdensityscore_xy.js"),dstdir / "muni_score_lists_and_charts" / "muni_builtdensityscore_xy.js")
+shutil.copyfile(srcdir / ("muni_fairsharescore_xy.js"),dstdir / "muni_score_lists_and_charts" / "muni_fairsharescore_xy.js")
+shutil.copyfile(srcdir / ("muni_transitscore_xy.js"),dstdir / "muni_score_lists_and_charts" / "muni_transitscore_xy.js")
 #muni_tpd_per_line
-shutil.copyfile(srcdir+"agency_"+cfg.gtfsdate+".js",dstdir+"muni_tpd_per_line"+"//"+"agency.js")
-shutil.copyfile(srcdir+"israel_city_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js",dstdir+"muni_tpd_per_line"+"//"+"israel_city_boarders_w_properties.js")
-shutil.copyfile(srcdir+"israel_town_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js",dstdir+"muni_tpd_per_line"+"//"+"israel_town_boarders_w_properties.js")
-shutil.copyfile(srcdir+"muni_w_tpd_per_line_"+cfg.gtfsdate+".js",dstdir+"muni_tpd_per_line"+"//"+"muni_w_tpd_per_line.js")
+shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "muni_tpd_per_line" / "agency.js")
+shutil.copyfile(srcdir / ("israel_city_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_tpd_per_line" / "israel_city_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("israel_town_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_tpd_per_line" / "israel_town_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("muni_w_tpd_per_line_"+cfg.gtfsdate+".js"),dstdir / "muni_tpd_per_line" / "muni_w_tpd_per_line.js")
 #muni_transitscore
-shutil.copyfile(srcdir+"israel_city_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js",dstdir+"muni_transitscore"+"//"+"israel_city_boarders_w_properties.js")
-shutil.copyfile(srcdir+"israel_town_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js",dstdir+"muni_transitscore"+"//"+"israel_town_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("israel_city_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_transitscore" / "israel_city_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("israel_town_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_transitscore" / "israel_town_boarders_w_properties.js")
 #stops_near_trainstops_editor
-shutil.copyfile(srcdir+"agency_"+cfg.gtfsdate+".js",dstdir+"stops_near_trainstops_editor"+"//"+"agency.js")
-shutil.copyfile(srcdir+"stopsneartrainstop_pre_edit_"+cfg.gtfsdate+".js",dstdir+"stops_near_trainstops_editor"+"//"+"stopsneartrainstop_pre_edit.js")
-shutil.copyfile(srcdir+"stops_"+cfg.gtfsdate+".js",dstdir+"stops_near_trainstops_editor"+"//"+"stops.js")
-shutil.copyfile(srcdir+"trainstop_w_tpd_per_line_"+cfg.gtfsdate+".js",dstdir+"stops_near_trainstops_editor"+"//"+"trainstop_w_tpd_per_line.js")
-shutil.copyfile(srcdir+"train_stops_"+cfg.gtfsdate+".js",dstdir+"stops_near_trainstops_editor"+"//"+"train_stops.js")
+shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "stops_near_trainstops_editor" / "agency.js")
+shutil.copyfile(srcdir / ("stopsneartrainstop_pre_edit_"+cfg.gtfsdate+".js"),dstdir / "stops_near_trainstops_editor" / "stopsneartrainstop_pre_edit.js")
+shutil.copyfile(srcdir / ("stops_"+cfg.gtfsdate+".js"),dstdir / "stops_near_trainstops_editor" / "stops.js")
+shutil.copyfile(srcdir / ("trainstop_w_tpd_per_line_"+cfg.gtfsdate+".js"),dstdir / "stops_near_trainstops_editor" / "trainstop_w_tpd_per_line.js")
+shutil.copyfile(srcdir / ("train_stops_"+cfg.gtfsdate+".js"),dstdir / "stops_near_trainstops_editor" / "train_stops.js")
 #tpd_at_stops_per_line
-shutil.copyfile(srcdir+"agency_"+cfg.gtfsdate+".js",dstdir+"tpd_at_stops_per_line"+"//"+"agency.js")
-shutil.copyfile(srcdir+"stops_w_tpd_per_line_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js",dstdir+"tpd_at_stops_per_line"+"//"+"stops_w_tpd_per_line.js")
+shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "tpd_at_stops_per_line" / "agency.js")
+shutil.copyfile(srcdir / ("stops_w_tpd_per_line_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "tpd_at_stops_per_line" / "stops_w_tpd_per_line.js")
 #tpd_near_trainstops_per_line
-shutil.copyfile(srcdir+"agency_"+cfg.gtfsdate+".js",dstdir+"tpd_near_trainstops_per_line"+"//"+"agency.js")
-shutil.copyfile(srcdir+"stopswtrainstopids_"+cfg.gtfsdate+".js",dstdir+"tpd_near_trainstops_per_line"+"//"+"stopswtrainstopids.js")
-shutil.copyfile(srcdir+"trainstop_w_tpd_per_line_"+cfg.gtfsdate+".js",dstdir+"tpd_near_trainstops_per_line"+"//"+"trainstop_w_tpd_per_line.js")
-shutil.copyfile(srcdir+"train_stops_"+cfg.gtfsdate+".js",dstdir+"tpd_near_trainstops_per_line"+"//"+"train_stops.js")
+shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "agency.js")
+shutil.copyfile(srcdir / ("stopswtrainstopids_"+cfg.gtfsdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "stopswtrainstopids.js")
+shutil.copyfile(srcdir / ("trainstop_w_tpd_per_line_"+cfg.gtfsdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "trainstop_w_tpd_per_line.js")
+shutil.copyfile(srcdir / ("train_stops_"+cfg.gtfsdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "train_stops.js")
 #transitscore
-shutil.copyfile(srcdir+"israel_city_boarders.js",dstdir+"transitscore"+"//"+"israel_city_boarders.js")
-shutil.copyfile(srcdir+"israel_town_boarders.js",dstdir+"transitscore"+"//"+"israel_town_boarders.js")
-shutil.copyfile(srcdir+"ts_lookup_israel"+cfg.gtfsdate+".js",dstdir+"transitscore"+"//"+"ts_lookup.js")
-shutil.copyfile(srcdir+"ts_rendered_israel"+cfg.gtfsdate+".png",dstdir+"transitscore"+"//"+"ts_rendered.png")
+shutil.copyfile(srcdir / ("israel_city_boarders.js"),dstdir / "transitscore" / "israel_city_boarders.js")
+shutil.copyfile(srcdir / ("israel_town_boarders.js"),dstdir / "transitscore" / "israel_town_boarders.js")
+shutil.copyfile(srcdir / ("ts_lookup_israel"+cfg.gtfsdate+".js"),dstdir / "transitscore" / "ts_lookup.js")
+shutil.copyfile(srcdir / ("ts_rendered_israel"+cfg.gtfsdate+".png"),dstdir / "transitscore" / "ts_rendered.png")
 
 print(os.listdir(dstdir))
 
@@ -124,16 +127,17 @@ if cfg.get_service_date == 'auto' :
 	#
 	# curent_or_past is changed to past in the js config file that was moved to website_past. TTM needs this to point the client to the correct server
 	#
-	jsfile = 'docs\\'+'transitanalystisrael_config.js'
-	tempjsfile = 'docs\\'+'temp_config.js'
-	in_dir = past_dir
-	out_dir = past_dir
+	jsdir = 'docs'
+	jsfile = 'transitanalystisrael_config.js'
+	tempjsfile = 'temp_config.js'
+	in_dir = past_dir / jsdir
+	out_dir = past_dir / jsdir
 	maxfilelinecount = 2000
-	print('input from ', in_dir+jsfile)
-	print('output to ', out_dir+tempjsfile)
-	if os.path.exists(in_dir+jsfile):
-		filein = open(in_dir+jsfile, 'r', encoding="utf8")
-		fileout = open(out_dir+tempjsfile, 'w', encoding="utf8")
+	print('input from ', in_dir / jsfile)
+	print('output to ', out_dir / tempjsfile)
+	if os.path.exists(in_dir / jsfile):
+		filein = open(in_dir / jsfile, 'r', encoding="utf8")
+		fileout = open(out_dir / tempjsfile, 'w', encoding="utf8")
 		count = 0
 		sline = filein.readline()
 		while ((count < maxfilelinecount) and (sline != '')):
@@ -150,12 +154,13 @@ if cfg.get_service_date == 'auto' :
 		print(' infile line count ',count)
 		filein.close()
 		fileout.close()
-		print('closed ', in_dir+jsfile)
-		print('closed ', out_dir+tempjsfile)
-		shutil.copyfile(out_dir+tempjsfile,out_dir+jsfile)
-		os.remove(out_dir+tempjsfile)
+		print('closed ', in_dir / jsfile)
+		print('closed ', out_dir / tempjsfile)
+		shutil.copyfile(out_dir / tempjsfile,out_dir / jsfile)
+		os.remove(out_dir / tempjsfile)
 	else :
-		print (in_dir+jsfile, ' does not exist')
+		print (in_dir / jsfile, ' does not exist')
+
 
 '''
 # old code for getting to all files in dir...

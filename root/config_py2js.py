@@ -5,17 +5,22 @@
 #
 import transitanalystisrael_config as cfg
 import os
+from pathlib import Path
+
+cwd = Path.cwd()
 
 pyfile = 'transitanalystisrael_config.py'
-jsfile = 'docs\\'+'transitanalystisrael_config.js'
+jsfile = 'transitanalystisrael_config.js'
+jsdir = 'docs'
 
-out_dir = cfg.websitelocalnodatapath
+out_dir = cwd.parent / cfg.websitelocalnodatapath / jsdir
+in_dir = cwd.parent / cfg.pythonpath
 
 maxfilelinecount = 2000
-print('input from ', cfg.pythonpath+pyfile)
-print('output to ', out_dir+jsfile)
-filein = open(cfg.pythonpath+pyfile, 'r', encoding="utf8")
-fileout = open(out_dir+jsfile, 'w', encoding="utf8")
+print('input from ', in_dir / pyfile)
+print('output to ', out_dir / jsfile)
+filein = open(in_dir / pyfile, 'r', encoding="utf8")
+fileout = open(out_dir / jsfile, 'w', encoding="utf8")
 count = 0
 sline = filein.readline()
 while ((count < maxfilelinecount) and (sline != '')):
@@ -42,6 +47,6 @@ print('------------------')
 print(' infile line count ',count)
 filein.close()
 fileout.close()
-print('closed ', cfg.pythonpath+pyfile)
-print('closed ', out_dir+jsfile)
+print('closed ', in_dir / pyfile)
+print('closed ', out_dir / jsfile)
 

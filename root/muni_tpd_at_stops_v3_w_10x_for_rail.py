@@ -44,8 +44,8 @@ print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
 def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	# input:
-	gtfspathin = gtfspath
-	pathout = processedpath
+	gtfspathin = cwd.parent / gtfspath
+	pathout = cwd.parent / processedpath
 	sserviceweekstartdate = serviceweekstartdate # recommend to use gtfsdate (expect gtfs files to be most accurate for first week in service range)
 	gtfsdir = gtfsdirbase+gtfsdate
 
@@ -59,14 +59,14 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	# scan lines in calendar to compute start and end service dates and to fill calendar_dict with calendar lines keyed on service_id
 	#
 	maxfilelinecount = gtfscfg.MAX_CALENDAR_COUNT
-	gtfspath = gtfspathin+gtfsdir+'\\'
+	gtfspath = gtfspathin / gtfsdir
 	gtfsfile = 'calendar.txt'
 	inid = 'service_id'
 	calendar_dict = {}
 	tripsperdaylist = []
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	print(slinelist)
@@ -156,8 +156,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	stops_dict = {}
 	tripsperstop_set = set([]) # set of trip_id s of all trips that stop at this stop
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -223,8 +223,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	gtfsfile = 'stop_times.txt'
 	inid = 'stop_id'
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -265,8 +265,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	inid = 'trip_id'
 	trips_dict = {}
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist

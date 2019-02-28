@@ -62,10 +62,10 @@ def scan_stops_by_lat_lon(gtfspathin, gtfspathout, maxfilelinecount,geo_filter_p
     slinelist=[]
     postsline = ''
     print('scan_stops_by_lat_lon')
-    print(gtfspathin+gtfsfile)
+    print(gtfspathin / gtfsfile)
     out_set = set([])
-    filein = open(gtfspathin+gtfsfile, 'r', encoding="utf8")
-    fileout = open(gtfspathout+gtfsfile, 'w', encoding="utf8")
+    filein = open(gtfspathin / gtfsfile, 'r', encoding="utf8")
+    fileout = open(gtfspathout / gtfsfile, 'w', encoding="utf8")
     sline = filein.readline()
     fileout.write(sline)
     sline = sline[:-1]
@@ -99,11 +99,11 @@ def scan_stops_by_lat_lon(gtfspathin, gtfspathout, maxfilelinecount,geo_filter_p
 # generic scan of gtfs_file by ids in in_set and create out_set of ids
 #
 def scan_gtfsfile_by_in_set_gen_out_set(gtfspathin, gtfsfile, maxfilelinecount, in_set, insetid, outsetid):
-    print('scan ', gtfspathin+gtfsfile, ' by set of ', insetid, ' gen set of ', outsetid)
+    print('scan ', gtfspathin / gtfsfile, ' by set of ', insetid, ' gen set of ', outsetid)
     outset_id = 'string of text'
     slinelist=[]
     out_set = set([])
-    filein = open(gtfspathin+gtfsfile, 'r', encoding="utf8")
+    filein = open(gtfspathin / gtfsfile, 'r', encoding="utf8")
     sline = filein.readline()
     sline = sline[:-1]
     slinelist=sline.split(",")
@@ -136,13 +136,13 @@ def scan_gtfsfile_by_in_set_gen_out_set(gtfspathin, gtfsfile, maxfilelinecount, 
 # generic filter of gtfs_file by ids in in_set and create out_set of ids
 #
 def filter_gtfsfile_by_in_set_gen_out_set(gtfspathin, gtfspathout, gtfsfile, maxfilelinecount, in_set, insetid, outsetid):
-    print('filter ', gtfspathin+gtfsfile, ' by set of ', insetid, ' gen set of ', outsetid)
+    print('filter ', gtfspathin / gtfsfile, ' by set of ', insetid, ' gen set of ', outsetid)
     outset_id = 'string of text'
     slinelist=[]
     postsline = ''
     out_set = set([])
-    filein = open(gtfspathin+gtfsfile, 'r', encoding="utf8")
-    fileout = open(gtfspathout+gtfsfile, 'w', encoding="utf8")
+    filein = open(gtfspathin / gtfsfile, 'r', encoding="utf8")
+    fileout = open(gtfspathout / gtfsfile, 'w', encoding="utf8")
     sline = filein.readline()
     fileout.write(sline)
     sline = sline[:-1]
@@ -179,11 +179,11 @@ def filter_gtfsfile_by_in_set_gen_out_set(gtfspathin, gtfspathout, gtfsfile, max
 # generic filter of gtfs_file by ids in in_set 
 #
 def filter_gtfsfile_by_in_set(gtfspathin, gtfspathout, gtfsfile, maxfilelinecount, in_set, insetid):
-    print('filter ', gtfspathin+gtfsfile, ' by set of ', insetid)
+    print('filter ', gtfspathin / gtfsfile, ' by set of ', insetid)
     slinelist=[]
     postsline = ''
-    filein = open(gtfspathin+gtfsfile, 'r', encoding="utf8")
-    fileout = open(gtfspathout+gtfsfile, 'w', encoding="utf8")
+    filein = open(gtfspathin / gtfsfile, 'r', encoding="utf8")
+    fileout = open(gtfspathout / gtfsfile, 'w', encoding="utf8")
     sline = filein.readline()
     fileout.write(sline)
     sline = sline[:-1]

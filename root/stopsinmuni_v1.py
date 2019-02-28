@@ -17,15 +17,18 @@ import csv
 import json
 from shapely.geometry import shape, Point, Polygon, MultiPolygon
 import numpy as np
+from pathlib import Path
+
+cwd = Path.cwd()
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #_________________________________
 #
 def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	# input:
-	parent_path = pathout
-	gtfs_parent_path = gtfsparentpath
+	parent_path = cwd.parent / pathout
+	gtfs_parent_path = cwd.parent / gtfsparentpath
 	servicedate = gtfsdate
-	gtfsdir = gtfsdirbase+servicedate+'\\'
+	gtfsdir = gtfsdirbase+servicedate
 	gtfsstopsfile = 'stops.txt'
 	cityfilein = 'israel_city_boarders.geojson'
 	townfilein = 'israel_town_boarders.geojson' # moatzot mekomiyot
@@ -34,15 +37,12 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	stopsinmuni_pre_edit = 'stopsinmuni_pre_edit'+'_'+servicedate+'.js'
 	stopsinmuni_pre_edit_txt = 'stopsinmuni_pre_edit'+'_'+servicedate+'.txt'
 
-	gtfspathin = parent_path
-	gtfspathout = parent_path
-
 	#
 	# load files 
 	#
 
 	# >>> load stops file
-	txtfilein = gtfs_parent_path+gtfsdir+gtfsstopsfile
+	txtfilein = gtfs_parent_path / gtfsdir / gtfsstopsfile
 	stops_list = []
 	with open(txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
@@ -55,13 +55,13 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	print('stops_list loaded. stop count ', len(stops_list))
 
 	# >>> load city boarders 
-	with open(parent_path+cityfilein) as cf:
+	with open(parent_path / cityfilein) as cf:
 		city_geo = json.load(cf)
 	print('loaded city geo, feature count: ', len(city_geo['features']))
 	#print city_geo
 
 	# >>> load town boarders 
-	with open(parent_path+townfilein) as tf:
+	with open(parent_path / townfilein) as tf:
 		town_geo = json.load(tf)
 	print('loaded town geo, feature count: ', len(town_geo['features']))
 	#print town_geo
@@ -144,7 +144,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 
 	# output js file of stopsinmuni pre edit
 	fileoutname = stopsinmuni_pre_edit
-	fileout = open(gtfspathout+fileoutname, 'w', encoding="utf8") # open file to save results 
+	fileout = open(parent_path / fileoutname, 'w', encoding="utf8") # open file to save results 
 	postsline = 'var inmunis = {\n'
 	for muni_id, stopsinmunilist in munisforoutput_dict.items():
 		postsline += muni_id+': ["'
@@ -160,7 +160,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 
 	# output txt file of stopsinmuni pre edit
 	fileoutname = stopsinmuni_pre_edit_txt
-	fileout = open(gtfspathout+fileoutname, 'w', encoding="utf8") # open file to save results 
+	fileout = open(parent_path / fileoutname, 'w', encoding="utf8") # open file to save results 
 	postsline = 'muni_id,stop_id\n'
 	fileout.write(postsline)
 	for muni_id, stopsinmunilist in munisforoutput_dict.items():

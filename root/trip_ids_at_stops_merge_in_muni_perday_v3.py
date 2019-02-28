@@ -46,7 +46,7 @@ jsfileout = 'muni_w_tpd_per_line_'+sserviceweekstartdate+'.js'
 #parent_path = 'C:\\transitanalyst\\processed\\' # small files for test
 #gtfsdir = 'israel20180106-binyamina_station' # small files for test
 
-gtfspathin = parent_path+gtfsdir+'\\'
+gtfspathin = parent_path / gtfsdir
 gtfspath = gtfspathin
 gtfspathout = pathout
 processedpathin = pathout
@@ -70,8 +70,8 @@ gtfsfile = 'calendar.txt'
 inid = 'service_id'
 calendar_dict = {}
 slinelist=[]
-print(gtfspath+gtfsfile)
-filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+print(gtfspath / gtfsfile)
+filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 sline = filein.readline()
 slinelist=sline[:-1].split(",")
 print(slinelist)
@@ -158,8 +158,8 @@ inid = 'stop_id'
 stops_dict = {}
 tripsperstop_dict = {} # dict of trip_id s and times at stop for this stop
 slinelist=[]
-print(gtfspath+gtfsfile)
-filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+print(gtfspath / gtfsfile)
+filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 sline = filein.readline()
 slinelist=sline[:-1].split(",")
 # print slinelist
@@ -208,8 +208,8 @@ maxfilelinecount = MAX_STOP_TIMES_COUNT
 gtfspath = gtfspathin
 gtfsfile = 'stop_times.txt'
 slinelist=[]
-print(gtfspath+gtfsfile)
-filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+print(gtfspath / gtfsfile)
+filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 sline = filein.readline()
 slinelist=sline[:-1].split(",")
 # print slinelist
@@ -265,8 +265,8 @@ gtfsfile = 'routes.txt'
 inid = 'route_id'
 routes_dict = {}
 slinelist=[]
-print(gtfspath+gtfsfile)
-filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+print(gtfspath / gtfsfile)
+filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 sline = filein.readline()
 slinelist=sline[:-1].split(",")
 print(slinelist)
@@ -307,8 +307,8 @@ gtfsfile = 'trips.txt'
 inid = 'trip_id'
 trips_dict = {} # trip_id: [service_id, route_id, xinweek, xpdlist, agency_id, route_short_name]
 slinelist=[]
-print(gtfspath+gtfsfile)
-filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+print(gtfspath / gtfsfile)
+filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 sline = filein.readline()
 slinelist=sline[:-1].split(",")
 # print slinelist
@@ -370,7 +370,7 @@ inid = 'agency_id'
 agency_dict = {}
 slinelist=[]
 print gtfspath+gtfsfile
-filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 sline = filein.readline()
 slinelist=sline[:-1].split(",")
 # print slinelist
@@ -468,7 +468,7 @@ print(deltatimehist)
 print('>>> load txt file of stopsinmuni post edit')
 txtfilein = stopsinmuni_post_edit
 stopsinmuni = {}
-with open(processedpathin+txtfilein, newline='', encoding="utf8") as f:
+with open(processedpathin / txtfilein, newline='', encoding="utf8") as f:
 	reader = csv.reader(f)
 	header = next(reader) # ['muni_id', 'stop_id']
 	print(header)
@@ -682,7 +682,7 @@ geoj = {
 	"type": "FeatureCollection",
 	"features": [getJSON(muni_id) for muni_id in munisforoutput_dict]
 }
-print ("Saving file: " + gtfspathout+jsfileout+ " ...")
+print ("Saving file: ", gtfspathout /jsfileout, " ...")
 nf = open(gtfspathout+jsfileout, "w", encoding="utf8")
 jsonstr = json.dumps(geoj, separators=(',',':')) # smaller file for download
 outstr = jsonstr.replace('}},', '}},\n')
@@ -706,7 +706,7 @@ def getJSON(m_id):
 
 print ("Generating JSON export.")
 json_list = [getJSON(muni_id) for muni_id in munisforoutput_dict]
-print(("Saving file: " + gtfspathout+jsfileout+ " ..."))
+print(("Saving file: ", gtfspathout /jsfileout, " ..."))
 nf = open(gtfspathout+jsfileout, "w", encoding="utf8")
 jsonstr = json.dumps(json_list, separators=(',',':')) # smaller file for download
 outstr = jsonstr.replace('}},{', '},\n').replace('[{', '{').replace('}]', '}')

@@ -6,10 +6,13 @@
 #
 import transitanalystisrael_config as cfg
 import os
+from pathlib import Path
+
+cwd = Path.cwd()
 
 prefile = 'stopsinmuni_pre_edit_'+cfg.gtfsdate+'.txt'
 postfile = 'stopsinmuni_post_edit_'+cfg.gtfsdate+'.txt'
 
-os.chdir(cfg.processedpath)
+os.chdir(cwd.parent / cfg.processedpath)
 os.system('copy '+prefile+' '+postfile)
 

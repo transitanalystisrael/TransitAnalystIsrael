@@ -14,12 +14,15 @@ import csv
 import json
 from geopy.distance import vincenty
 import numpy as np
+from pathlib import Path
+
+cwd = Path.cwd()
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #_________________________________
 #
 def main(gtfsdate, processedpath):
 	# input:
-	parent_path = processedpath
+	parent_path = cwd.parent / processedpath
 	servicedate = gtfsdate
 	stopswtpdfile = 'stops_w_tpd_per_line'+'_'+servicedate+'.geojson'
 	stopsneartrainstop_post_edit = 'stopsneartrainstop_post_edit'+'_'+servicedate+'.txt'
@@ -34,8 +37,8 @@ def main(gtfsdate, processedpath):
 	#
 
 	# >>> load stops_w_tpd_per_line geojson file 
-	print(parent_path+stopswtpdfile)
-	with open(parent_path+stopswtpdfile) as sf:
+	print(parent_path / stopswtpdfile)
+	with open(parent_path / stopswtpdfile) as sf:
 		stops_geo = json.load(sf)
 	print('loaded stops_geo, feature count: ', len(stops_geo['features']))
 	#print stops_geo
@@ -43,7 +46,7 @@ def main(gtfsdate, processedpath):
 	# >>> load txt file of stopsneartrainstop post edit
 	txtfilein = stopsneartrainstop_post_edit
 	stopsneartrainstop = {}
-	with open(gtfspathin+txtfilein, newline='', encoding="utf8") as f:
+	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # ['trainstop_id', 'stop_id']
 		print(header)
@@ -119,8 +122,8 @@ def main(gtfsdate, processedpath):
 		"features": [getJSON(stop_id, stop_lat, stop_lon, maxtpdatstop, averagetpdatstop, maxdaytpdperline_dict) 
 			for stop_id, [stop_lat, stop_lon, maxtpdatstop, averagetpdatstop, maxdaytpdperline_dict] in stops_dict.items()]
 	}
-	print(("Saving file: " + gtfspathout+jsfileout+ " ..."))
-	nf = open(gtfspathout+jsfileout, "w", encoding="utf8")
+	print(("Saving file: ", gtfspathout / jsfileout, " ..."))
+	nf = open(gtfspathout / jsfileout, "w", encoding="utf8")
 	jsonstr = json.dumps(geoj, separators=(',',':')) # smaller file for download
 	outstr = jsonstr.replace('}},', '}},\n')
 	nf.write('var stopsWtrainstopid =\n')

@@ -9,11 +9,14 @@ from datetime import date
 from datetime import timedelta
 import time
 import csv
+from pathlib import Path
+
+cwd = Path.cwd()
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #_________________________________
 #
 # input:
-parent_path = cfg.processedpath
+parent_path = cwd.parent / cfg.processedpath
 servicedate = cfg.gtfsdate
 refservicedate = cfg.autoeditrefdate
 ref_post_txt_filein = 'stopsneartrainstop_post_edit'+'_'+refservicedate+'.txt'
@@ -28,7 +31,7 @@ gtfspathout = parent_path
 # >>> load txt file of stopsneartrainstop pre edit reference date
 txtfilein = ref_pre_txt_filein
 stopsneartrainstop_ref_pre = {}
-with open(gtfspathin+txtfilein, newline='', encoding="utf8") as f:
+with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 	reader = csv.reader(f)
 	header = next(reader) # ['trainstop_id', 'stop_id']
 	print(header)
@@ -46,7 +49,7 @@ print('stopsneartrainstop_ref_pre loaded. trainstop count ', len(stopsneartrains
 # >>> load txt file of stopsneartrainstop post edit reference date
 txtfilein = ref_post_txt_filein
 stopsneartrainstop_ref_post = {}
-with open(gtfspathin+txtfilein, newline='', encoding="utf8") as f:
+with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 	reader = csv.reader(f)
 	header = next(reader) # ['trainstop_id', 'stop_id']
 	print(header)
@@ -64,7 +67,7 @@ print('stopsneartrainstop_ref_post loaded. trainstop count ', len(stopsneartrain
 # >>> load txt file of stopsneartrainstop pre edit 
 txtfilein = pre_txt_filein
 stopsneartrainstop_pre = {}
-with open(gtfspathin+txtfilein, newline='', encoding="utf8") as f:
+with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 	reader = csv.reader(f)
 	header = next(reader) # ['trainstop_id', 'stop_id']
 	print(header)
@@ -118,7 +121,7 @@ print('stopsneartrainstop_post len : ',len(stopsneartrainstop_post))
 
 # >>> output txt file of stopsneartrainstop post edit
 fileoutname = post_txt_fileout
-fileout = open(gtfspathout+fileoutname, 'w', encoding="utf8") # open file to save results 
+fileout = open(gtfspathout / fileoutname, 'w', encoding="utf8") # open file to save results 
 postsline = 'trainstop_id,stop_id\n'
 fileout.write(postsline)
 count = 0

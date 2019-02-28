@@ -18,18 +18,21 @@ import csv
 import json
 from geopy.distance import vincenty
 import numpy as np
+from pathlib import Path
+
+cwd = Path.cwd()
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #_________________________________
 #
 def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, neartrainstop):
 	# input:
-	parent_path = pathout
-	gtfs_parent_path = gtfsparentpath
+	parent_path = cwd.parent / pathout
+	gtfs_parent_path = cwd.parent / gtfsparentpath
 	servicedate = gtfsdate
-	gtfsdir = gtfsdirbase+servicedate+'\\'
+	gtfsdir = gtfsdirbase+servicedate
 	gtfsstopsfile = 'stops.txt'
 	trainstopsfilein = 'train_stops'+'_'+servicedate+'.txt'
-	NEAR = neartrainstop # in meters 
+	NEAR = float(neartrainstop) # in meters 
 
 	# output:
 	stopsneartrainstop_pre_edit = 'stopsneartrainstop_pre_edit'+'_'+servicedate+'.js'
@@ -43,7 +46,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, neartrainstop):
 	#
 
 	# >>> load stops file
-	txtfilein = gtfs_parent_path+gtfsdir+gtfsstopsfile
+	txtfilein = gtfs_parent_path / gtfsdir / gtfsstopsfile
 	stops_list = []
 	with open(txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
@@ -58,7 +61,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, neartrainstop):
 	# >>> load trainstops txt file 
 	txtfilein = trainstopsfilein
 	trainstops_list = []
-	with open(gtfspathin+txtfilein, newline='', encoding="utf8") as f:
+	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # ['stop_id', 'stop_name', 'stop_lat', 'stop_lon']
 		print(header)
@@ -106,7 +109,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, neartrainstop):
 
 	# output js file of stopsneartrainstop pre edit
 	fileoutname = stopsneartrainstop_pre_edit
-	fileout = open(gtfspathout+fileoutname, 'w', encoding="utf8") # open file to save results 
+	fileout = open(gtfspathout / fileoutname, 'w', encoding="utf8") # open file to save results 
 	postsline = 'var nearTrainstops = {\n'
 	for trainstop_id, stopsnearlist in stopsneartrainstop.items():
 		postsline += trainstop_id+': ["'
@@ -122,7 +125,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, neartrainstop):
 
 	# output txt file of stopsneartrainstop pre edit
 	fileoutname = stopsneartrainstop_pre_edit_txt
-	fileout = open(gtfspathout+fileoutname, 'w', encoding="utf8") # open file to save results 
+	fileout = open(gtfspathout / fileoutname, 'w', encoding="utf8") # open file to save results 
 	postsline = 'trainstop_id,stop_id\n'
 	fileout.write(postsline)
 	for trainstop_id, stopsnearlist in stopsneartrainstop.items():

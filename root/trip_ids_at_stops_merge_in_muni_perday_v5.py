@@ -26,12 +26,15 @@ import copy
 import json
 import csv
 import gtfs_config as gtfscfg
+from pathlib import Path
+
+cwd = Path.cwd()
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
-def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
+def main(gtfsdate, gtfsparentpath, gtfsdirbase, processedpath, serviceweekstartdate):
 # input:
-	parent_path = gtfspath
-	pathout = processedpath
+	parent_path = cwd.parent / gtfsparentpath
+	pathout = cwd.parent / processedpath
 	sserviceweekstartdate = serviceweekstartdate # recommend to use gtfsdate (expect gtfs files to be most accurate for first week in service range)
 	gtfsdir = gtfsdirbase+gtfsdate
 	servicedate = sserviceweekstartdate
@@ -47,7 +50,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	#parent_path = 'C:\\transitanalyst\\processed\\' # small files for test
 	#gtfsdir = 'israel20180106-binyamina_station' # small files for test
 
-	gtfspathin = parent_path+gtfsdir+'\\'
+	gtfspathin = parent_path / gtfsdir
 	gtfspath = gtfspathin
 	gtfspathout = pathout
 	processedpathin = pathout
@@ -63,8 +66,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	inid = 'service_id'
 	calendar_dict = {}
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	print(slinelist)
@@ -151,8 +154,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	stops_dict = {}
 	tripsperstop_dict = {} # dict of trip_id s and times at stop for this stop
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -198,11 +201,10 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	#
 	maxtimeatstop = '00:00:00'
 	maxfilelinecount = gtfscfg.MAX_STOP_TIMES_COUNT
-	gtfspath = gtfspathin
 	gtfsfile = 'stop_times.txt'
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -258,8 +260,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	inid = 'route_id'
 	routes_dict = {}
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	print(slinelist)
@@ -295,13 +297,12 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	# scan trips.txt to create trips dict keyed on trip_id and includes service_id and route_id and number of times the trip runs during the analyzed service week
 	#
 	maxfilelinecount = gtfscfg.MAX_TRIPS_COUNT
-	gtfspath = gtfspathin
 	gtfsfile = 'trips.txt'
 	inid = 'trip_id'
 	trips_dict = {} # trip_id: [service_id, route_id, xinweek, xpdlist, agency_id, route_short_name]
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -357,13 +358,12 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	# scan agency.txt to create agency dict keyed on agency_id and includes agency name
 	#
 	maxfilelinecount = gtfscfg.MAX_AGENCY_COUNT
-	gtfspath = gtfspathin
 	gtfsfile = 'agency.txt'
 	inid = 'agency_id'
 	agency_dict = {}
 	slinelist=[]
-	print gtfspath+gtfsfile
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print gtfspath / gtfsfile
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -461,7 +461,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	print('>>> load txt file of stopsinmuni post edit')
 	txtfilein = stopsinmuni_post_edit
 	stopsinmuni = {}
-	with open(processedpathin+txtfilein, newline='', encoding="utf8") as f:
+	with open(processedpathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # ['muni_id', 'stop_id']
 		print(header)
@@ -566,7 +566,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	#
 	#   output txtfileout3 of munis with trips per hour in day summed over one week -'munis_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
 	#
-	fileout = open(gtfspathout+txtfileout3, 'w', encoding="utf8") # save results in file
+	fileout = open(gtfspathout / txtfileout3, 'w', encoding="utf8") # save results in file
 	postsline = 'muni_id,tph00,tph01,tph02,tph03,tph04,tph05,tph06,tph07,tph08,tph09,tph10,tph11,tph12,tph13,tph14,tph15,tph16,tph17,tph18,tph19,tph20,tph21,tph22,tph23\n'
 	fileout.write(postsline)
 	for muni_id, tripswxinweekandminmaxtimes_dict in tripswxinweekandminmaxtimesinmuni_dict.items() :
@@ -585,13 +585,13 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 		fileout.write(postsline)
 
 	fileout.close()
-	print(gtfspathout+txtfileout3)
+	print(gtfspathout / txtfileout3)
 
 	'''
 	#
 	#   output txtfileout1 of stops with trip_id s -'stops_w_trip_ids'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
 	#
-	fileout = open(gtfspathout+txtfileout1, 'w', encoding="utf8") # save results in file
+	fileout = open(gtfspathout / txtfileout1, 'w', encoding="utf8") # save results in file
 	postsline = 'stop_id,trip_id\n'
 	fileout.write(postsline)
 	for stop_id, [stop_lat, stop_lon, tripsatstop_dict, tphlist, totaltpwatstop] in stops_dict.iteritems():
@@ -600,12 +600,12 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 				postsline = stop_id+','+trip_id+'\n'
 				fileout.write(postsline)
 	fileout.close()
-	print gtfspathout+txtfileout1
+	print (gtfspathout / txtfileout1)
 
 	#
 	#   output txtfileout2 of stops with trips per hour in day summed over one week -'stops_w_tph_summed_over_week'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
 	#
-	fileout = open(gtfspathout+txtfileout2, 'w', encoding="utf8") # save results in file
+	fileout = open(gtfspathout / txtfileout2, 'w', encoding="utf8") # save results in file
 	postsline = 'stop_id,tph00,tph01,tph02,tph03,tph04,tph05,tph06,tph07,tph08,tph09,tph10,tph11,tph12,tph13,tph14,tph15,tph16,tph17,tph18,tph19,tph20,tph21,tph22,tph23\n'
 	fileout.write(postsline)
 	for stop_id, [stop_lat, stop_lon, tripsatstop_dict, tphlist, totaltpwatstop] in stops_dict.iteritems():
@@ -615,7 +615,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 		postsline = stop_id+stphlist+'\n'
 		fileout.write(postsline)
 	fileout.close()
-	print gtfspathout+txtfileout2
+	print (gtfspathout / txtfileout2)
 	'''
 
 	#
@@ -675,14 +675,14 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 		"type": "FeatureCollection",
 		"features": [getJSON(muni_id) for muni_id in munisforoutput_dict]
 	}
-	print ("Saving file: " + gtfspathout+jsfileout+ " ...")
-	nf = open(gtfspathout+jsfileout, "w", encoding="utf8")
+	print ("Saving file: ", gtfspathout / jsfileout, " ...")
+	nf = open(gtfspathout / jsfileout, "w", encoding="utf8")
 	jsonstr = json.dumps(geoj, separators=(',',':')) # smaller file for download
 	outstr = jsonstr.replace('}},', '}},\n')
 	nf.write('var munisWtpdperline =\n')
 	nf.write(outstr)
 	nf.close()
-	print ("Saved file: " + jsfileout)
+	print ("Saved file: ", jsfileout)
 	'''
 
 	def getJSON(m_id):
@@ -699,8 +699,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 
 	print ("Generating JSON export.")
 	json_list = [getJSON(muni_id) for muni_id in munisforoutput_dict]
-	print(("Saving file: " + gtfspathout+jsfileout+ " ..."))
-	nf = open(gtfspathout+jsfileout, "w", encoding="utf8")
+	print(("Saving file: ", gtfspathout / jsfileout, " ..."))
+	nf = open(gtfspathout / jsfileout, "w", encoding="utf8")
 	jsonstr = json.dumps(json_list, separators=(',',':')) # smaller file for download
 	outstr = jsonstr.replace('}},{', '},\n').replace('[{', '{').replace('}]', '}')
 	nf.write('var munisWtpdperline =\n')
@@ -711,7 +711,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	#
 	#   output txt file with tpd per line (agency_id+route_short_name) in muni - 'muni_w_tpd_per_line'+'_'+servicedate+'.txt'
 	#
-	fileout = open(gtfspathout+txtfileout4, 'w', encoding="utf8") # open file to save results 
+	fileout = open(gtfspathout / txtfileout4, 'w', encoding="utf8") # open file to save results 
 	postsline = 'muni_id,tpwinmuni,total_tpd,line_name_i,maxdaylinetpd,muniline,tpw,tpd1,tpd2,tpd3,tpd4,tpd5,tpd6,tpd7\n'
 	fileout.write(postsline)
 	for muni_id, [tpwinmuni, maxdaytpdinmuni, averagetpdinmuni, maxdaytpdperline_dict, tpdperline_dict] in munisforoutput_dict.items():
@@ -724,6 +724,6 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 			postsline += '\n'
 			fileout.write(postsline)
 	fileout.close()
-	print(gtfspathout+txtfileout4)
+	print(gtfspathout / txtfileout4)
 
 	print("Local current time :", time.asctime( time.localtime(time.time()) ))

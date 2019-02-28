@@ -10,11 +10,14 @@ print('output ts_lookup.js')
 
 import time
 import csv
+from pathlib import Path
+
+cwd = Path.cwd()
 #
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
 def main(gtfsdate, gtfsdirbase, processedpath):
-	parent_path = processedpath
+	parent_path = cwd.parent / processedpath
 
 	tsfilein = 'transit_score_'+gtfsdirbase+gtfsdate+'.txt'
 	tsfileout = 'ts_lookup_'+gtfsdirbase+gtfsdate+'.js'
@@ -30,7 +33,7 @@ def main(gtfsdate, gtfsdirbase, processedpath):
 	transitscore_list = []
 	max_grid_lat = 0
 	max_grid_lon = 0
-	with open(parent_path+tsfilein, newline='', encoding="utf8") as ts_f:
+	with open(parent_path / tsfilein, newline='', encoding="utf8") as ts_f:
 		readerts = csv.reader(ts_f)
 		headerts = next(readerts)
 		print(headerts)
@@ -49,8 +52,8 @@ def main(gtfsdate, gtfsdirbase, processedpath):
 	#
 	# output file of ts_lookup as object with gridlatlon as key to look up transitscore from 1-100
 	#
-	print(("Saving file: " + parent_path+tsfileout + " ..."))
-	nf = open(parent_path+tsfileout, "w", encoding="utf8")
+	print(("Saving file: ", parent_path / tsfileout, " ..."))
+	nf = open(parent_path / tsfileout, "w", encoding="utf8")
 	postsline = 'var transitScore = {\n' # format as js for load to leaflet
 	print(postsline)
 	nf.write(postsline)

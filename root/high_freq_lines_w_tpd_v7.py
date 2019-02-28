@@ -25,6 +25,9 @@ import time
 import copy
 import json
 import gtfs_config as gtfscfg
+from pathlib import Path
+
+cwd = Path.cwd()
 #
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
@@ -50,8 +53,8 @@ print("Local current time :", time.asctime( time.localtime(time.time()) ))
 # high_freq_lines_w_tpd_v7.main('20181021', 'C:\\transitanalyst\\gtfs\\', 'israel', 'C:\\transitanalyst\\processed\\', '00:00:00', '24:00:00', 60)
 def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, freqtpdmin):
 
-	parent_path = pathout
-	gtfs_parent_path = gtfsparentpath
+	parent_path = cwd.parent / pathout
+	gtfs_parent_path = cwd.parent / gtfsparentpath
 	gtfsdir = gtfsdirbase+gtfsdate
 	if len(gtfsdirbase) > len('israel'):
 		gtfs_area = gtfsdirbase[len('israel_'):] # area in israel
@@ -61,9 +64,9 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	sstarttimename = '_'+sstarttime[0:2]+sstarttime[3:5]
 	sstoptimename = '-'+sstoptime[0:2]+sstoptime[3:5]
 
-	FREQUENT_TPD = freqtpdmin # e.g. 8 tpd for delta time from start to stop of 2 hours is average of 4 trips an hour 
+	FREQUENT_TPD = int(freqtpdmin) # e.g. 8 tpd for delta time from start to stop of 2 hours is average of 4 trips an hour 
 
-	gtfspathin = gtfs_parent_path+gtfsdir+'\\'
+	gtfspathin = gtfs_parent_path / gtfsdir
 	gtfspath = gtfspathin
 	gtfspathout = parent_path
 	routeswithtripcountfile = 'routeswtripcountperday.txt'
@@ -80,8 +83,8 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	inid = 'service_id'
 	calendar_dict = {}
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -157,8 +160,8 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	routes_dict = {}
 	tripsperroute_set = set([]) # set of trip_id s of all trips that share the same route
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	print(slinelist)
@@ -197,13 +200,12 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	# trips.txt : route_id,service_id,trip_id,trip_headsign,direction_id,shape_id
 
 	maxfilelinecount = gtfscfg.MAX_TRIPS_COUNT
-	gtfspath = gtfspathin
 	gtfsfile = 'trips.txt'
 	inid = 'trip_id'
 	trips_dict = {}
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -239,12 +241,11 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	# scan stop_times.txt to populate trip start_time in trips dict
 	#
 	maxfilelinecount = gtfscfg.MAX_STOP_TIMES_COUNT
-	gtfspath = gtfspathin
 	gtfsfile = 'stop_times.txt'
 	inid = 'stop_id'
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -278,12 +279,11 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	# scan trips.txt to populate trip_id set per route in the routes dict and direction_id into routes dict
 	#
 	maxfilelinecount = gtfscfg.MAX_TRIPS_COUNT
-	gtfspath = gtfspathin
 	gtfsfile = 'trips.txt'
 	inid = 'route_id'
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -378,12 +378,11 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	# to find route_id - lookup trip_id in trips dict 
 	#
 	maxfilelinecount = gtfscfg.MAX_STOP_TIMES_COUNT
-	gtfspath = gtfspathin
 	gtfsfile = 'stop_times.txt'
 	inid = 'stop_id'
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -415,13 +414,12 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	# scan shapes.txt to create shape dict keyed on shape_id and includes list of latlon points
 	#
 	maxfilelinecount = gtfscfg.MAX_SHAPES_COUNT
-	gtfspath = gtfspathin
 	gtfsfile = 'shapes.txt'
 	inid = 'shape_id'
 	shapes_dict = {}
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -540,13 +538,12 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	# scan agency.txt to create agency dict keyed on agency_id and includes agency name
 	#
 	maxfilelinecount = gtfscfg.MAX_AGENCY_COUNT
-	gtfspath = gtfspathin
 	gtfsfile = 'agency.txt'
 	inid = 'agency_id'
 	agency_dict = {}
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	print(slinelist)
@@ -574,7 +571,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	# output to file of routes with tripcount and stops count
 	#  while we are at it - collect the set of route_id s of routes with zero total trips per route for later cleanup
 	#
-	fileout = open(gtfspathout+routeswithtripcountfile, 'w', encoding="utf8") # save results in file
+	fileout = open(gtfspathout / routeswithtripcountfile, 'w', encoding="utf8") # save results in file
 	postsline = 'route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,totaltripsperroute,'
 	postsline += 'day1,tpd1,day2,tpd2,day3,tpd3,day4,tpd4,day5,tpd5,day6,tpd6,day7,tpd7,stopsperroute,direction_id, shape_id\n'
 	fileout.write(postsline)
@@ -590,7 +587,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 		postsline += '\n'
 		fileout.write(postsline)
 	fileout.close()
-	print(gtfspathout+routeswithtripcountfile)
+	print(gtfspathout / routeswithtripcountfile)
 	print('count ', count)
 	print('maxtotaltripsanyroute ', maxtotaltripsanyroute)
 	#print 'routeswnotripsset - ', routeswnotripsset
@@ -611,8 +608,8 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 	unique_route_dict = {}
 	same_stops = False
 	used_route_id_set = set()
-	fileout = open(gtfspathout+uniquerouteswithtripcountattimefile, 'w', encoding="utf8") # save results in file
-	fileouthist = open(gtfspathout+'samestopshist.txt', 'w', encoding="utf8") # save results in file
+	fileout = open(gtfspathout / uniquerouteswithtripcountattimefile, 'w', encoding="utf8") # save results in file
+	fileouthist = open(gtfspathout / 'samestopshist.txt', 'w', encoding="utf8") # save results in file
 	#postsline = 'route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,totaltripsperroute,'
 	#postsline += 'day1,tpd1,day2,tpd2,day3,tpd3,day4,tpd4,day5,tpd5,day6,tpd6,day7,tpd7\n'
 	postsline = 'route_id,agency_id,route_short_name,totaltripsperroute,'
@@ -681,7 +678,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 
 	fileout.close()
 	fileouthist.close()
-	print(gtfspathout+uniquerouteswithtripcountattimefile)
+	print(gtfspathout / uniquerouteswithtripcountattimefile)
 	print('count, merge_count, unique:  ', count, merge_count, len(unique_route_id_list))
 	print(unique_route_id_list[:10])
 
@@ -735,12 +732,12 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 		"features": [getJSON(route_id) for route_id in unique_route_id_list]
 	}
 
-	print(("Saving file: " + gtfspathout+jsfileout+ " ..."))
-	nf = open(gtfspathout+jsfileout, "w", encoding="utf8")
+	print(("Saving file: ", gtfspathout / jsfileout, " ..."))
+	nf = open(gtfspathout / jsfileout, "w", encoding="utf8")
 	jsonstr = json.dumps(geoj, separators=(',',':')) # smaller file for download
 	outstr = jsonstr.replace('}},', '}},\n')
 	nf.write('var freqRoutes =\n')
 	nf.write(outstr)
 	nf.close()
-	print(("Saved file: " + jsfileout))
+	print(("Saved file: ", jsfileout))
 	

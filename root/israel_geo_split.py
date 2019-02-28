@@ -8,13 +8,17 @@
 print("GTFS Israel Geo Split importing")
 import os
 import GTFS_geo_filter_full
+from pathlib import Path
+
+cwd = Path.cwd()
 
 def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	#------
 	gtfs_area_dir = gtfsdirbase+'_telavivmetro'+gtfsdate
-	if not os.access(pathout+gtfs_area_dir, os.F_OK): os.mkdir(pathout+gtfs_area_dir)
-	gtfspathin = gtfsparentpath+gtfsdirbase+gtfsdate+'\\'
-	gtfspathout = pathout+gtfs_area_dir+'\\'
+	gtfsdir = gtfsdirbase+gtfsdate
+	if not os.access(cwd.parent / pathout / gtfs_area_dir, os.F_OK): os.mkdir(cwd.parent / pathout / gtfs_area_dir)
+	gtfspathin = cwd.parent / gtfsparentpath / gtfsdir
+	gtfspathout = cwd.parent / pathout / gtfs_area_dir
 	#
 	geo_filter = [(32.525974,34.376221),
 				  (32.528289,35.071106),
@@ -23,12 +27,13 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	#
 	GTFS_geo_filter_full.main(gtfspathin, gtfspathout, geo_filter)
 	print('---- saved filtered files in ', gtfspathout)
-	#
+	
 	#------
 	gtfs_area_dir = gtfsdirbase+'_jerusalem'+gtfsdate
-	if not os.access(pathout+gtfs_area_dir, os.F_OK): os.mkdir(pathout+gtfs_area_dir)
-	gtfspathin = gtfsparentpath+gtfsdirbase+gtfsdate+'\\'
-	gtfspathout = pathout+gtfs_area_dir+'\\'
+	gtfsdir = gtfsdirbase+gtfsdate
+	if not os.access(cwd.parent / pathout / gtfs_area_dir, os.F_OK): os.mkdir(cwd.parent / pathout / gtfs_area_dir)
+	gtfspathin = cwd.parent / gtfsparentpath / gtfsdir
+	gtfspathout = cwd.parent / pathout / gtfs_area_dir
 	#
 	geo_filter = [
 		(31.972845178914596,34.97577209472661),
@@ -43,9 +48,10 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	#
 	#------
 	gtfs_area_dir = gtfsdirbase+'_north'+gtfsdate
-	if not os.access(pathout+gtfs_area_dir, os.F_OK): os.mkdir(pathout+gtfs_area_dir)
-	gtfspathin = gtfsparentpath+gtfsdirbase+gtfsdate+'\\'
-	gtfspathout = pathout+gtfs_area_dir+'\\'
+	gtfsdir = gtfsdirbase+gtfsdate
+	if not os.access(cwd.parent / pathout / gtfs_area_dir, os.F_OK): os.mkdir(cwd.parent / pathout / gtfs_area_dir)
+	gtfspathin = cwd.parent / gtfsparentpath / gtfsdir
+	gtfspathout = cwd.parent / pathout / gtfs_area_dir
 	#
 	geo_filter = [
 		(33.363512395936034,34.716906738281295),
@@ -58,9 +64,10 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	#
 	#------
 	gtfs_area_dir = gtfsdirbase+'_south'+gtfsdate
-	if not os.access(pathout+gtfs_area_dir, os.F_OK): os.mkdir(pathout+gtfs_area_dir)
-	gtfspathin = gtfsparentpath+gtfsdirbase+gtfsdate+'\\'
-	gtfspathout = pathout+gtfs_area_dir+'\\'
+	gtfsdir = gtfsdirbase+gtfsdate
+	if not os.access(cwd.parent / pathout / gtfs_area_dir, os.F_OK): os.mkdir(cwd.parent / pathout / gtfs_area_dir)
+	gtfspathin = cwd.parent / gtfsparentpath / gtfsdir
+	gtfspathout = cwd.parent / pathout / gtfs_area_dir
 	#
 	geo_filter = [
 		(31.89475958053676, 34.596057128906295),
@@ -75,9 +82,10 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	#
 	#------
 	gtfs_area_dir = gtfsdirbase+'_ramatavivgimel'+gtfsdate
-	if not os.access(pathout+gtfs_area_dir, os.F_OK): os.mkdir(pathout+gtfs_area_dir)
-	gtfspathin = gtfsparentpath+gtfsdirbase+gtfsdate+'\\'
-	gtfspathout = pathout+gtfs_area_dir+'\\'
+	gtfsdir = gtfsdirbase+gtfsdate
+	if not os.access(cwd.parent / pathout / gtfs_area_dir, os.F_OK): os.mkdir(cwd.parent / pathout / gtfs_area_dir)
+	gtfspathin = cwd.parent / gtfsparentpath / gtfsdir
+	gtfspathout = cwd.parent / pathout / gtfs_area_dir
 	#
 	geo_filter = [
 		(32.13437749119699, 34.78600044250493),
@@ -87,7 +95,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	#
 	GTFS_geo_filter_full.main(gtfspathin, gtfspathout, geo_filter)
 	print('---- saved filtered files in ', gtfspathout)
-	#
+	
 	#
 	#print os.listdir(os.getcwd())
 	print('----------- Israel GTFS files have been split into 4 GTFS files for 4 overlapping areas: Tel-Aviv Metro, Jerusalem, North, South')

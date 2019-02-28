@@ -7,12 +7,15 @@
 #
 import time
 import csv
+from pathlib import Path
+
+cwd = Path.cwd()
 #
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
 def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	# input:
-	parent_path = gtfsparentpath
+	parent_path = cwd.parent / gtfsparentpath
 	gtfsdir = gtfsdirbase+gtfsdate
 	txtfilein = ''
 	
@@ -20,14 +23,14 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	txtfileout = 'stop_types'+'_'+gtfsdate+'.txt'
 	jsfileout  = 'stop_types'+'_'+gtfsdate+'.js'
 	
-	gtfspathin = parent_path+gtfsdir+'\\'
+	gtfspathin = parent_path / gtfsdir
 	gtfspath = gtfspathin
-	gtfspathout = pathout
+	gtfspathout = cwd.parent / pathout
 	
 	# >>> load routes file
 	txtfilein = 'routes.txt'
 	routes_list = []
-	with open(gtfspathin+txtfilein, newline='', encoding="utf8") as f:
+	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # [route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_color]
 		print(header)
@@ -40,7 +43,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	# >>> load trips file
 	txtfilein = 'trips.txt'
 	trips_list = []
-	with open(gtfspathin+txtfilein, newline='', encoding="utf8") as f:
+	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # [route_id,service_id,trip_id,trip_headsign,direction_id,shape_id]
 		print(header)
@@ -53,7 +56,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	# >>> load stop_times file
 	txtfilein = 'stop_times.txt'
 	stop_times_list = []
-	with open(gtfspathin+txtfilein, newline='', encoding="utf8") as f:
+	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # [trip_id,arrival_time,departure_time,stop_id,stop_sequence,pickup_type,drop_off_type,shape_dist_traveled]
 		print(header)
@@ -66,7 +69,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	# >>> load stops file
 	txtfilein = 'stops.txt'
 	stops_dict = {}
-	with open(gtfspathin+txtfilein, newline='', encoding="utf8") as f:
+	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # ['stop_id', 'stop_code', 'stop_name', 'stop_desc', 'stop_lat', 'stop_lon', 'location_type', 'parent_station', 'zone_id']
 		print(header)
@@ -132,8 +135,8 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	# ************************************************************************************************************************
 	# open and prep output txt file 
 	#
-	print('open file ', pathout+txtfileout)
-	fileout = open(pathout+txtfileout, 'w', encoding="utf8") # save results in file
+	print('open file ', gtfspathout / txtfileout)
+	fileout = open(gtfspathout / txtfileout, 'w', encoding="utf8") # save results in file
 	postsline = 'stop_id,stop_name,stop_type,stop_lat,stop_lon\n'
 	print(postsline)
 	fileout.write(postsline)
@@ -145,14 +148,14 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		fileout.write(postsline)
 		outfilelinecount += 1
 	fileout.close()
-	print('close file ', pathout+txtfileout)
+	print('close file ', gtfspathout / txtfileout)
 	print('lines in out file count ', outfilelinecount)
 	
 	# ************************************************************************************************************************
 	# open and output js file 
 	#
-	print(("Saving file: " + gtfspathout+jsfileout+ " ..."))
-	nf = open(gtfspathout+jsfileout, "w", encoding="utf8")
+	print("Saving file: ", gtfspathout / jsfileout, " ...")
+	nf = open(gtfspathout / jsfileout, "w", encoding="utf8")
 	outstr = 'var stopsType = {\n'
 	for [stop_id, stop_name, stop_type, stop_lat, stop_lon] in stop_types_list :
 		nf.write(outstr)
@@ -160,7 +163,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	outstr = outstr[:-2]+'\n}'
 	nf.write(outstr)
 	nf.close()
-	print(("Saved file: " + jsfileout))
+	print(("Saved file: ", jsfileout))
 	
 	print("Local current time :", time.asctime( time.localtime(time.time()) ))
 

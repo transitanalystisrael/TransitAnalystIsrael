@@ -7,6 +7,9 @@
 import time
 import csv
 import json
+from pathlib import Path
+
+cwd = Path.cwd()
 #
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
@@ -19,13 +22,13 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	# output:
 	jsfileout  = 'stops'+'_'+gtfsdate+'.js'
 
-	gtfspathin = parent_path+gtfsdir+'\\'
+	gtfspathin = cwd.parent / parent_path / gtfsdir
 	gtfspath = gtfspathin
-	gtfspathout = pathout
+	gtfspathout = cwd.parent / pathout
 	
 	# >>> load stops file
 	stops_list = []
-	with open(gtfspathin+txtfilein, newline='', encoding="utf8") as f:
+	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # ['stop_id', 'stop_code', 'stop_name', 'stop_desc', 'stop_lat', 'stop_lon', 'location_type', 'parent_station', 'zone_id']
 		print(header)
@@ -58,8 +61,8 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		"type": "FeatureCollection",
 		"features": [getJSON(stop_id, stop_lat, stop_lon) for [stop_id, stop_code, stop_name, stop_desc, stop_lat, stop_lon, location_type, parent_station, zone_id] in stops_list]
 	}
-	print(("Saving file: " + gtfspathout+jsfileout+ " ..."))
-	nf = open(gtfspathout+jsfileout, "w", encoding="utf8")
+	print(("Saving file: " + str(gtfspathout / jsfileout) , " ..."))
+	nf = open(gtfspathout / jsfileout, "w", encoding="utf8")
 	jsonstr = json.dumps(geoj, separators=(',',':')) # smaller file for download
 	outstr = jsonstr.replace('}},', '}},\n')
 	nf.write('var gtfsStops =\n')

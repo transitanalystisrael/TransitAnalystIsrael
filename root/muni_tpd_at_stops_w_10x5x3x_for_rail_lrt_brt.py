@@ -22,6 +22,9 @@ import time
 import copy
 import csv
 import gtfs_config as gtfscfg
+from pathlib import Path
+
+cwd = Path.cwd()
 
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
@@ -45,9 +48,9 @@ print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
 def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	# input:
-	gtfspathin = gtfspath
-	pathout = processedpath
-	pathin = processedpath
+	gtfspathin = cwd.parent / gtfspath
+	pathout = cwd.parent / processedpath
+	pathin = cwd.parent / processedpath
 	sserviceweekstartdate = serviceweekstartdate # recommend to use gtfsdate (expect gtfs files to be most accurate for first week in service range)
 	gtfsdir = gtfsdirbase+gtfsdate
 	txtfilein = 'stop_types'+'_'+gtfsdate+'.txt'
@@ -62,14 +65,14 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	# scan lines in calendar to compute start and end service dates and to fill calendar_dict with calendar lines keyed on service_id
 	#
 	maxfilelinecount = gtfscfg.MAX_CALENDAR_COUNT
-	gtfspath = gtfspathin+gtfsdir+'\\'
+	gtfsdirpath = gtfspathin / gtfsdir
 	gtfsfile = 'calendar.txt'
 	inid = 'service_id'
 	calendar_dict = {}
 	tripsperdaylist = []
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfsdirpath / gtfsfile)
+	filein = open(gtfsdirpath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	print(slinelist)
@@ -159,8 +162,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	stops_dict = {}
 	tripsperstop_set = set([]) # set of trip_id s of all trips that stop at this stop
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfsdirpath / gtfsfile)
+	filein = open(gtfsdirpath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -209,8 +212,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	gtfsfile = 'stop_times.txt'
 	inid = 'stop_id'
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfsdirpath / gtfsfile)
+	filein = open(gtfsdirpath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -251,8 +254,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	inid = 'trip_id'
 	trips_dict = {}
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfsdirpath / gtfsfile)
+	filein = open(gtfsdirpath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -327,7 +330,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	
 	# >>> load stop types file
 	stop_types_dict = {}
-	with open(pathin+txtfilein, newline='', encoding="utf8") as f:
+	with open(pathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # ['stop_id', 'stop_name', 'stop_type', 'stop_lat', 'stop_lon']
 		print(header)
@@ -337,7 +340,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	#print stop_types_dict[row[0]] # last one
 	print('stop_types_dict loaded. stop count ', len(stop_types_dict))
 	
-	fileout = open(pathout+txtfileout, 'w', encoding="utf8") # save results in file
+	fileout = open(pathout / txtfileout, 'w', encoding="utf8") # save results in file
 	postsline = 'stop_id,stop_lat,stop_lon,averagetpdatstop\n'
 	fileout.write(postsline)
 	for stop_id, [stop_desc, stop_lat, stop_lon, tripset, tpdlist, totaltpdatstop] in stops_dict.items():
@@ -354,7 +357,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 		fileout.write(postsline)
 		maxtotaltripsanystop = max(maxtotaltripsanystop, totaltpdatstop)
 	fileout.close()
-	print(pathout+txtfileout)
+	print(pathout / txtfileout)
 	print('stop_desc,stop_id,stop_lat,stop_lon,averagetpdatstop\n')
 	print('count ', count)
 	print('maxtotaltripsanystop, maxaveragetpdatanystop after 10x for rail', maxtotaltripsanystop, maxtotaltripsanystop/daysofservicetocount)

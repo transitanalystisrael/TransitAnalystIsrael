@@ -10,16 +10,19 @@ import time
 import copy
 import math
 import csv
+import utils
+import progressbar
 import gtfs_config as gtfscfg
+from pathlib import Path
 
-print('# input GTFS dir israelyyyymmdd is expected in transitanalyst\\gtfs directory  ')
+cwd = Path.cwd()
 
 def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 
 	gtfsdir = gtfsdirbase+gtfsdate
-	gtfspathin = gtfspath
-	gtfsdirin = gtfspathin+gtfsdir+'\\'
-	gtfspathout = processedpath
+	gtfspathin = cwd.parent / gtfspath
+	gtfsdirin = gtfspathin / gtfsdir
+	gtfspathout = cwd.parent / processedpath
 
 	gridfileraw = 'raw_transit_score_'+gtfsdir+'.txt'
 	gridfile = 'transit_score_'+gtfsdir+'.txt'
@@ -65,8 +68,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	stops_dict = {}
 	tripsperstop_set = set([]) # set of trip_id s of all trips that stop at this stop
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	print(slinelist)
@@ -131,8 +134,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	gtfsfile = 'stop_times.txt'
 	inid = 'stop_id'
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	print(slinelist)
@@ -173,8 +176,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	calendar_dict = {}
 	tripsperdaylist = []
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -241,7 +244,7 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	txtfilein = 'routes.txt'
 	pathin = gtfsdirin
 	routes_dict = {}
-	with open(pathin+txtfilein, newline='', encoding="utf8") as f:
+	with open(pathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # [route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_color]
 		print(header)
@@ -261,8 +264,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	inid = 'trip_id'
 	trips_dict = {}
 	slinelist=[]
-	print(gtfspath+gtfsfile)
-	filein = open(gtfspath+gtfsfile, 'r', encoding="utf8")
+	print(gtfspath / gtfsfile)
+	filein = open(gtfspath / gtfsfile, 'r', encoding="utf8")
 	sline = filein.readline()
 	slinelist=sline[:-1].split(",")
 	# print slinelist
@@ -375,8 +378,11 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	weight_m = 0.8
 	weight_l = 0.5
 	totalgridelements = len(grid_dict)
+	pbar = utils.createProgressBar(totalgridelements, action='Calculating tpd per grid element: ')
 	for grid_key, [stopset, tripset, tpdlist, rawtransitscore] in grid_dict.items():
 		gridcount +=1
+		pbar.update(gridcount)
+		progressbar.streams.flush()
 		#print grid_key, gridcount, totalgridelements
 		for trip_id in tripset:
 			tripcount +=1
@@ -475,14 +481,15 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 			maxtripsperday_total = max(maxtripsperday_total, trips_total)
 			rawtransitscore += (weight_s*trips_s+weight_m*trips_m+weight_l*trips_l) # and add to raw transit score after applying weight
 		grid_dict[grid_key][3] = rawtransitscore
-		maxrawtransitscore = max(maxrawtransitscore, rawtransitscore)    
+		maxrawtransitscore = max(maxrawtransitscore, rawtransitscore)
+	pbar.finish()
 
 	#
 	# output grid id based rawtransitscore file 
 	#
 	#gridfile = 'grid_scores.txt'
-	print('output to gridfileraw ', gtfspathout+gridfileraw)
-	fileout = open(gtfspathout+gridfileraw, 'w', encoding="utf8")
+	print('output to gridfileraw ', gtfspathout / gridfileraw)
+	fileout = open(gtfspathout / gridfileraw, 'w', encoding="utf8")
 	postsline = 'grid_lat_i,grid_lon_i,rawtransitscore\n'
 	fileout.write(postsline)
 	for grid_key, [stopset, tripset, tpdlist, rawtransitscore] in grid_dict.items():
@@ -498,8 +505,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	#
 	# output csv file of lat lon points with transitscore
 	#
-	print('output to pointfile ', gtfspathout+pointfile)
-	fileout = open(gtfspathout+pointfile, 'w', encoding="utf8")
+	print('output to pointfile ', gtfspathout / pointfile)
+	fileout = open(gtfspathout / pointfile, 'w', encoding="utf8")
 	postsline = 'grid_lat,grid_lon,transitscore\n'
 	fileout.write(postsline)
 	for grid_key, [stopset, tripset, tpdlist, rawtransitscore] in grid_dict.items():
@@ -517,8 +524,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	# output grid id based transitscore file 
 	#
 	#gridfile = 'grid_scores.txt'
-	print('output to gridfile ', gtfspathout+gridfile)
-	fileout = open(gtfspathout+gridfile, 'w', encoding="utf8")
+	print('output to gridfile ', gtfspathout / gridfile)
+	fileout = open(gtfspathout / gridfile, 'w', encoding="utf8")
 	postsline = 'grid_lat_i,grid_lon_i,transitscore\n'
 	fileout.write(postsline)
 	for grid_key, [stopset, tripset, tpdlist, rawtransitscore] in grid_dict.items():

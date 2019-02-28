@@ -42,6 +42,9 @@ import json
 from shapely.geometry import shape, Point, Polygon
 from shapely.validation import explain_validity
 import csv
+from pathlib import Path
+
+cwd = Path.cwd()
 #
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
@@ -49,7 +52,7 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 	SERVICE_DAYS_COUNT = 6 # use one week or 6 service days
 	SERVICE15MININDAY = 4*16 # for compatability with transitscore in XLS
 
-	parent_path = processedpath
+	parent_path = cwd.parent / processedpath
 	pathin = parent_path
 	pathout = parent_path
 
@@ -75,20 +78,20 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 	#
 
 	# >>> load city boarders 
-	with open(parent_path+cityfilein) as cf:
+	with open(parent_path / cityfilein) as cf:
 		city_geo = json.load(cf)
 	print('loaded city geo, feature count: ', len(city_geo['features']))
 	#print city_geo
 
 	# >>> load town boarders 
-	with open(parent_path+townfilein) as tf:
+	with open(parent_path / townfilein) as tf:
 		town_geo = json.load(tf)
 	print('loaded town geo, feature count: ', len(town_geo['features']))
 	#print town_geo
 
 	# >>> load muniinfo file
 	muniinfodict = {}
-	with open(parent_path+muniinfofilein, newline='', encoding="utf8") as muniinfo_f:
+	with open(parent_path / muniinfofilein, newline='', encoding="utf8") as muniinfo_f:
 		readermuniinfo = csv.reader(muniinfo_f)
 		headermuniinfo = next(readermuniinfo) # muni_code,pop,built-area
 		print(headermuniinfo)
@@ -103,7 +106,7 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 
 	# >>> load munitransit file
 	munitransitdict = {}
-	with open(parent_path+munitransitfilein, newline='', encoding="utf8") as munitransit_f:
+	with open(parent_path / munitransitfilein, newline='', encoding="utf8") as munitransit_f:
 		readermunitransit = csv.reader(munitransit_f)
 		headermunitransit = next(readermunitransit) # municode,muni_name,muniopd,stopsinmuni
 		print(headermunitransit)
@@ -119,7 +122,7 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 
 	# >>> load muninames file
 	muninameseng2hebdict = {}
-	with open(parent_path+muninamesfilein, newline='', encoding="utf8") as muninames_f:
+	with open(parent_path / muninamesfilein, newline='', encoding="utf8") as muninames_f:
 		readermuninames = csv.reader(muninames_f)
 		headermuninames = next(readermuninames) # muni_id,muni_name_h,muni_name_e
 		print(headermuninames)
@@ -146,8 +149,8 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 		feature['properties']['muni_name_h'] = muninameseng2hebdict[muni_name_e]
 	
 	geojson_file_name = cityfileout1
-	print(("Saving file: " + pathout+geojson_file_name + " ..."))
-	nf = open(pathout+geojson_file_name, "w", encoding="utf8")
+	print(("Saving file: ", pathout / geojson_file_name ,  " ..."))
+	nf = open(pathout / geojson_file_name, "w", encoding="utf8")
 	#json.dump(city_geo, nf, indent=4)
 	jsonstr = json.dumps(city_geo, separators=(',',':')) # smaller file for download
 	outstr = jsonstr.replace('}},', '}},\n')
@@ -157,8 +160,8 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 	print(("Saved file: " + geojson_file_name))
 
 	geojson_file_name = townfileout1
-	print(("Saving file: " + pathout+geojson_file_name + " ..."))
-	nf = open(pathout+geojson_file_name, "w", encoding="utf8")
+	print(("Saving file: ", pathout / geojson_file_name ,  " ..."))
+	nf = open(pathout / geojson_file_name, "w", encoding="utf8")
 	#json.dump(town_geo, nf, indent=4)
 	jsonstr = json.dumps(town_geo, separators=(',',':')) # smaller file for download
 	outstr = jsonstr.replace('}},', '}},\n')
@@ -279,8 +282,8 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 	print ("Generating GeoJSON export.")
 
 	geojson_file_name = cityfileout
-	print(("Saving file: " + pathout+geojson_file_name + " ..."))
-	nf = open(pathout+geojson_file_name, "w", encoding="utf8")
+	print(("Saving file: ", pathout / geojson_file_name ,  " ..."))
+	nf = open(pathout / geojson_file_name, "w", encoding="utf8")
 	#json.dump(city_geo, nf, indent=4)
 	jsonstr = json.dumps(city_geo, separators=(',',':')) # smaller file for download
 	outstr = jsonstr.replace('}},', '}},\n')
@@ -290,8 +293,8 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 	print(("Saved file: " + geojson_file_name))
 
 	geojson_file_name = townfileout
-	print(("Saving file: " + pathout+geojson_file_name + " ..."))
-	nf = open(pathout+geojson_file_name, "w", encoding="utf8")
+	print(("Saving file: ", pathout / geojson_file_name ,  " ..."))
+	nf = open(pathout / geojson_file_name, "w", encoding="utf8")
 	#json.dump(town_geo, nf, indent=4)
 	jsonstr = json.dumps(town_geo, separators=(',',':')) # smaller file for download
 	outstr = jsonstr.replace('}},', '}},\n')
@@ -322,18 +325,18 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 
 	# save chart xy files
 	xy_file_name1 = transitscorefileout
-	print(("Saving file: " + pathout+xy_file_name1 + " ..."))
-	nf1 = open(pathout+xy_file_name1, "w", encoding="utf8")
+	print(("Saving file: ", pathout / xy_file_name1 ,  " ..."))
+	nf1 = open(pathout / xy_file_name1, "w", encoding="utf8")
 	outstr1 = 'var chartxy = {\n'
 
 	xy_file_name2 = fairsharescorefileout
-	print(("Saving file: " + pathout+xy_file_name2 + " ..."))
-	nf2 = open(pathout+xy_file_name2, "w", encoding="utf8")
+	print(("Saving file: ", pathout / xy_file_name2 ,  " ..."))
+	nf2 = open(pathout / xy_file_name2, "w", encoding="utf8")
 	outstr2 = 'var chartxy = {\n'
 
 	xy_file_name3 = builtdensityscorefileout
-	print(("Saving file: " + pathout+xy_file_name3 + " ..."))
-	nf3 = open(pathout+xy_file_name3, "w", encoding="utf8")
+	print(("Saving file: ", pathout / xy_file_name3 ,  " ..."))
+	nf3 = open(pathout / xy_file_name3, "w", encoding="utf8")
 	outstr3 = 'var chartxy = {\n'
 
 	'''

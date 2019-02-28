@@ -7,6 +7,9 @@ import transitanalystisrael_config as cfg
 import shutil
 import os
 import boto3
+from pathlib import Path
+
+cwd = Path.cwd()
 
 def delete_all_objects(bucket_name):
 	print('--------delete_all_objects------------')
@@ -57,7 +60,7 @@ def upload_localdir_to_bucket(localdir_from, bucket_to_name):
 		for file in files:
 			full_path = os.path.join(subdir, file)
 			with open(full_path, 'rb') as data:
-				bucket2.put_object(Key=full_path[len(localdir_from)+1:].replace('\\','/'), Body=data)
+				bucket2.put_object(Key=full_path[len(str(localdir_from))+1:].replace('\\','/'), Body=data)
 				print(full_path)
 
 def upload_localdir_w_gzip_to_bucket(localdir_from, bucket_to_name):
@@ -75,39 +78,39 @@ def upload_localdir_w_gzip_to_bucket(localdir_from, bucket_to_name):
 				print('skipped : ',full_path)
 			elif file.endswith(".gz"): # upload gzip file but remove .gz from the filename and add Metadata
 				with open(full_path, 'rb') as data:
-					bucket2.put_object(Key=full_path[len(localdir_from)+1:].replace('\\','/')[:-3], Body=data, ContentEncoding='gzip', ContentType='text/javascript')
+					bucket2.put_object(Key=full_path[len(str(localdir_from))+1:].replace('\\','/')[:-3], Body=data, ContentEncoding='gzip', ContentType='text/javascript')
 					print('removed .gz from end : ',full_path)
 			elif file.endswith(".js"): #upload small js file with metadata
 				with open(full_path, 'rb') as data:
-					bucket2.put_object(Key=full_path[len(localdir_from)+1:].replace('\\','/'), Body=data, ContentType='application/javascript')
+					bucket2.put_object(Key=full_path[len(str(localdir_from))+1:].replace('\\','/'), Body=data, ContentType='application/javascript')
 					print('small js file : ',full_path)
 			elif file.endswith(".html"): #upload with html metadata
 				with open(full_path, 'rb') as data:
-					bucket2.put_object(Key=full_path[len(localdir_from)+1:].replace('\\','/'), Body=data, ContentType='text/html')
+					bucket2.put_object(Key=full_path[len(str(localdir_from))+1:].replace('\\','/'), Body=data, ContentType='text/html')
 					print('html file : ',full_path)
 			elif file.endswith(".png") : #upload with image metadata
 				with open(full_path, 'rb') as data:
-					bucket2.put_object(Key=full_path[len(localdir_from)+1:].replace('\\','/'), Body=data, ContentType='image/png')
+					bucket2.put_object(Key=full_path[len(str(localdir_from))+1:].replace('\\','/'), Body=data, ContentType='image/png')
 					print('image/png file : ',full_path)
 			elif (file.endswith(".jpg") or file.endswith(".JPG")) : #upload with image metadata
 				with open(full_path, 'rb') as data:
-					bucket2.put_object(Key=full_path[len(localdir_from)+1:].replace('\\','/'), Body=data, ContentType='image/jpeg')
+					bucket2.put_object(Key=full_path[len(str(localdir_from))+1:].replace('\\','/'), Body=data, ContentType='image/jpeg')
 					print('image/jpg file : ',full_path)
 			elif file.endswith(".css") : #upload with image metadata
 				with open(full_path, 'rb') as data:
-					bucket2.put_object(Key=full_path[len(localdir_from)+1:].replace('\\','/'), Body=data, ContentType='text/css')
+					bucket2.put_object(Key=full_path[len(str(localdir_from))+1:].replace('\\','/'), Body=data, ContentType='text/css')
 					print('css file : ',full_path)
 			else : #upload with no special treatment
 				with open(full_path, 'rb') as data:
-					bucket2.put_object(Key=full_path[len(localdir_from)+1:].replace('\\','/'), Body=data)
+					bucket2.put_object(Key=full_path[len(str(localdir_from))+1:].replace('\\','/'), Body=data)
 					print(full_path)
 
 #-------------------------------------------------------------------------
 
 if cfg.get_service_date == 'auto' : 
 	print('********** upload to AWS S3 cloud *************')
-	current_localdir = cfg.websitelocalcurrentpath[:-1]
-	temp_localdir = cfg.temppath
+	current_localdir = cwd.parent / cfg.websitelocalcurrentpath
+	temp_localdir = cwd.parent / cfg.temppath
 	print('current_localdir : ',current_localdir)
 
 	os.chdir(current_localdir)
@@ -179,17 +182,17 @@ if cfg.get_service_date == 'auto' :
 	#
 	# download js config file to temp dir, edit file, then upload
 	#download
-	s3.Bucket('transitanalystisrael-past').download_file('docs/transitanalystisrael_config.js', temp_localdir+'transitanalystisrael_config.js')
+	s3.Bucket('transitanalystisrael-past').download_file('docs/transitanalystisrael_config.js', temp_localdir / 'transitanalystisrael_config.js')
 	#edit
 	jsfile = 'transitanalystisrael_config.js'
 	tempjsfile = 'temp_config.js'
 	in_dir = temp_localdir
 	out_dir = temp_localdir
 	maxfilelinecount = 2000
-	print('input from ', in_dir+jsfile)
-	print('output to ', out_dir+tempjsfile)
-	filein = open(in_dir+jsfile, 'r', encoding="utf8")
-	fileout = open(out_dir+tempjsfile, 'w', encoding="utf8")
+	print('input from ', in_dir / jsfile)
+	print('output to ', out_dir / tempjsfile)
+	filein = open(in_dir / jsfile, 'r', encoding="utf8")
+	fileout = open(out_dir / tempjsfile, 'w', encoding="utf8")
 	count = 0
 	sline = filein.readline()
 	while ((count < maxfilelinecount) and (sline != '')):
@@ -206,20 +209,20 @@ if cfg.get_service_date == 'auto' :
 	print(' infile line count ',count)
 	filein.close()
 	fileout.close()
-	print('closed ', in_dir+jsfile)
-	print('closed ', out_dir+tempjsfile)
-	shutil.copyfile(out_dir+tempjsfile,out_dir+jsfile)
-	os.remove(out_dir+tempjsfile)
+	print('closed ', in_dir / jsfile)
+	print('closed ', out_dir / tempjsfile)
+	shutil.copyfile(out_dir / tempjsfile,out_dir / jsfile)
+	os.remove(out_dir / tempjsfile)
 	#upload
-	with open(out_dir+jsfile, 'rb') as data:
+	with open(out_dir / jsfile, 'rb') as data:
 		s3.Bucket('transitanalystisrael-past').put_object(Key='docs/transitanalystisrael_config.js', Body=data, ContentType='application/javascript')
-		print('uploaded : ', out_dir+jsfile)
+		print('uploaded : ', out_dir / jsfile)
 #---------------------------------------------------------------------------------------
 else : # cfg.get_service_date == 'on_demand'
-	on_demand_dir = cfg.websitelocalondemandpath.replace('yyyymmdd', cfg.gtfsdate)
+	on_demand_dir = cwd.parent / cfg.websitelocalondemandpath.replace('yyyymmdd', cfg.gtfsdate)
 	print('********** upload to AWS S3 cloud *************')
 	on_demand_localdir = on_demand_dir
-	temp_localdir = cfg.temppath
+	temp_localdir = cwd.parent / cfg.temppath
 	print('on_demand_localdir : ',on_demand_localdir)
 
 	os.chdir(on_demand_localdir)
