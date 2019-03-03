@@ -174,7 +174,7 @@ def gtfs_osm_download():
     :return:
     """
     try:
-        # get_gtfs_file_from_url_ftp(cfg.gtfs_url, cfg.gtfs_file_name_on_mot_server, _log)
+        get_gtfs_file_from_url_ftp(cfg.gtfs_url, cfg.gtfs_file_name_on_mot_server, _log)
         gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate + ".zip"
         unzip_gtfs(gtfs_zip_file_name, cfg.gtfspath, _log)
         remove_bom_characters_from_unzipped_files(os.path.join(cfg.gtfspath, cfg.gtfsdirbase+cfg.gtfsdate))
