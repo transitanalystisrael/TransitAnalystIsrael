@@ -14,7 +14,7 @@ print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
 #
 
-#muni_tpd_at_stops_w_10x5x3x_for_rail_lrt_brt.main(cfg.gtfsdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath, cfg.serviceweekstartdate)
+muni_tpd_at_stops_w_10x5x3x_for_rail_lrt_brt.main(cfg.gtfsdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath, cfg.serviceweekstartdate)
 muni_opd_from_stops_tpd.main(cfg.gtfsdate, cfg.processedpath, cfg.serviceweekstartdate)
 muni_transitscore_from_opd_v2.main(cfg.gtfsdate, cfg.processedpath, cfg.serviceweekstartdate, cfg.language)
 
