@@ -51,13 +51,11 @@ ttm_server_on = 'local_pc'
 
 
 # common config
-gtfsdate = '20190226'
-serviceweekstartdate = '20190226'
+gtfsdate = '20190302'
+serviceweekstartdate = '20190302'
 gtfsdirbase = 'israel'
 gtfs_url = 'gtfs.mot.gov.il'
-#on OTM (TransitFeeds) the following can be left blank, e.g. ''
 gtfs_file_name_on_mot_server = 'israel-public-transportation.zip' 
-#gtfs_zip_file_name=gtfsdirbase+gtfsdate+".zip"
 gtfspath = 'gtfs'
 osm_url='https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf'
 osm_file_name = "israel-and-palestine-latest.osm.pbf"
@@ -105,7 +103,7 @@ current_or_past = 'current'
 default_coverage_name = 'default'
 secondary_custom_coverage_name = 'secondary-cov'
 # navitia_docker_compose_file_path = '/home/ec2-user/navitia-docker-compose/'
-navitia_docker_compose_file_path = 'assets' 
+navitia_docker_compose_file_path="C:\git\TTM_Navitia\navitia-docker-compose"
 navitia_docker_compose_file_name = 'docker-israel-custom-instances.yml'
 # transit_time_map url config - local or AWS API Getway for Transit Analyst production
 # local address should be: "http://localhost:9191"
