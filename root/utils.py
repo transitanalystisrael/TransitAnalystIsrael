@@ -10,11 +10,9 @@ import tarfile
 import re
 from io import BytesIO
 import generate_transfers_table
-import send_email
-import logger
+from Logger import _log
 import transitanalystisrael_config as cfg
 
-_log = logger.get_logger("navitia_data_process_")
 
 
 def get_config_params():
@@ -104,7 +102,7 @@ def get_navitia_url_for_cov_status(cov_name):
     :param cov_name: the name of the coverage to return, e.g. "default" or "secondary-cov"
     :return: url of Navitia coverage status page
     """
-    return "http://localhost:9191/v1/coverage/" + cov_name + "/status/"
+    return "http://localhost:9191/v1/coverage/" + cov_name #+ "/status/"
 
 
 def check_coverage_running(url, coverage_name):
@@ -137,15 +135,15 @@ def get_coverage_start_production_date(coverage_name):
     response = requests.get(url)
     # Get the status of the coverage as Json
     json_data = json.loads(response.text)
-    if "status" not in json_data or "running" not in json_data["status"]["status"]:
+    if "running" not in json_data["regions"][0]['status']:
         _log.debug("%s coverage is down so the start of production date can't be established", coverage_name)
-        raise Exception
+        return ""
     else:
-        start_production_date = json_data["status"]["start_production_date"]
+        start_production_date = json_data["regions"][0]["start_production_date"]
         return start_production_date
 
 
-def validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name, default_cov_sop_date):
+def validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name, default_cov_sop_date, worker_con):
     """
     Validate that the secondary_custom_coverage has the original start of production date of the previous default
     coverage and that the default cov has a now different date (usually later one)
@@ -157,12 +155,13 @@ def validate_graph_changes_applied(default_coverage_name, secondary_custom_cover
 
     # Check that the current default coverage is up-to-date by comparing sop dates
     if get_coverage_start_production_date(default_coverage_name) == default_cov_sop_date:
-        _log.debug("The %s coverage seems not to be up-to-date following update attempts.\n Production date stayed the "
+        _log.error("The %s coverage seems not to be up-to-date following update attempts.\n Production date stayed the "
                    "same. ", default_coverage_name)
         raise Exception
     # Check that the current secondary coverage is up-to-date by comparing to the original default sop date
-    if not get_coverage_start_production_date(secondary_custom_coverage_name) == default_cov_sop_date:
-        _log.debug("The %s coverage seems not to be up-to-date following update attempts.\n Production date should be "
+    if is_cov_exists(worker_con, secondary_custom_coverage_name) \
+            and not get_coverage_start_production_date(secondary_custom_coverage_name) == default_cov_sop_date:
+        _log.error("The %s coverage seems not to be up-to-date following update attempts.\n Production date should be "
                    "the same as old %s coverage date", secondary_custom_coverage_name, default_coverage_name)
         raise Exception
     else:
@@ -270,7 +269,7 @@ def move_current_to_past(container, source_cov_name, dest_cov_name):
     return True
 
 def is_cov_exists(container, coverage_name):
-    _log.info("Checking if %s exists in /srv/ed/output of %s", coverage_name, container)
+    _log.info("Checking if %s exists in /srv/ed/output of %s", coverage_name, container.name)
     file_list_command = "/bin/sh -c \"ls\""
     exit_code, output = container.exec_run(cmd=file_list_command, stdout=True, workdir="/srv/ed/output/")
     return coverage_name in str(output)
@@ -491,23 +490,12 @@ def validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_cu
                 _log.info("%s image is removed", beat_image_id)
 
                 # re-run navitia docker-compose which re-downloads the tyr_beat container
-                _log.info("Restarting docker with defauly coverage and custom coverage: %s",
+                _log.info("Restarting docker with default coverage and custom coverage: %s",
                           secondary_custom_coverage_name)
                 start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
                                            navitia_docker_compose_file_name, True)
     else:
         _log.info("Validated tyr_beat is up and running")
-
-
-def send_log_to_email(subject, message):
-    """
-    Send an e-mail with user-defined subject and message. the e-mail is attached with logs of this script
-    :param subject:
-    :param message:
-    :return: Whether the e-mail was sent successfully
-    """
-    attached_file = logger.get_log_file_name()
-    return send_email.create_msg_and_send_email(subject, message, attached_file)
 
 
 def is_aws_machine():
@@ -523,6 +511,22 @@ def is_aws_machine():
             return False
     except requests.exceptions.ConnectionError:
         return False
+
+
+if is_aws_machine():
+    import send_email
+
+
+def send_log_to_email(subject, message):
+    """
+    Send an e-mail with user-defined subject and message. the e-mail is attached with logs of this script
+    :param subject:
+    :param message:
+    :return: Whether the e-mail was sent successfully
+    """
+    attached_file = _log.get_log_file_name()
+    return send_email.create_msg_and_send_email(subject, message, attached_file)
+
 
 
 def createProgressBar(file_size, action='Downloading: '):
@@ -558,11 +562,4 @@ def get_gtfs_list_from_omd():
     r = requests.get(url, stream=True)
     response = r.json()
     print(response.status)
-
-
-def get_logger():
-    """
-    Get a logger that outputs info and error messages to the console and a log file
-    """
-    return _log
 

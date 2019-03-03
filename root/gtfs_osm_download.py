@@ -9,8 +9,7 @@ from dateutil import parser
 import progressbar
 import ftplib
 import requests
-import zipfile
-import logger
+from Logger import _log
 import os
 from pathlib import Path
 import shutil
@@ -59,7 +58,7 @@ def get_gtfs_file_from_url_ftp(url, file_name_on_server, _log):
         file_lines = []
         size = 0
 
-        local_file_name = "israel"
+        local_file_name = cfg.gtfsdirbase
         ftp.dir("", file_lines.append)
         for line in file_lines:
             tokens = line.split(maxsplit=4)
@@ -163,20 +162,19 @@ def remove_bom_characters_from_unzipped_files(gtfspath):
 
 
 # Download GTFS & OSM
-def gtfs_osm_download(_log):
+def gtfs_osm_download():
     """
     Downloads osm and gtfs files from the web. Also unzipps GTFS into cfg.gtfs_osm_download
     :param _log:
     :return:
     """
     get_gtfs_file_from_url_ftp(cfg.gtfs_url, cfg.gtfs_file_name_on_mot_server, _log)
-    unzip_gtfs(cfg.gtfs_zip_file_name, cfg.gtfspath, _log)
+    gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate + ".zip"
+    unzip_gtfs(gtfs_zip_file_name, cfg.gtfspath, _log)
     remove_bom_characters_from_unzipped_files(os.path.join(cfg.gtfspath, cfg.gtfsdirbase+cfg.gtfsdate))
     get_file_from_url_http(cfg.osm_url, cfg.osm_file_name, cfg.osmpath,  _log)
 
 
-
-_log = logger.get_logger("osm_gtfs_download")
-gtfs_osm_download(_log)
+gtfs_osm_download()
 
 

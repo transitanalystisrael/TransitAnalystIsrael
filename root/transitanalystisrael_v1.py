@@ -1,12 +1,9 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
-import transitanalystisrael_config as cfg
-import logger
 
-# get a log file
-_log = logger.get_logger("transit_analyst_")
-'''
+import transitanalystisrael_config as cfg
+from Logger import _log
+
 if cfg.get_service_date == 'auto' :
 	# get gtfs files and osm file
 	_log.info("Download OSM & GTFS")
@@ -45,7 +42,7 @@ import tpd_near_trainstops_per_line
 # convert the py file to js to use in index.html js code
 _log.info("Convert py config file to js config file")
 import config_py2js
-'''
+
 # copy files from processed dir with date in name to local website dir for testing. rename files to remove date from filenames
 _log.info("Copy processed files to website")
 import copyprocessed2website
@@ -54,12 +51,13 @@ import copyprocessed2website
 _log.info("Gzip big files")
 import gzip_big_files
 
-if cfg.web_client_hosted_on == 'aws_s3' :
+# if cfg.web_client_hosted_on == 'aws_s3' :
 	# upload files to cloud website dir from local website dir
 	# _log.info("Upload website to AWS S3")
-	import upload2aws_s3
+	# import upload2aws_s3
 
 if cfg.ttm_graph_processing != 'none' :
 	#process TTM files
 	_log.info("Update Navitia Time Map server")
 	import navitia_update
+	navitia_update.main(_log)

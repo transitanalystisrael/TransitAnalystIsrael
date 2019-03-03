@@ -3,14 +3,20 @@ Instructions for starting local version of Israel Transit Analyst with running T
 
 1. Run Docker for Windows
 
-2. Go to the folder where you have the TransitAnalyst Israel to the assets sub folder, e.g. ..\TransitAnalystIsrael\root\assets
+2. Go to the folder where you clonde the Navitia-docker-compose repo e.g. \Dev\Navitia-docker-compose
 
 3. run "Git Bash" and type: 
 $ docker-compose up
 	
-4.Config file: 
-===============
-Remeber that GTFS is uploaded to MOT servers at 10pm, so gtfsdate date should be as in the MOT site ftp://gtfs.mot.gov.il
+4.Config file - transitanalystisrael_config: 
+============================================
+a. Remeber that GTFS is uploaded to MOT servers at 10pm, so gtfsdate date should be as in the MOT site ftp://gtfs.mot.gov.il
+
+If using transit time map:
+--------------------------
+b. Set in the config file navitia_docker_compose_file_path where you downlaoded navitia-docker-compose folder, e.g.: "..\Dev\\Nativia\\navitia-docker-
+compose"
+c. Set time_map_server_url to "http://localhost:9191/"
 
 5. Run transitanalystisrael_v1.py with python3
 
