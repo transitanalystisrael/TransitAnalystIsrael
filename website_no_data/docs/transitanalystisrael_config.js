@@ -57,7 +57,7 @@ var cfg_gtfsdirbase = 'israel' ;
 var cfg_gtfs_url='gtfs.mot.gov.il' ;
 // #on OTM (TransitFeeds) this can be left blank, e.g. ''
 var cfg_gtfs_file_name_on_mot_server='israel-public-transportation.zip'  ;
-var cfg_gtfs_zip_file_name=gtfsdirbase+gtfsdate+".zip" ;
+
 var cfg_gtfspath = '..\\gtfs\\' ;
 var cfg_osm_url='https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf' ;
 var cfg_osm_file_name = "israel-and-palestine-latest.osm.pbf" ;

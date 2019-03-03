@@ -32,6 +32,7 @@ import datetime
 import transitanalystisrael_config as cfg
 import os
 
+
 def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path, osm_file_path, osm_file_name,
                                          gtfs_file_path, gtfs_file_name,
                                          secondary_custom_coverage_name, navitia_docker_compose_file_name,
@@ -56,17 +57,17 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
                                                            navitia_docker_compose_file_name)
 
     # After 20 minutes - test that both osm and gtfs conversions are done
-    success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 20)
+    success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30)
 
     # If it didn't succeed, give it 20 more minutes
     if not success:
-        success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 25)
+        success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 60)
 
     if not success:
-        _log.error("After 45 minutes - tasks aren't completed - connect to server for manual inspection")
+        _log.error("After 90 minutes - tasks aren't completed - connect to server for manual inspection")
         raise Exception
 
-    # Re-start Navitia to make sure all changes are applied with default and custom coverages
+    # Re-start Navitia to make sure all changesgtfs_zip_file_name are applied with default and custom coverages
     utils.stop_all_containers(docker_client)
     is_up = utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
                                              navitia_docker_compose_file_name)
@@ -76,15 +77,16 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
         utils.delete_file_from_host(osm_file_name)
         utils.delete_file_from_host(gtfs_file_name)
 
+    #Get the current worker container
+    worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
     # Validate new data is accessible via default and the old data is accessible via secondary
     utils.validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name,
-                                         default_cov_eos_date)
+                                         default_cov_eos_date, worker_con)
 
 
-def main():
+def main(_log):
     # Get logger
     update_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
-    _log = utils.get_logger()
 
     # config variables to be moved to config-file downstrem
     default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_file_path, \
@@ -96,9 +98,10 @@ def main():
         # Get the worker container
         worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
         # Get the current start of production dates of default coverage for post-processing comparison
+        default_cov_eos_date = ""
         if utils.is_cov_exists(worker_con, default_coverage_name):
             default_cov_eos_date = utils.get_coverage_start_production_date(default_coverage_name)
-        else:
+        if default_cov_eos_date is "":
             # There is no default covereage yet, assiging old date
             default_cov_eos_date = 19700101
 
@@ -107,14 +110,15 @@ def main():
             utils.backup_past_coverage(worker_con, secondary_custom_coverage_name)
             utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
         # Generate the Transfers file required for Navitia and add to GTFS
-        utils.generate_gtfs_with_transfers(cfg.gtfs_zip_file_name, os.path.join(cfg.gtfspath))
+        gtfs_zip_file_name = cfg.gtfsdirbase+ cfg.gtfsdate+".zip"
+        utils.generate_gtfs_with_transfers(gtfs_zip_file_name, os.path.join(cfg.gtfspath))
 
         # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
         if utils.is_cov_exists(worker_con, default_coverage_name):
             utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
 
         process_new_data_to_current_coverage(docker_client, cfg.navitia_docker_compose_file_path,
-                                             cfg.osmpath, cfg.osm_file_name, cfg.gtfspath, cfg.gtfs_zip_file_name,
+                                             cfg.osmpath, cfg.osm_file_name, cfg.gtfspath, gtfs_zip_file_name,
                                              secondary_custom_coverage_name, navitia_docker_compose_file_name,
                                              default_coverage_name, default_cov_eos_date, _log)
 
@@ -133,6 +137,4 @@ def main():
         else:
             _log.exception("Done with errors - see Exception stacktrace")
 
-
-main()
 
