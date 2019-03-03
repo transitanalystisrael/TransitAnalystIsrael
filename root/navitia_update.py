@@ -32,7 +32,7 @@ import datetime
 import transitanalystisrael_config as cfg
 import os
 from pathlib import Path
-
+from Logger import _log
 
 def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path, osm_file_path, osm_file_name,
                                          gtfs_file_path, gtfs_file_name,
@@ -85,58 +85,58 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
                                          default_cov_eos_date, worker_con)
 
 
-def main(_log):
-    # Get logger
-    update_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
 
-    # config variables to be moved to config-file downstrem
-    default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_file_path, \
-        navitia_docker_compose_file_name = utils.get_config_params()
+# Get logger
+update_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
 
-    try:
-        # Get the docker service client
-        docker_client = utils.get_docker_service_client()
-        # Get the worker container
-        worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
-        # Get the current start of production dates of default coverage for post-processing comparison
-        default_cov_eos_date = ""
-        if utils.is_cov_exists(worker_con, default_coverage_name):
-            default_cov_eos_date = utils.get_coverage_start_production_date(default_coverage_name)
-        if default_cov_eos_date is "":
-            # There is no default covereage yet, assiging old date
-            default_cov_eos_date = 19700101
+# config variables to be moved to config-file downstrem
+default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_file_path, \
+    navitia_docker_compose_file_name = utils.get_config_params()
 
-        # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
-        if utils.is_cov_exists(worker_con, secondary_custom_coverage_name):
-            utils.backup_past_coverage(worker_con, secondary_custom_coverage_name)
-            utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
-        # Generate the Transfers file required for Navitia and add to GTFS
-        gtfs_file_path = Path(os.getcwd()).parent / cfg.gtfspath
-        gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate+".zip"
-        utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path )
+try:
+    # Get the docker service client
+    docker_client = utils.get_docker_service_client()
+    # Get the worker container
+    worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
+    # Get the current start of production dates of default coverage for post-processing comparison
+    default_cov_eos_date = ""
+    if utils.is_cov_exists(worker_con, default_coverage_name):
+        default_cov_eos_date = utils.get_coverage_start_production_date(default_coverage_name)
+    if default_cov_eos_date is "":
+        # There is no default covereage yet, assiging old date
+        default_cov_eos_date = 19700101
 
-        # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
-        if utils.is_cov_exists(worker_con, default_coverage_name):
-            utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
+    # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
+    if utils.is_cov_exists(worker_con, secondary_custom_coverage_name):
+        utils.backup_past_coverage(worker_con, secondary_custom_coverage_name)
+        utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
+    # Generate the Transfers file required for Navitia and add to GTFS
+    gtfs_file_path = Path(os.getcwd()).parent / cfg.gtfspath
+    gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate+".zip"
+    utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path )
 
-        process_new_data_to_current_coverage(docker_client, cfg.navitia_docker_compose_file_path,
-                                             cfg.osmpath, cfg.osm_file_name, gtfs_file_path, gtfs_zip_file_name,
-                                             secondary_custom_coverage_name, navitia_docker_compose_file_name,
-                                             default_coverage_name, default_cov_eos_date, _log)
+    # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
+    if utils.is_cov_exists(worker_con, default_coverage_name):
+        utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
 
-        # Send e-mail everything is completed - only on automatic script on AWS
-        # On local Windows machine, there's no need.
-        if utils.is_aws_machine():
-            utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
-            _log.info("Done without errors - log was sent to email")
-        else:
-            _log.info("Done without errors - log is saved locally")
+    process_new_data_to_current_coverage(docker_client, cfg.navitia_docker_compose_file_path,
+                                         cfg.osmpath, cfg.osm_file_name, gtfs_file_path, gtfs_zip_file_name,
+                                         secondary_custom_coverage_name, navitia_docker_compose_file_name,
+                                         default_coverage_name, default_cov_eos_date, _log)
 
-    except Exception as e:
-        if utils.is_aws_machine():
-            _log.exception("Done with errors - see Exception stacktrace")
-            utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Failed - see logs")
-        else:
-            _log.exception("Done with errors - see Exception stacktrace")
+    # Send e-mail everything is completed - only on automatic script on AWS
+    # On local Windows machine, there's no need.
+    if utils.is_aws_machine():
+        utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
+        _log.info("Done without errors - log was sent to email")
+    else:
+        _log.info("Done without errors - log is saved locally")
+
+except Exception as e:
+    if utils.is_aws_machine():
+        _log.exception("Done with errors - see Exception stacktrace")
+        utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Failed - see logs")
+    else:
+        _log.exception("Done with errors - see Exception stacktrace")
 
 
