@@ -296,7 +296,7 @@ def backup_past_coverage(container, coverage_name):
     for chunk in bits:
         if chunk:
             file_write_update_progress_bar(chunk, local_graph_file, pbar, size_iterator)
-            size_iterator += 1
+            size_iterator += len(chunk)
     local_graph_file.close()
     pbar.finish()
     _log.info("Finished copying %s.nav.lz4 to %s on local host", coverage_name, os.getcwd())

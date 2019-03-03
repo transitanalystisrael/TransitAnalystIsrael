@@ -15,6 +15,8 @@ from pathlib import Path
 import shutil
 import codecs
 
+size_iterator = 0 # used for the progress bar for download. not the best practice, but quick and dirty becaue of the ftp callback
+
 def get_file_from_url_http(url, file_name, file_path, _log):
     """
     Downloads a file to the working directory
@@ -36,8 +38,7 @@ def get_file_from_url_http(url, file_name, file_path, _log):
     size_iterator = 0
     for chunk in r.iter_content(chunk_size=1024):
         if chunk:
-            file_write_update_progress_bar(chunk, file, pbar, size_iterator)
-            size_iterator += 1
+            file_write_update_progress_bar(chunk, file, pbar)
     file.close()
     pbar.finish()
     _log.info("Finished loading latest OSM to: %s", local_file_path_and_name)
@@ -76,7 +77,8 @@ def get_gtfs_file_from_url_ftp(url, file_name_on_server, _log):
         pbar = createProgressBar(size)
 
         # Download
-        ftp.retrbinary("RETR " + file_name_on_server, lambda data: file_write_update_progress_bar(data, local_file, pbar, len(data)))
+        size_iterator = 0
+        ftp.retrbinary("RETR " + file_name_on_server, lambda data, : file_write_update_progress_bar(data, local_file, pbar))
 
         # Finish
         local_file.close()
@@ -115,13 +117,14 @@ def createProgressBar(file_size, action='Downloading: '):
     return pbar
 
 
-def file_write_update_progress_bar(data, dest_file, pbar, size_iterator):
+def file_write_update_progress_bar(data, dest_file, pbar):
     """
     Call back for writing fetched or processed data from FTP while updating the progress bar
     """
+    global size_iterator
+    size_iterator += len(data)
     dest_file.write(data)
     pbar.update(size_iterator)
-
 
 def unzip_gtfs(gtfs_zip_file_name, gtfspath, _log):
     """
@@ -171,7 +174,7 @@ def gtfs_osm_download():
     :return:
     """
     try:
-        get_gtfs_file_from_url_ftp(cfg.gtfs_url, cfg.gtfs_file_name_on_mot_server, _log)
+        # get_gtfs_file_from_url_ftp(cfg.gtfs_url, cfg.gtfs_file_name_on_mot_server, _log)
         gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate + ".zip"
         unzip_gtfs(gtfs_zip_file_name, cfg.gtfspath, _log)
         remove_bom_characters_from_unzipped_files(os.path.join(cfg.gtfspath, cfg.gtfsdirbase+cfg.gtfsdate))
