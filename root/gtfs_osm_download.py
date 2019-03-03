@@ -35,6 +35,7 @@ def get_file_from_url_http(url, file_name, file_path, _log):
     pbar = createProgressBar(size)
 
     # Fetching
+    global size_iterator
     size_iterator = 0
     for chunk in r.iter_content(chunk_size=1024):
         if chunk:
@@ -77,6 +78,7 @@ def get_gtfs_file_from_url_ftp(url, file_name_on_server, _log):
         pbar = createProgressBar(size)
 
         # Download
+        global size_iterator
         size_iterator = 0
         ftp.retrbinary("RETR " + file_name_on_server, lambda data, : file_write_update_progress_bar(data, local_file, pbar))
 
