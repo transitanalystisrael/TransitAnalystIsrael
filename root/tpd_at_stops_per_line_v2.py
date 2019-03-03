@@ -475,7 +475,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, processedpath, serviceweekstartd
 	for stop_id, [stop_desc, stop_lat, stop_lon, tripset, tpdlist, totaltripsatstop] in stops_dict.items():
 		maxtpdatstop = 0
 		maxdaytpdperline_dict = {}
-		averagetpdatstop = totaltripsatstop/daysofservicetocount
+		averagetpdatstop = round(totaltripsatstop/daysofservicetocount)
 		for [dayofservice, trips, tpdperline_dict] in tpdlist: # scan all service days per stop to find day with maxtpd and save tpdperline for that day
 			if trips >= maxtpdatstop :
 				maxtpdatstop = trips
