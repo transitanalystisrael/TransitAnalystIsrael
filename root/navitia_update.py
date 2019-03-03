@@ -31,6 +31,7 @@ import utils
 import datetime
 import transitanalystisrael_config as cfg
 import os
+from pathlib import Path
 
 
 def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path, osm_file_path, osm_file_name,
@@ -110,15 +111,16 @@ def main(_log):
             utils.backup_past_coverage(worker_con, secondary_custom_coverage_name)
             utils.delete_grpah_from_container(worker_con, secondary_custom_coverage_name)
         # Generate the Transfers file required for Navitia and add to GTFS
-        gtfs_zip_file_name = cfg.gtfsdirbase+ cfg.gtfsdate+".zip"
-        utils.generate_gtfs_with_transfers(gtfs_zip_file_name, os.path.join(cfg.gtfspath))
+        gtfs_file_path = Path(os.getcwd()).parent / cfg.gtfspath
+        gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate+".zip"
+        utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path )
 
         # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
         if utils.is_cov_exists(worker_con, default_coverage_name):
             utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
 
         process_new_data_to_current_coverage(docker_client, cfg.navitia_docker_compose_file_path,
-                                             cfg.osmpath, cfg.osm_file_name, cfg.gtfspath, gtfs_zip_file_name,
+                                             cfg.osmpath, cfg.osm_file_name, gtfs_file_path, gtfs_zip_file_name,
                                              secondary_custom_coverage_name, navitia_docker_compose_file_name,
                                              default_coverage_name, default_cov_eos_date, _log)
 
