@@ -53,7 +53,7 @@ Make sure you have the following python3(!) modules installed:
 ==============================================================
 logger
 docker
-progressbar
+progressbar2
 json
 requests
 zipfile
