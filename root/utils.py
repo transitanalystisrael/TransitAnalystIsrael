@@ -42,7 +42,7 @@ def copy_file_into_docker(container, dest_path, file_path, file_name):
     _log.info("Going to copy %s to %s at %s", file_name, container.name, dest_path)
 
     # Read the file
-    file = open(os.path.join(file_path, file_name), 'rb')
+    file = open(Path(os.getcwd()).parent / file_path / file_name, 'rb')
     file = file.read()
 
     try:
@@ -118,7 +118,7 @@ def check_coverage_running(url, coverage_name):
     # Get the status of the coverage as Json
     json_data = json.loads(response.text)
     if "status" not in json_data or "running" not in json_data["status"]["status"]:
-        _log.error("%s coverage is down", coverage_name)
+        _log.info("%s coverage is down", coverage_name)
         return False
     else:
         _log.info("%s coverage is up", coverage_name)
