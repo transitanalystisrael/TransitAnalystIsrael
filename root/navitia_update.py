@@ -113,7 +113,7 @@ try:
     # Generate the Transfers file required for Navitia and add to GTFS
     gtfs_file_path = Path(os.getcwd()).parent / cfg.gtfspath
     gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate+".zip"
-    utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path )
+    # utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path )
 
     # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
     if utils.is_cov_exists(worker_con, default_coverage_name):

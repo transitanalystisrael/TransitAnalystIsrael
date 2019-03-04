@@ -1,16 +1,11 @@
-Minimum Requirements:
-=====================
-- 16 GB of RAM *8 will be allocated for Docker)
-
 Install required Software:
 ==========================
-* Docker for Windows
-* GDAL for widnows: https://trac.osgeo.org/gdal/wiki/OSGeo4W
+* Docker for Windows / Linux
+* GDAL for widnows: https://trac.osgeo.org/gdal/wiki/OSGeo4W ### For AWS: https://gist.github.com/mojodna/2f596ca2fca48f08438e
 * Gzip
-* Python 3.7 (https://www.python.org/ftp/python/3.7.2/python-3.7.2.exe)
-* Pyathon 3 dependencies:
-python3 -m pip install logger docker progressbar2 json requests zipfile tarfile re argparse csv math httplib2 apiclient boto3 gdal
-
+* Python3 
+* remove email from local setup
+python3 -m pip install logger docker progressbar2 json requests zipfile tarfile re argparse csv math httplib2 oauth2client base64 mimetypes email apiclient boto3 gdal python3-devel
 Start Docker Server with 2 covereges:
 =====================================
 
