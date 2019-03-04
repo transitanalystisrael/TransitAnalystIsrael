@@ -23,7 +23,7 @@ def get_config_params():
     # Get parameters
     default_coverage_name = cfg.default_coverage_name
     secondary_custom_coverage_name = cfg.secondary_custom_coverage_name
-    navitia_docker_compose_file_path = Path(os.getcwd()).parent / "navitia-docker-compose"
+    navitia_docker_compose_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose"
     navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"
     return default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_file_path, \
            navitia_docker_compose_file_name
