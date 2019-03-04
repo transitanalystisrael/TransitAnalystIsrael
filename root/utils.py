@@ -12,7 +12,7 @@ from io import BytesIO
 import generate_transfers_table
 from Logger import _log
 import transitanalystisrael_config as cfg
-
+from pathlib import Path
 
 
 def get_config_params():
@@ -23,8 +23,8 @@ def get_config_params():
     # Get parameters
     default_coverage_name = cfg.default_coverage_name
     secondary_custom_coverage_name = cfg.secondary_custom_coverage_name
-    navitia_docker_compose_file_path = cfg.navitia_docker_compose_file_path
-    navitia_docker_compose_file_name = cfg.navitia_docker_compose_file_name
+    navitia_docker_compose_file_path = Path(os.getcwd()).parent / "navitia-docker-compose"
+    navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"
     return default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_file_path, \
            navitia_docker_compose_file_name
 
@@ -182,8 +182,7 @@ def start_navitia_with_default_coverage(navitia_docker_compose_file_path, extend
 
     # run the docker- compose and redirect logs to prevent from printing in the output
     navitia_docker_start_command = ["docker-compose", "up"]
-    compose_file_path = os.path.join(os.getcwd(), navitia_docker_compose_file_path)
-    subprocess.Popen(navitia_docker_start_command, shell=True, cwd=compose_file_path,
+    subprocess.Popen(navitia_docker_start_command, shell=True, cwd=navitia_docker_compose_file_path,
                     stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
     # Longer wait time is required because images are being re-downloaded

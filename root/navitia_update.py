@@ -119,7 +119,7 @@ try:
     if utils.is_cov_exists(worker_con, default_coverage_name):
         utils.move_current_to_past(worker_con, default_coverage_name, secondary_custom_coverage_name)
 
-    process_new_data_to_current_coverage(docker_client, cfg.navitia_docker_compose_file_path,
+    process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path,
                                          cfg.osmpath, cfg.osm_file_name, gtfs_file_path, gtfs_zip_file_name,
                                          secondary_custom_coverage_name, navitia_docker_compose_file_name,
                                          default_coverage_name, default_cov_eos_date, _log)

@@ -102,11 +102,8 @@ autoeditrefdate = '20181021'
 current_or_past = 'current'
 default_coverage_name = 'default'
 secondary_custom_coverage_name = 'secondary-cov'
-# navitia_docker_compose_file_path = '/home/ec2-user/navitia-docker-compose/'
-navitia_docker_compose_file_path="C:\git\TTM_Navitia\navitia-docker-compose"
-navitia_docker_compose_file_name = 'docker-israel-custom-instances.yml'
 # transit_time_map url config - local or AWS API Getway for Transit Analyst production
 # local address should be: "http://localhost:9191"
 # time_map_server_url = "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/"
-time_map_server_url = "http://localhost:9191/"
+time_map_server_url = "http://localhost:9191/v1/coverage/"
 

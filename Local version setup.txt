@@ -69,13 +69,31 @@ mimetypes
 email
 apiclient
 boto3
+gdal
 
-Config file: 
-============
-Remeber that GTFS is uploaded to MOT servers at 10pm, so gtfsdate date should be as in the MOT site ftp://gtfs.mot.gov.il
+GDAL installation on AWS Linux:
+===============================
+sudo yum -y update
+sudo yum-config-manager --enable epel
+sudo yum -y install make automake gcc gcc-c++ libcurl-devel proj-devel geos-devel
+cd /tmp
+curl -L http://download.osgeo.org/gdal/2.3.3/gdal-2.3.3.tar.gz | tar zxf -
+cd gdal-2.3.3/
+./configure --prefix=/usr/local --with-python
+sudo make -j4
+sudo make install
+---
+sudo make install
+sudo easy_install GDAL
+****sudo python3 -m easy_install GDAL
+*****
+export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+sudo ldconfig
+----
+cd /usr/local
+tar zcvf ~/gdal-gdal-2.3.3-amz1.tar.gz *
+make clean 
 
-
-Run transitanalystisrael_v1.py with python3
-
-
+Installing the python moduel for gdal requires installing python3 dev tools:
+sudo yum install python3-devel
 
