@@ -280,8 +280,8 @@ def backup_past_coverage(container, coverage_name):
     :param coverage_name: the coverage graph name to copy
     """
     # Create a local file for writing the incoming graph
-    _log.info("Going to copy %s.nav.lz4 to %s on local host", coverage_name, os.getcwd())
-    local_processed_folder = Path(os.getcwd()).parent.parent / "processed"
+    local_processed_folder = Path(os.getcwd()).parent / "processed"
+    _log.info("Going to copy %s.nav.lz4 to %s on local host", coverage_name, local_processed_folder)
     local_graph_file = open(os.path.join(local_processed_folder, coverage_name + '.nav.lz4'), 'wb')
 
     # Fetch the graph file
