@@ -13,6 +13,7 @@ import generate_transfers_table
 from Logger import _log
 import transitanalystisrael_config as cfg
 from pathlib import Path
+from datetime import datetime as dt
 
 
 def get_config_params():
@@ -25,8 +26,10 @@ def get_config_params():
     secondary_custom_coverage_name = cfg.secondary_custom_coverage_name
     navitia_docker_compose_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose"
     navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"
+    gtfs_file_path = Path(os.getcwd()).parent / cfg.gtfspath
+    gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate + ".zip"
     return default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_file_path, \
-           navitia_docker_compose_file_name
+           navitia_docker_compose_file_name, gtfs_file_path, gtfs_zip_file_name
 
 
 
@@ -389,32 +392,6 @@ def copy_osm_and_gtfs_to_default_cov(worker_con, osm_file_path, osm_file_name, g
     copy_file_into_docker(worker_con, 'srv/ed/input/default', osm_file_path, osm_file_name)
     copy_file_into_docker(worker_con, 'srv/ed/input/default', gtfs_file_path, gtfs_file_name)
 
-
-def clear_container_logs(con):
-    """
-    Clear the logs of a docker container running on the machine
-    If onWindows, we need to get a new minimal image that allows us to conenct to the docker vm and then delete the logs
-    :param con: the container with logs to be cleared
-    """
-    if is_aws_machine():
-        clear_log_command = "sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' " + con.name + ")"
-        subprocess.Popen(clear_log_command, shell=True)
-        _log.info("Cleared %s logs", con.name)
-    else:
-        _log.info("Going to create a minimal image for accessing the Dcoker VM and delete logs from there")
-        pull_img_cmd = "docker pull alpine"
-        subprocess.Popen(pull_img_cmd, shell=True)
-        _log.info("minimal image pulled")
-        connect_to_img = "docker run --net=host --ipc=host --uts=host --pid=host -it --security-opt=seccomp=unconfined " \
-                         "--privileged --rm -v /:/host alpine /bin/sh"
-        p = subprocess.Popen(connect_to_img, shell=True)
-        chg_permissions_cmd = "chroot /host"
-        p.communicate(chg_permissions_cmd)
-        delete_logs_cmd = "find /var/lib/docker/containers/ -type f -name '*.log' -delete"
-        p.communicate(delete_logs_cmd)
-        _log.info("Cleared %s logs", con.name)
-
-
 def validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, time_to_wait=20):
     """
     Validates that the following Navitia worker tasks were successfully completed:
@@ -456,44 +433,54 @@ def validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_cu
     # tyr_beat must be running as it manages the tasks for the worker, the latter generates the graph
     _log.info("Validating that tyr_beat is up and running")
     beat_con = docker_client.containers.list(filters={"name": "beat"})
+
+    time_beat_restarted=""
     if not beat_con:
         # restarting tyr_beat
         _log.info("tyr_beat is down, attempting to re-run")
         tyr_beat_start_command = "docker-compose up tyr_beat"
-
-        with open("tyr_beat_output.txt", "a+", encoding="UTF-8") as tyr_beat_output:
+        time_beat_restarted = dt.utcnow()
+        with open("tyr_beat_output.txt", "w", encoding="UTF-8") as tyr_beat_output:
             subprocess.Popen(tyr_beat_start_command, cwd=navitia_docker_compose_file_path,
                                                 shell=True, stdout=tyr_beat_output, stderr=tyr_beat_output)
         # Wait 30 seconds for it to come up
-        _log.info("Waiting 10 seconds to see if tyr_beat is up")
-        time.sleep(30)
+        _log.info("Waiting 15 seconds to see if tyr_beat is up")
+        time.sleep(15)
+        tyr_beat_output.close()
 
-        # Check that tyr_beat is working
+        # Check that tyr_beat is working using it's log and comparing the restart time with time in the log
+        new_time_is_found = False
         with open("tyr_beat_output.txt", "r", encoding="UTF-8") as tyr_beat_output:
-            if "Sending due task udpate-data-every-30-seconds" not in tyr_beat_output.read():
-                _log.info("tyr_beat is up and running")
-                tyr_beat_output.close()
-            # tyr_beat is malfunctioned, need to delete and re-download
-            else:
-                # stop all containers
-                _log.info("Stopping all containers")
-                stop_all_containers(docker_client)
+            lines = tyr_beat_output.readlines()
+            for line in reversed(lines):
+                if "Sending due task udpate-data-every-30-seconds" in line:
+                    time_of_line = re.findall(r'\d{1,4}-\d{1,2}-\d{1,2}\b \d{1,2}:\d{1,2}:\d{1,2}', line)
+                    time_of_line = dt.strptime(time_of_line[0], '%Y-%m-%d %H:%M:%S')
+                    if time_beat_restarted < time_of_line:
+                        _log.info("tyr_beat is up and running")
+                        new_time_is_found = True
+                        break
+        # tyr_beat is malfunctioned, need to delete and re-download
+        if not new_time_is_found:
+            # stop all containers
+            _log.info("Stopping and removing all containers to pull fresh copy of tyr_beat container")
+            stop_all_containers(docker_client)
 
-                # delete container and image
-                beat_con = docker_client.containers.list(all=True, filters={"name": "beat"})[0]
-                beat_image = docker_client.images.list(name="navitia/tyr-beat")[0]
-                beat_con_name = beat_con.name
-                beat_image_id = beat_image.id
-                beat_con.remove()
-                _log.info("%s container is removed", beat_con_name)
-                docker_client.images.remove(beat_image.id)
-                _log.info("%s image is removed", beat_image_id)
+            # delete container and image
+            beat_con = docker_client.containers.list(all=True, filters={"name": "beat"})[0]
+            beat_image = docker_client.images.list(name="navitia/tyr-beat")[0]
+            beat_con_name = beat_con.name
+            beat_image_id = beat_image.id
+            beat_con.remove()
+            _log.info("%s container is removed", beat_con_name)
+            docker_client.images.remove(beat_image.id)
+            _log.info("%s image is removed", beat_image_id)
 
-                # re-run navitia docker-compose which re-downloads the tyr_beat container
-                _log.info("Restarting docker with default coverage and custom coverage: %s",
-                          secondary_custom_coverage_name)
-                start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
-                                           navitia_docker_compose_file_name, True)
+            # re-run navitia docker-compose which re-downloads the tyr_beat container
+            _log.info("Restarting docker with default coverage and custom coverage: %s",
+                      secondary_custom_coverage_name)
+            start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
+                                       navitia_docker_compose_file_name, True)
         # removing the log file
         os.remove("tyr_beat_output.txt")
 
