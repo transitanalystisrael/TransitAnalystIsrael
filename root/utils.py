@@ -281,7 +281,8 @@ def backup_past_coverage(container, coverage_name):
     """
     # Create a local file for writing the incoming graph
     _log.info("Going to copy %s.nav.lz4 to %s on local host", coverage_name, os.getcwd())
-    local_graph_file = open(os.path.join(os.getcwd(), coverage_name + '.nav.lz4'), 'wb')
+    local_processed_folder = Path(os.getcwd()).parent.parent / "processed"
+    local_graph_file = open(os.path.join(local_processed_folder, coverage_name + '.nav.lz4'), 'wb')
 
     # Fetch the graph file
     bits, stat = container.get_archive('/srv/ed/output/' + coverage_name + '.nav.lz4')
@@ -493,6 +494,9 @@ def validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_cu
                           secondary_custom_coverage_name)
                 start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
                                            navitia_docker_compose_file_name, True)
+        # removing the log file
+        os.remove("tyr_beat_output.txt")
+
     else:
         _log.info("Validated tyr_beat is up and running")
 

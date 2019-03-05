@@ -1,3 +1,8 @@
+Minimum Requirements:
+=====================
+- 16 GB of RAM *8 will be allocated for Docker)
+- 30 GB of storage
+
 Install required Software:
 ==========================
 * Docker for Windows / Linux
@@ -67,8 +72,8 @@ oauth2client
 base64
 mimetypes
 email
-apiclient
 boto3
+apiclient
 gdal
 
 GDAL installation on AWS Linux:
@@ -92,6 +97,74 @@ sudo easy_install GDAL
 export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
 sudo ldconfig
 ----
+
+****sudo python3 -m easy_install GDAL -d /usr/lib64/python3.7/site-packages NOT WORKINF
+*****
+cd /tmp/gdal-2.4.0/swig/python
+sudo python3 setup.py install --user
+sudo mv o* /usr/lib64/python3.7/site-packages
+--sudo mv g* /usr/lib64/python3.7/site-packages
+trying to use make install
+
+*****cd /usr/local
+****tar zcvf ~/gdal-gdal-2.4.0-amz1.tar.gz *
+***--sudo make clean  SEEMS LIEK BREAKS
+
+Installing the python moduel for gdal requires installing python3 dev tools:
+sudo yum install python3-devel
+
+===
+last attempt:
+
+sudo yum-config-manager --enable epel
+sudo yum install gdal-python
+sudo yum -y update
+sudo yum -y install make automake gcc gcc-c++ libcurl-devel proj-devel geos-devel
+cd /tmp
+curl -L http://download.osgeo.org/gdal/2.0.0/gdal-2.0.0.tar.gz | tar zxf -
+cd gdal-2.0.0/
+./configure --prefix=/usr/local --with-python
+make -j4
+sudo make install
+sudo python3 -m easy_install GDAL --sudo easy_install GDAL
+export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+sudo ldconfig
+
+
+
+GDAL installation on AWS Linux:
+===============================
+Anacoonda:
+wget https://repo.anaconda.com/archive/Anaconda3-2018.12-Linux-x86_64.sh
+conda install gdal
+
+
+
+THE BWLOW DONT WORK!!!
+sudo yum -y update
+sudo yum install python3-devel
+sudo yum-config-manager --enable epel
+sudo yum -y install make automake gcc gcc-c++ libcurl-devel proj-devel geos-devel
+cd /tmp
+curl -L http://download.osgeo.org/gdal/2.3.3/gdal-2.3.3.tar.gz | tar zxf -
+--curl -L http://download.osgeo.org/gdal/2.4.0/gdal-2.4.0.tar.gz | tar zxf -
+cd gdal-2.3.3/
+--cd gdal-2.4.0/
+./configure --prefix=/usr/local --with-python
+sudo make -j4
+sudo make install
+---
+sudo make install
+sudo easy_install GDAL
+
+****sudo python3 -m easy_install GDAL -d /usr/lib64/python3.7/site-packages NOT WORKINF
+sudo python3 -m easy_install GDAL -d /usr/lib/python3.7/site-packages
+*****
+****sudo python3 setup.py install --user
+
+export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+sudo ldconfig
+----
 cd /usr/local
 tar zcvf ~/gdal-gdal-2.3.3-amz1.tar.gz *
 make clean 
@@ -99,3 +172,6 @@ make clean
 Installing the python moduel for gdal requires installing python3 dev tools:
 sudo yum install python3-devel
 
+
+
+====
