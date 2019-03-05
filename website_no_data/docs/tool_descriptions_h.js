@@ -20,7 +20,7 @@ var descHtool10 = '<b>מפת ניידות</b><br>הצגה של האזורים ה
 
 var startD = new Date(cfg_gtfsdate.slice(0,4), cfg_gtfsdate.slice(4,6)-1, cfg_gtfsdate.slice(6)); // js months are 0-11
 var endD = new Date();
-endD.setDate(startD.getDate() + 6);
+endD.setTime(startD.getTime() + 6*24*60*60*1000);
 var servicePeriodH = '<br><br>תקופת השירות שנותחה'+' : '+startD.toDateString()+' - '+endD.toDateString();
 
 var logos = '<br><br><img src="../docs/images/MIU_logo.jpg" alt="MIU logo" height="60px"><img src="../docs/images/YEE_logo.jpg" alt="YEE logo" height="60px">';
