@@ -9,7 +9,7 @@ Install required Software:
 * GDAL for widnows: https://trac.osgeo.org/gdal/wiki/OSGeo4W ### For AWS: https://gist.github.com/mojodna/2f596ca2fca48f08438e
 * Gzip
 * Python3 
-* remove email from local setup
+
 python3 -m pip install logger docker progressbar2 json requests zipfile tarfile re argparse csv math httplib2 oauth2client base64 mimetypes email apiclient boto3 gdal python3-devel
 Start Docker Server with 2 covereges:
 =====================================
@@ -56,122 +56,43 @@ Dokcer Server is ready!
 
 Make sure you have the following python3(!) modules installed:
 ==============================================================
-logger
-docker
-progressbar2
-json
-requests
-zipfile
-tarfile
-re
-argparse
-csv
-math
-httplib2
-oauth2client
-base64
-mimetypes
-email
-boto3
-apiclient
-gdal
 
-GDAL installation on AWS Linux:
-===============================
-sudo yum -y update
-sudo yum-config-manager --enable epel
-sudo yum -y install make automake gcc gcc-c++ libcurl-devel proj-devel geos-devel
-cd /tmp
-curl -L http://download.osgeo.org/gdal/2.3.3/gdal-2.3.3.tar.gz | tar zxf -
---curl -L http://download.osgeo.org/gdal/2.4.0/gdal-2.4.0.tar.gz | tar zxf -
-cd gdal-2.3.3/
---cd gdal-2.4.0/
-./configure --prefix=/usr/local --with-python
-sudo make -j4
-sudo make install
----
-sudo make install
-sudo easy_install GDAL
-****sudo python3 -m easy_install GDAL
-*****
-export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
-sudo ldconfig
-----
+UBUNTU
+=======
+docker installation:
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04 - complete both steps until and including:
+su - ${USER} 
 
-****sudo python3 -m easy_install GDAL -d /usr/lib64/python3.7/site-packages NOT WORKINF
-*****
-cd /tmp/gdal-2.4.0/swig/python
-sudo python3 setup.py install --user
-sudo mv o* /usr/lib64/python3.7/site-packages
---sudo mv g* /usr/lib64/python3.7/site-packages
-trying to use make install
+docker compose for linux: https://docs.docker.com/compose/install/ (go to linux tab)
 
-*****cd /usr/local
-****tar zcvf ~/gdal-gdal-2.4.0-amz1.tar.gz *
-***--sudo make clean  SEEMS LIEK BREAKS
 
-Installing the python moduel for gdal requires installing python3 dev tools:
-sudo yum install python3-devel
+#Install Gdal for gdal command line operations:
+sudo apt-get install libgdal-dev
+sudo apt install gdal-bin
 
-===
-last attempt:
+#Update pythong and install gdal
+sudo apt-get install python3.6-dev
+sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
+sudo apt-get update
+sudo apt install python3-pip
+sudo apt-get install python3-gdal
+pip3 install logger docker progressbar2  requests argparse httplib2 oauth2client boto3 apiclient
 
-sudo yum-config-manager --enable epel
-sudo yum install gdal-python
-sudo yum -y update
-sudo yum -y install make automake gcc gcc-c++ libcurl-devel proj-devel geos-devel
-cd /tmp
-curl -L http://download.osgeo.org/gdal/2.0.0/gdal-2.0.0.tar.gz | tar zxf -
-cd gdal-2.0.0/
-./configure --prefix=/usr/local --with-python
-make -j4
-sudo make install
-sudo python3 -m easy_install GDAL --sudo easy_install GDAL
-export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
-sudo ldconfig
+pip3 install logger 
+pip3 install docker 
+pip3 install progressbar2 
+pip3 install requests 
+pip3 install argparse 
+pip3 install httplib2 
+pip3 install oauth2client 
+pip3 install boto3 
+pip3 install google-api-python-client
+pip3 install google-auth
+pip3 install google-auth-httplib2
 
 
 
-GDAL installation on AWS Linux:
-===============================
-Anacoonda:
-wget https://repo.anaconda.com/archive/Anaconda3-2018.12-Linux-x86_64.sh
-conda install gdal
+clone gits
 
-
-
-THE BWLOW DONT WORK!!!
-sudo yum -y update
-sudo yum install python3-devel
-sudo yum-config-manager --enable epel
-sudo yum -y install make automake gcc gcc-c++ libcurl-devel proj-devel geos-devel
-cd /tmp
-curl -L http://download.osgeo.org/gdal/2.3.3/gdal-2.3.3.tar.gz | tar zxf -
---curl -L http://download.osgeo.org/gdal/2.4.0/gdal-2.4.0.tar.gz | tar zxf -
-cd gdal-2.3.3/
---cd gdal-2.4.0/
-./configure --prefix=/usr/local --with-python
-sudo make -j4
-sudo make install
----
-sudo make install
-sudo easy_install GDAL
-
-****sudo python3 -m easy_install GDAL -d /usr/lib64/python3.7/site-packages NOT WORKINF
-sudo python3 -m easy_install GDAL -d /usr/lib/python3.7/site-packages
-*****
-****sudo python3 setup.py install --user
-
-export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
-sudo ldconfig
-----
-cd /usr/local
-tar zcvf ~/gdal-gdal-2.3.3-amz1.tar.gz *
-make clean 
-
-Installing the python moduel for gdal requires installing python3 dev tools:
-sudo yum install python3-devel
-
-
-
-====
+Bring up the docker compose:
+$sudo docker-compose up
