@@ -56,10 +56,21 @@ Dokcer Server is ready!
 
 Make sure you have the following python3(!) modules installed:
 ==============================================================
-logger docker progressbar2  requests zipfile tarfile re argparse csv math httplib2 oauth2client base64 mimetypes email boto3 apiclient gdal
 
 UBUNTU
 =======
+docker installation:
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04 - complete both steps until and including:
+su - ${USER} 
+
+docker compose for linux: https://docs.docker.com/compose/install/ (go to linux tab)
+
+
+#Install Gdal for gdal command line operations:
+sudo apt-get install libgdal-dev
+sudo apt install gdal-bin
+
+#Update pythong and install gdal
 sudo apt-get install python3.6-dev
 sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update
@@ -67,11 +78,19 @@ sudo apt install python3-pip
 sudo apt-get install python3-gdal
 pip3 install logger docker progressbar2  requests argparse httplib2 oauth2client boto3 apiclient
 
-docker installation:
-https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04 - complete both steps until and including:
-su - ${USER} 
+pip3 install logger 
+pip3 install docker 
+pip3 install progressbar2 
+pip3 install requests 
+pip3 install argparse 
+pip3 install httplib2 
+pip3 install oauth2client 
+pip3 install boto3 
+pip3 install google-api-python-client
+pip3 install google-auth
+pip3 install google-auth-httplib2
 
-docker compose for linux: https://docs.docker.com/compose/install/ (go to linux tab)
+
 
 clone gits
 

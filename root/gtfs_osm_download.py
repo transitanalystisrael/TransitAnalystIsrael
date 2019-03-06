@@ -4,6 +4,7 @@
 #
 # """
 import transitanalystisrael_config as cfg
+import time
 import sys
 from dateutil import parser
 import progressbar
@@ -12,8 +13,7 @@ import requests
 from Logger import _log
 import os
 from pathlib import Path
-import shutil
-import codecs
+
 
 size_iterator = 0 # used for the progress bar for download. not the best practice, but quick and dirty becaue of the ftp callback
 
@@ -44,6 +44,7 @@ def get_file_from_url_http(url, file_name, file_path, _log):
     pbar.finish()
     _log.info("Finished loading latest OSM to: %s", local_file_path_and_name)
 
+
 def get_gtfs_file_from_url_ftp(url, file_name_on_server, _log):
     """
     Downloads a GTFS file from an FTP server to the working directory
@@ -52,56 +53,71 @@ def get_gtfs_file_from_url_ftp(url, file_name_on_server, _log):
     :return: file name of the downloaded content in the working directory
     """
     _log.info("Going to download the latest GTFS from %s ", url)
-    try:
-        # Connect to FTP
-        ftp = ftplib.FTP(url)
-        ftp.login()
-        # Get the GTFS time stamp and generate local file name, "israel20190225"
-        file_lines = []
-        size = 0
+    download_complete = False
+    download_attempts = 1
+    max_download_attemtps = 24
 
-        local_file_name = cfg.gtfsdirbase
-        ftp.dir("", file_lines.append)
-        for line in file_lines:
-            tokens = line.split(maxsplit=4)
-            name = tokens[3]
-            if name == file_name_on_server:
-                time_str = tokens[0]
-                time = parser.parse(time_str)
-                local_file_name = local_file_name + str(time.strftime('%Y') +  time.strftime('%m') + time.strftime('%d')) + ".zip"
-                size = float(tokens[2])
+    while not download_complete:
+        if not download_complete and 24 > download_attempts > 1:
+            download_attempts += 1
+            _log.error("%s is unreachable. Sleeping for 60 minutes and trying again. This is attempt %s out of "
+                       "%s attempts", url, download_attempts, max_download_attemtps)
+            time.sleep(60*60)
+        if not download_complete and download_attempts == 24:
+            _log.error("%s is unreachable for more than 24 hours. Aborting update", url)
+            raise Exception
 
-        pardir = Path(os.getcwd()).parent
-        local_file_path_and_name = pardir / cfg.gtfspath / local_file_name
-        # Generate a progress bar and download
-        local_file = open(local_file_path_and_name, 'wb')
-        pbar = createProgressBar(size)
+        try:
+            # Connect to FTP
+            ftp = ftplib.FTP(url)
+            ftp.login()
+            # Get the GTFS time stamp and generate local file name, "israel20190225"
+            file_lines = []
+            size = 0
 
-        # Download
-        global size_iterator
-        size_iterator = 0
-        ftp.retrbinary("RETR " + file_name_on_server, lambda data, : file_write_update_progress_bar(data, local_file, pbar))
+            local_file_name = cfg.gtfsdirbase
+            ftp.dir("", file_lines.append)
+            for line in file_lines:
+                tokens = line.split(maxsplit=4)
+                name = tokens[3]
+                if name == file_name_on_server:
+                    time_str = tokens[0]
+                    actual_time = parser.parse(time_str)
+                    local_file_name = local_file_name + str(actual_time.strftime('%Y') +  actual_time.strftime('%m')
+                                                            + actual_time.strftime('%d')) + ".zip"
+                    size = float(tokens[2])
 
-        # Finish
-        local_file.close()
-        ftp.quit()
-        pbar.finish()
-        sys.stdout.flush()
+            pardir = Path(os.getcwd()).parent
+            local_file_path_and_name = pardir / cfg.gtfspath / local_file_name
+            # Generate a progress bar and download
+            local_file = open(local_file_path_and_name, 'wb')
+            pbar = createProgressBar(size)
 
-        _log.info("Finished loading latest GTFS to: %s", local_file_path_and_name)
+            # Download
+            global size_iterator
+            size_iterator = 0
+            ftp.retrbinary("RETR " + file_name_on_server, lambda data, : file_write_update_progress_bar(data, local_file, pbar))
 
-        return local_file_name
-
-    except ftplib.all_errors as err:
-        error_code = err.args[0]
-        # file not found on server
-        if error_code == 2:
-            _log.error(file_name_on_server, "is not found on %s", url)
+            # Finish
+            local_file.close()
             ftp.quit()
-        # Unvalid URL
-        if error_code == 11001:
-            _log.error("URL %s is not valid", url)
-        raise err
+            pbar.finish()
+            sys.stdout.flush()
+            download_complete = True
+            _log.info("Finished loading latest GTFS to: %s", local_file_path_and_name)
+            return local_file_name
+
+        except ftplib.all_errors as err:
+            error_code = err.args[0]
+            # file not found on server
+            if error_code == 2:
+                _log.error(file_name_on_server, "is not found on %s", url)
+                raise err
+            # Unvalid URL
+            if error_code == 11001:
+                _log.error("URL %s is not valid", url)
+                continue
+
 
 
 def createProgressBar(file_size, action='Downloading: '):
@@ -137,7 +153,6 @@ def gtfs_osm_download():
     """
     try:
         get_gtfs_file_from_url_ftp(cfg.gtfs_url, cfg.gtfs_file_name_on_mot_server, _log)
-        gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate + ".zip"
         get_file_from_url_http(cfg.osm_url, cfg.osm_file_name, cfg.osmpath,  _log)
     except Exception as e:
         raise e
