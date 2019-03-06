@@ -27,22 +27,43 @@ def get_file_from_url_http(url, file_name, file_path, _log):
     # Preparing file for fetching
     local_file_path_and_name = Path(os.getcwd()).parent / file_path / file_name
     _log.info("Going to download the latest osm from %s to %s", url, local_file_path_and_name)
-    r = requests.get(url, stream=True)
-    file = open(local_file_path_and_name, 'wb')
 
-    # Creating a progress bar
-    size = int(r.headers['Content-Length'])
-    pbar = createProgressBar(size)
+    download_complete = False
+    download_attempts = 1
+    max_download_attemtps = 24
 
-    # Fetching
-    global size_iterator
-    size_iterator = 0
-    for chunk in r.iter_content(chunk_size=1024):
-        if chunk:
-            file_write_update_progress_bar(chunk, file, pbar)
-    file.close()
-    pbar.finish()
-    _log.info("Finished loading latest OSM to: %s", local_file_path_and_name)
+    while not download_complete:
+        if not download_complete and 24 > download_attempts > 1:
+            _log.error("%s is unreachable. Sleeping for 60 minutes and trying again. This is attempt %s out of "
+                       "%s attempts", url, download_attempts, max_download_attemtps)
+            time.sleep(60*60)
+        if not download_complete and download_attempts > 24:
+            _log.error("%s is unreachable for more than 24 hours. Aborting update", url)
+            raise Exception
+        download_attempts += 1
+
+        try:
+            r = requests.get(url, stream=True)
+            file = open(local_file_path_and_name, 'wb')
+
+            # Creating a progress bar
+            size = int(r.headers['Content-Length'])
+            pbar = createProgressBar(size)
+
+            # Fetching
+            global size_iterator
+            size_iterator = 0
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:
+                    file_write_update_progress_bar(chunk, file, pbar)
+            file.close()
+            pbar.finish()
+            _log.info("Finished loading latest OSM to: %s", local_file_path_and_name)
+            download_complete = True
+            return
+
+        except Exception as e:
+            continue
 
 
 def get_gtfs_file_from_url_ftp(url, file_name_on_server, _log):
@@ -59,13 +80,13 @@ def get_gtfs_file_from_url_ftp(url, file_name_on_server, _log):
 
     while not download_complete:
         if not download_complete and 24 > download_attempts > 1:
-            download_attempts += 1
             _log.error("%s is unreachable. Sleeping for 60 minutes and trying again. This is attempt %s out of "
                        "%s attempts", url, download_attempts, max_download_attemtps)
             time.sleep(60*60)
-        if not download_complete and download_attempts == 24:
+        if not download_complete and download_attempts > 24:
             _log.error("%s is unreachable for more than 24 hours. Aborting update", url)
             raise Exception
+        download_attempts += 1
 
         try:
             # Connect to FTP
@@ -153,7 +174,7 @@ def gtfs_osm_download():
     """
     try:
         get_gtfs_file_from_url_ftp(cfg.gtfs_url, cfg.gtfs_file_name_on_mot_server, _log)
-        get_file_from_url_http(cfg.osm_url, cfg.osm_file_name, cfg.osmpath,  _log)
+        # get_file_from_url_http(cfg.osm_url, cfg.osm_file_name, cfg.osmpath,  _log)
     except Exception as e:
         raise e
 
