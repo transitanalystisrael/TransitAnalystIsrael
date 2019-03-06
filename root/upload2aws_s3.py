@@ -7,6 +7,7 @@ import transitanalystisrael_config as cfg
 import shutil
 import os
 import boto3
+import json
 from pathlib import Path
 
 cwd = Path.cwd()
@@ -243,16 +244,27 @@ else : # cfg.get_service_date == 'on_demand'
 	#
 	on_demand_bucket = 'transitanalystisrael-'+cfg.gtfsdate
 	s3.create_bucket(Bucket=on_demand_bucket, CreateBucketConfiguration={'LocationConstraint': 'eu-central-1'})
+	
 	# Create the configuration for the website
 	website_configuration = {'ErrorDocument': {'Key': 'error.html'}, 'IndexDocument': {'Suffix': 'index.html'},}
 	# Set the new policy on the selected bucket
 	s3c.put_bucket_website(Bucket=on_demand_bucket, WebsiteConfiguration=website_configuration)
-	# Call to S3 to retrieve the policy for the current bucket
-	policy_result = s3c.get_bucket_policy(Bucket='transitanalystisrael-current')
-	print(policy_result)
-	# Set the current policy on the on-demand bucket - need to fix - till then change manually on created bucket
-	#bucket_policy = policy_result
-	#s3c.put_bucket_policy(Bucket=on_demand_bucket, Policy=bucket_policy)
+
+	# Create the bucket policy
+	bucket_policy = {
+		'Version': '2012-10-17',
+		'Statement': [{
+			'Sid': 'PublicReadGetObject',
+			'Effect': 'Allow',
+			'Principal': '*',
+			'Action': ['s3:GetObject'],
+			'Resource': "arn:aws:s3:::%s/*" % on_demand_bucket
+		}]
+	}
+	# Convert the policy to a JSON string
+	bucket_policy = json.dumps(bucket_policy)
+	# Set the new policy on the given bucket
+	s3c.put_bucket_policy(Bucket=on_demand_bucket, Policy=bucket_policy)
 
 	#
 	# copy content of local to on_demand bucket
