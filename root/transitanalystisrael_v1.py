@@ -9,6 +9,9 @@ if cfg.get_service_date == 'auto' :
 	_log.info("Download OSM & GTFS")
 	import gtfs_osm_download
 
+#unzip gtfs file
+import gtfs_unzip
+
 # copy static files to processed dir
 _log.info("Loading static files")
 import load_static_files

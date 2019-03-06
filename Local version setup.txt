@@ -4,6 +4,7 @@ Minimum Requirements:
 
 Install required Software:
 ==========================
+* Git with Git-bash (https://git-scm.com/downloads)
 * Docker for Windows
 * GDAL for widnows: https://trac.osgeo.org/gdal/wiki/OSGeo4W
 * Gzip
