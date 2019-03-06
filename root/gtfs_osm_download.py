@@ -128,58 +128,16 @@ def file_write_update_progress_bar(data, dest_file, pbar):
     dest_file.write(data)
     pbar.update(size_iterator)
 
-def unzip_gtfs(gtfs_zip_file_name, gtfspath, _log):
-    """
-    Unzip gtfs to gtfspath
-    """
-    _log.info("Going to unzip %s file to %s", gtfs_zip_file_name, gtfspath)
-    pardir = Path(os.getcwd()).parent
-    dest_folder = pardir / gtfspath / gtfs_zip_file_name[:-4] # removing the .zip end
-    if not os.path.exists(dest_folder):
-         os.mkdir(dest_folder)
-    gtfs_contets_folder = Path(os.getcwd()).parent / gtfspath / gtfs_zip_file_name
-    shutil.unpack_archive(gtfs_contets_folder, extract_dir=dest_folder, format='zip')
-    _log.info("Finished unzipping")
-
-
-def remove_bom_characters_from_unzipped_files(gtfspath):
-    """
-    Sometimes the GTFS files are preceded with a BOM set of characters (\ufeff)
-    This method remvoed them
-    """
-    BUFSIZE = 4096
-    BOMLEN = len(codecs.BOM_UTF8)
-
-    gtfs_contets_folder = Path(os.getcwd()).parent / gtfspath
-    for file in os.listdir(gtfs_contets_folder):
-        if ".txt" in file:
-            with open( gtfs_contets_folder / file, "r+b") as fp:
-                chunk = fp.read(BUFSIZE)
-                if chunk.startswith(codecs.BOM_UTF8):
-                    i = 0
-                    chunk = chunk[BOMLEN:]
-                    while chunk:
-                        fp.seek(i)
-                        fp.write(chunk)
-                        i += len(chunk)
-                        fp.seek(BOMLEN, os.SEEK_CUR)
-                        chunk = fp.read(BUFSIZE)
-                    fp.seek(-BOMLEN, os.SEEK_CUR)
-                    fp.truncate()
-
-
 # Download GTFS & OSM
 def gtfs_osm_download():
     """
-    Downloads osm and gtfs files from the web. Also unzipps GTFS into cfg.gtfs_osm_download
+    Downloads osm and gtfs files from the web.
     :param _log:
     :return:
     """
     try:
         get_gtfs_file_from_url_ftp(cfg.gtfs_url, cfg.gtfs_file_name_on_mot_server, _log)
         gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate + ".zip"
-        unzip_gtfs(gtfs_zip_file_name, cfg.gtfspath, _log)
-        remove_bom_characters_from_unzipped_files(os.path.join(cfg.gtfspath, cfg.gtfsdirbase+cfg.gtfsdate))
         get_file_from_url_http(cfg.osm_url, cfg.osm_file_name, cfg.osmpath,  _log)
     except Exception as e:
         raise e
