@@ -174,7 +174,7 @@ def gtfs_osm_download():
     """
     try:
         get_gtfs_file_from_url_ftp(cfg.gtfs_url, cfg.gtfs_file_name_on_mot_server, _log)
-        # get_file_from_url_http(cfg.osm_url, cfg.osm_file_name, cfg.osmpath,  _log)
+        get_file_from_url_http(cfg.osm_url, cfg.osm_file_name, cfg.osmpath,  _log)
     except Exception as e:
         raise e
 
