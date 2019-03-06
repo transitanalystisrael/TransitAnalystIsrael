@@ -21,7 +21,6 @@ _log.info("GTFS pre-processing")
 import gtfs_preprocessing
 # _log.info("Calculating TransitScore Israel")
 import transitscore_israel # check that long processing steps (2 hours)are not commented out in imported file
-
 _log.info("Calculating Municipal Scores")
 import muni_scores
 _log.info("Calculating High Freq Lines")

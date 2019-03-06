@@ -7,6 +7,7 @@ import transitanalystisrael_config as cfg
 import shutil
 import os
 import boto3
+import json
 from pathlib import Path
 
 cwd = Path.cwd()
@@ -74,7 +75,7 @@ def upload_localdir_w_gzip_to_bucket(localdir_from, bucket_to_name):
 			full_path = os.path.join(subdir, file)
 			filesize = os.path.getsize(full_path)
 			print('file, filesize : ',file, filesize)
-			if (file.endswith(".js") and filesize > cfg.bigjs2gzip): # skip big js files that were gziped. only the gzip file will be uploaded
+			if (file.endswith(".js") and filesize > int(cfg.bigjs2gzip)): # skip big js files that were gziped. only the gzip file will be uploaded
 				print('skipped : ',full_path)
 			elif file.endswith(".gz"): # upload gzip file but remove .gz from the filename and add Metadata
 				with open(full_path, 'rb') as data:
@@ -222,7 +223,6 @@ else : # cfg.get_service_date == 'on_demand'
 	on_demand_dir = cwd.parent / cfg.websitelocalondemandpath.replace('yyyymmdd', cfg.gtfsdate)
 	print('********** upload to AWS S3 cloud *************')
 	on_demand_localdir = on_demand_dir
-	temp_localdir = cwd.parent / cfg.temppath
 	print('on_demand_localdir : ',on_demand_localdir)
 
 	os.chdir(on_demand_localdir)
@@ -230,6 +230,8 @@ else : # cfg.get_service_date == 'on_demand'
 
 	# Create an S3 resource
 	s3 = boto3.resource('s3')
+	# Create an S3 client
+	s3c = boto3.client('s3')
 
 	# Call S3 to list current buckets
 	for bucket in s3.buckets.all():
@@ -242,6 +244,27 @@ else : # cfg.get_service_date == 'on_demand'
 	#
 	on_demand_bucket = 'transitanalystisrael-'+cfg.gtfsdate
 	s3.create_bucket(Bucket=on_demand_bucket, CreateBucketConfiguration={'LocationConstraint': 'eu-central-1'})
+	
+	# Create the configuration for the website
+	website_configuration = {'ErrorDocument': {'Key': 'error.html'}, 'IndexDocument': {'Suffix': 'index.html'},}
+	# Set the new policy on the selected bucket
+	s3c.put_bucket_website(Bucket=on_demand_bucket, WebsiteConfiguration=website_configuration)
+
+	# Create the bucket policy
+	bucket_policy = {
+		'Version': '2012-10-17',
+		'Statement': [{
+			'Sid': 'PublicReadGetObject',
+			'Effect': 'Allow',
+			'Principal': '*',
+			'Action': ['s3:GetObject'],
+			'Resource': "arn:aws:s3:::%s/*" % on_demand_bucket
+		}]
+	}
+	# Convert the policy to a JSON string
+	bucket_policy = json.dumps(bucket_policy)
+	# Set the new policy on the given bucket
+	s3c.put_bucket_policy(Bucket=on_demand_bucket, Policy=bucket_policy)
 
 	#
 	# copy content of local to on_demand bucket
