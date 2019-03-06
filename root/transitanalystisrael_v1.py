@@ -3,7 +3,7 @@
 # 
 import transitanalystisrael_config as cfg
 from Logger import _log
-'''
+
 if cfg.get_service_date == 'auto' :
 	# get gtfs files and osm file
 	_log.info("Download OSM & GTFS")
@@ -18,7 +18,6 @@ _log.info("GTFS pre-processing")
 import gtfs_preprocessing
 # _log.info("Calculating TransitScore Israel")
 import transitscore_israel # check that long processing steps (2 hours)are not commented out in imported file
-
 _log.info("Calculating Municipal Scores")
 import muni_scores
 _log.info("Calculating High Freq Lines")
@@ -56,7 +55,7 @@ if cfg.web_client_hosted_on == 'aws_s3' :
 	# upload files to cloud website dir from local website dir
 	_log.info("Upload website to AWS S3")
 	import upload2aws_s3
-'''
+
 if cfg.ttm_graph_processing != 'none' :
 	#process TTM files
 	_log.info("Update Navitia Time Map server")
