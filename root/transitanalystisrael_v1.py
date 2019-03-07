@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 
 import transitanalystisrael_config as cfg
-from Logger import _log
+from logger import _log
 
 if cfg.get_service_date == 'auto' :
 	# get gtfs files and osm file
