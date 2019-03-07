@@ -57,6 +57,7 @@ Dokcer Server is ready!
 Make sure you have the following python3(!) modules installed:
 ==============================================================
 
+AWS EC2 Ubuntu should have proper IAM role to access the transit-analyst-key-bucket ("Navitia_EC2_to_S3") through instance settingsinthe EC2 console
 UBUNTU
 =======
 docker installation:
@@ -79,6 +80,8 @@ sudo apt-get install python3-gdal
 pip3 install logger docker progressbar2  requests argparse httplib2 oauth2client boto3 apiclient
 
 pip3 install logger 
+pip3 install shapely
+pip3 install geopy
 pip3 install docker 
 pip3 install progressbar2 
 pip3 install requests 
@@ -96,3 +99,5 @@ clone gits
 
 Bring up the docker compose:
 $sudo docker-compose up
+
+
