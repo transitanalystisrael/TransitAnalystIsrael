@@ -24,7 +24,7 @@ class Logger(object):
         if self.log is not None:
             return self.log
         self.log_name = log_name
-        logger = logging.getLogger('gtfs_monthly_update')
+        logger = logging.getLogger(log_name)
         logger.setLevel(logging.DEBUG)
         # create file handler which logs even debug messages
         # check if logs fodler exists, and if not create it
@@ -48,7 +48,19 @@ class Logger(object):
         # logger.addHandler(ch1)
         logger.addHandler(fh)
         self.log = logger
-        return self.log
+        return self
+
+    def info(self, msg):
+        self.log.info(msg)
+
+    def error(self, msg):
+        self.log.error(msg)
+
+    def debug(self, msg):
+        self.log.debug(msg)
+
+    def exception(self,msg):
+        self.log.exception(msg)
 
 
 _log = Logger()
