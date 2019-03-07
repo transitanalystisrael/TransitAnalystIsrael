@@ -513,7 +513,7 @@ def send_log_to_email(subject, message):
     :param message:
     :return: Whether the e-mail was sent successfully
     """
-    attached_file = _log.get_log_file_name()
+    attached_file = _log.get_logger_name()
     return send_email.create_msg_and_send_email(subject, message, attached_file)
 
 
