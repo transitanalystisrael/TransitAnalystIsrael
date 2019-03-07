@@ -515,7 +515,8 @@ def send_log_to_email(subject, message):
     :return: Whether the e-mail was sent successfully
     """
 
-    list_of_files = glob.glob('/path/to/folder/*')  # * means all if need specific format then *.csv
+    path = Path.cwd() / "logs" / '*'
+    list_of_files = glob.glob(str(path))  # * means all if need specific format then *.csv
     attached_file = max(list_of_files, key=os.path.getctime)
     return send_email.create_msg_and_send_email(subject, message, attached_file)
 
