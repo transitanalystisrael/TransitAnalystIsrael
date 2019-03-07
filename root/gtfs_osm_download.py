@@ -10,7 +10,7 @@ from dateutil import parser
 import progressbar
 import ftplib
 import requests
-from Logger import _log
+from logger import _log
 import os
 from pathlib import Path
 

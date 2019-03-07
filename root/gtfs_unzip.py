@@ -1,7 +1,7 @@
 # """
 import transitanalystisrael_config as cfg
 
-from Logger import _log
+from logger import _log
 import os
 from pathlib import Path
 import shutil

@@ -32,7 +32,7 @@ import datetime
 import transitanalystisrael_config as cfg
 import os
 from pathlib import Path
-from Logger import _log
+from logger import _log
 
 def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path, osm_file_path, osm_file_name,
                                          gtfs_file_path, gtfs_file_name,
