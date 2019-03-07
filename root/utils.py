@@ -184,9 +184,8 @@ def start_navitia_with_default_coverage(navitia_docker_compose_file_path, extend
     _log.info("Attempting to start Navitia with default coverage")
 
     # run the docker- compose and redirect logs to prevent from printing in the output
-    navitia_docker_start_command = ["docker-compose", "up"]
-    subprocess.Popen(navitia_docker_start_command, shell=True, cwd=navitia_docker_compose_file_path,
-                    stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+    navitia_docker_start_command = "docker-compose up"
+    subprocess.Popen(navitia_docker_start_command, shell=True, cwd=navitia_docker_compose_file_path, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
     # Longer wait time is required because images are being re-downloaded
     if extend_wait_time:

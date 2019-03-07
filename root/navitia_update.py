@@ -94,8 +94,12 @@ default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_fi
 try:
     # Get the docker service client
     docker_client = utils.get_docker_service_client()
+    containers = docker_client.containers.list(filters={"name": "worker"})
+    if len(containers) == 0:
+        _log.error("Navitia docker is down, run 'docker-compose up' in the navitia-docker-compose repo folder")
+        raise Exception
     # Get the worker container
-    worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
+    worker_con = containers[0]
     # Get the current start of production dates of default coverage for post-processing comparison
     default_cov_eos_date = ""
     if utils.is_cov_exists(worker_con, default_coverage_name):
