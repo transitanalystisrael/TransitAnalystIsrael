@@ -50,17 +50,17 @@ class Logger(object):
         self.log = logger
         return self
 
-    def info(self, msg):
-        self.log.info(msg)
+    def info(self, *args):
+        self.log.info(args)
 
-    def error(self, msg):
-        self.log.error(msg)
+    def error(self, *args):
+        self.log.error(args)
 
-    def debug(self, msg):
-        self.log.debug(msg)
+    def debug(self, *args):
+        self.log.debug(args)
 
-    def exception(self,msg):
-        self.log.exception(msg)
+    def exception(self, *args):
+        self.log.exception(args)
 
 
 _log = Logger()
