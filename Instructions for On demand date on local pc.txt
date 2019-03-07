@@ -1,0 +1,80 @@
+Instructions for "On demand date on local pc"
+
+On demand date on local pc
+	get_service_date = 'on_demand'
+	python_processing = 'local_pc'
+	ttm_graph_processing = 'local_pc'
+	web_client_hosted_on = 'local_pc'
+	ttm_server_on = 'local_pc'
+
+=============================================================================================
+
+0. Set up a PC for local production with TTM - Transit Time Map. see instructions document "Set up a PC for local production with Transit Time Map"
+	a. The starting dir structure under TransitAnalystIsrael (the name of this parent dir is not important and can be different) is explained below:
+		gtfs 					- GTFS unzipped dir is placed in this dir
+		osm 					- Open Street Map file for Israel is downloaded to this dir for the TTM tool
+		processed 				- this dir can start out empty, it will hold all the processed data files produced by the python scripts
+		root					- this dir holds the python scripts that process the GTFS files about 50 files. See the flows presentation to see how they are used.
+		static_data				- this dir holds the 8 or so data files that do not change every month. They are copied into the processed dir before processing starts.
+		website_no_data			- this dir holds the client side html and js code for the tools, without the processed data. 
+									the files in this dir are copied into the on-demand date dir website_yyyymmdd together with the processed data to create the tools
+
+		website_current			- not used in this product. this output dir will hold the tools and processed data to display for the current month
+		website_past			- not used in this product. this output dir will hold the tools and processed data to display for the past month
+		AWS Lambda function 	- not used in this product. used only in Monthly auto update on AWS 
+
+		
+	b. note that the on-demand date output dir for the tools - website_yyyymmdd - does not exist prior to processing. It will be created by the scripts in the same parent dir.
+
+1. Update the config file - \root\transitanalystisrael_config.py 
+	a. remove "#" from the "On demand date on local pc no TTM" to un-comment parameters to look as below:
+
+#On demand date on local pc
+get_service_date = 'on_demand'
+python_processing = 'local_pc'
+ttm_graph_processing = 'local_pc'
+web_client_hosted_on = 'local_pc'
+ttm_server_on = 'local_pc'
+
+	b. make sure all the rest of the 6 product processing configurations are commented out - have "#"in the first char of the line.
+
+	c. change "gtfsdate" and "serviceweekstartdate" to the requested on-demand date e.g. for 20190302 
+
+gtfsdate = '20190302'
+serviceweekstartdate = '20190302'
+
+	d. save the config file
+
+2. Download or copy the GTFS zip file, unzip, rename dir and place in /gtfs/ directory
+	a. Locate GTFS files that corespond to a service start date that is equal to the on-demand date. Remeber that GTFS is uploaded to MOT servers (ftp://gtfs.mot.gov.il) at 10pm each day with a service start date of the next day. 
+	b. Download or copy the GTFS zip file
+	c. unzip the file 
+	d. rename the dir of unzipped GTFS files to be gtfsdirbase+gtfsdate (as in the config file) e.g. 'israel20190302'
+	e. place the renamed dir in the /gtfs/ directory e.g. C:\git\TransitAnalystIsrael\gtfs\israel20190302
+
+3. Download or copy the Open Street Map - OSM file, and place in /osm/ directory
+	a. Locate the current or recent Israel OSM file or one that coresponds to the on-demand date. download from  http://download.geofabrik.de/asia/israel-and-palestine.html
+	b. Download or copy the OSM file - israel-and-palestine-latest.osm.pbf
+	c. place the file in the /osm/ directory e.g. C:\git\TransitAnalystIsrael\osm\israel-and-palestine-latest.osm.pbf
+	
+4. Run the Navitia docker environment
+	a. Run the Docker Desktop for Windows application and wait for it to come up.
+	b. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
+	c. Right-click and select run "Git Bash" to open a terminal window.
+	d. type at the prompt "docker-compose up"
+		$ docker-compose up
+
+5. Run transitanalystisrael_v1.py with python3
+	a. open a window in the pythonpath (as in the config file) e.g. C:\git\TransitAnalystIsrael\root
+	b. type "cmd" in the bar on top to open a cmd terminal
+	c. at the prompt type 'python3 transitanalystisrael_v1' e.g. C:\git\TransitAnalystIsrael\root>python3 transitanalystisrael_v1
+
+6. Wait about 4.5 hours for the scripts to run to completion
+
+7. Run the TransitAnalystIsrael
+	a. open a window in the websitelocalondemandpath (as in the config file) e.g. C:\git\TransitAnalystIsrael\website_20190302
+	b. doubleclick on index.html
+
+
+
+
