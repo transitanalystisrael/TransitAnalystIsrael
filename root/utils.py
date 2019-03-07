@@ -10,10 +10,11 @@ import tarfile
 import re
 from io import BytesIO
 import generate_transfers_table
-from Logger import _log
+from logger import _log
 import transitanalystisrael_config as cfg
 from pathlib import Path
 from datetime import datetime as dt
+import glob
 
 
 def get_config_params():
@@ -513,7 +514,10 @@ def send_log_to_email(subject, message):
     :param message:
     :return: Whether the e-mail was sent successfully
     """
-    attached_file = _log.get_logger_name()
+
+    path = Path.cwd() / "logs" / '*'
+    list_of_files = glob.glob(str(path))  # * means all if need specific format then *.csv
+    attached_file = max(list_of_files, key=os.path.getctime)
     return send_email.create_msg_and_send_email(subject, message, attached_file)
 
 
