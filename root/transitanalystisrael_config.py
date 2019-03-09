@@ -29,18 +29,18 @@
 #ttm_server_on = 'aws_ec2'
 
 #On demand date on S3 only (no TTM)
-get_service_date = 'on_demand'
-python_processing = 'local_pc'
-ttm_graph_processing = 'none'
-web_client_hosted_on = 'aws_s3'
-ttm_server_on = 'none'
-
-#On demand date on local pc
 #get_service_date = 'on_demand'
 #python_processing = 'local_pc'
-#ttm_graph_processing = 'local_pc'
-#web_client_hosted_on = 'local_pc'
-#ttm_server_on = 'local_pc'
+#ttm_graph_processing = 'none'
+#web_client_hosted_on = 'aws_s3'
+#ttm_server_on = 'none'
+
+#On demand date on local pc
+get_service_date = 'on_demand'
+python_processing = 'local_pc'
+ttm_graph_processing = 'local_pc'
+web_client_hosted_on = 'local_pc'
+ttm_server_on = 'local_pc'
 
 #On demand date on local pc no TTM
 #get_service_date = 'on_demand'
@@ -51,8 +51,8 @@ ttm_server_on = 'none'
 
 
 # common config
-gtfsdate = '20190302'
-serviceweekstartdate = '20190302'
+gtfsdate = '20190202'
+serviceweekstartdate = '20190202'
 gtfsdirbase = 'israel'
 gtfs_url = 'gtfs.mot.gov.il'
 gtfs_file_name_on_mot_server = 'israel-public-transportation.zip' 
