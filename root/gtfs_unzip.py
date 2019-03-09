@@ -1,4 +1,6 @@
 # """
+from builtins import Exception
+
 import transitanalystisrael_config as cfg
 
 from logger import _log
@@ -11,12 +13,15 @@ def unzip_gtfs(gtfs_zip_file_name, gtfspath, _log):
     """
     Unzip gtfs to gtfspath
     """
-    _log.info("Going to unzip %s file to %s", gtfs_zip_file_name, gtfspath)
     pardir = Path(os.getcwd()).parent
+    gtfs_contets_folder = Path(os.getcwd()).parent / gtfspath / gtfs_zip_file_name
+    if not os.path.isfile(gtfs_contets_folder):
+        _log.error("%s does not exist - please check correct GTFS date is configured", gtfs_zip_file_name)
+        raise Exception
+    _log.info("Going to unzip %s file to %s", gtfs_zip_file_name, gtfspath)
     dest_folder = pardir / gtfspath / gtfs_zip_file_name[:-4] # removing the .zip end
     if not os.path.exists(dest_folder):
          os.mkdir(dest_folder)
-    gtfs_contets_folder = Path(os.getcwd()).parent / gtfspath / gtfs_zip_file_name
     shutil.unpack_archive(gtfs_contets_folder, extract_dir=dest_folder, format='zip')
     _log.info("Finished unzipping")
 
