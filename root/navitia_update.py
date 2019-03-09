@@ -120,13 +120,5 @@ try:
                                          secondary_custom_coverage_name, navitia_docker_compose_file_name,
                                          default_coverage_name, default_cov_eos_date, _log)
 
-    # Send e-mail everything is completed - only on automatic script on AWS
-    # On local Windows machine, there's no need.
-    if utils.is_aws_machine():
-        utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed")
-        _log.info("Done without errors - log was sent to email")
-    else:
-        _log.info("Done without errors - log is saved locally")
-
 except Exception as e:
     raise Exception

@@ -70,6 +70,9 @@ try:
 		_log.info("Update Navitia Time Map server")
 		import navitia_update
 
+
+# Send e-mail everything is completed - only on automatic script on AWS
+# On local Windows machine, there's no need.
 except Exception as e:
 	if utils.is_aws_machine():
 		_log.exception("Done with errors - see Exception stacktrace")
