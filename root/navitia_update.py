@@ -83,10 +83,6 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
                                          default_cov_eos_date, worker_con)
 
 
-
-# Get logger
-update_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
-
 # config variables to be moved to config-file downstrem
 default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_file_path, \
     navitia_docker_compose_file_name, gtfs_file_path, gtfs_zip_file_name = utils.get_config_params()
@@ -133,10 +129,4 @@ try:
         _log.info("Done without errors - log is saved locally")
 
 except Exception as e:
-    if utils.is_aws_machine():
-        _log.exception("Done with errors - see Exception stacktrace")
-        utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Failed - see logs")
-    else:
-        _log.exception("Done with errors - see Exception stacktrace")
-
-
+    raise Exception
