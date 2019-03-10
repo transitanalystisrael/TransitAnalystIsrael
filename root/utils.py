@@ -274,7 +274,12 @@ def is_cov_exists(container, coverage_name):
     _log.info("Checking if %s exists in /srv/ed/output of %s", coverage_name, container.name)
     file_list_command = "/bin/sh -c \"ls\""
     exit_code, output = container.exec_run(cmd=file_list_command, stdout=True, workdir="/srv/ed/output/")
-    return coverage_name in str(output)
+    exists = coverage_name in str(output)
+    if exists:
+        _log.info("%s exists in /srv/ed/output of %s", coverage_name, container.name)
+    else:
+        _log.info("%s doesn't exists in /srv/ed/output of %s", coverage_name, container.name)
+    return exists
 
 def backup_past_coverage(container, coverage_name):
     """
