@@ -19,7 +19,6 @@ try:
 	#unzip gtfs file
 	import gtfs_unzip
 
-	'''
 	# copy static files to processed dir
 	_log.info("Loading static files")
 	import load_static_files
@@ -66,7 +65,7 @@ try:
 		# upload files to cloud website dir from local website dir
 		_log.info("Upload website to AWS S3")
 		import upload2aws_s3
-	'''
+
 	if cfg.ttm_graph_processing != 'none' :
 		#process TTM files
 		_log.info("Update Navitia Time Map server")

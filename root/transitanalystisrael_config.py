@@ -51,8 +51,8 @@ ttm_server_on = 'local_pc'
 
 
 # common config
-gtfsdate = '20190202'
-serviceweekstartdate = '20190202'
+gtfsdate = '20190307'
+serviceweekstartdate = '20190307'
 gtfsdirbase = 'israel'
 gtfs_url = 'gtfs.mot.gov.il'
 gtfs_file_name_on_mot_server = 'israel-public-transportation.zip' 
