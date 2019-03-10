@@ -39,6 +39,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
                                          osm_file_name, gtfs_file_path, gtfs_file_name, secondary_custom_coverage_name,
                                          navitia_docker_compose_file_name, default_coverage_name, default_cov_eos_date,
                                          _log):
+    '''
     # Re-start Navitia docker with default coverage only in order to process the OSM & GTFS
     # Later we will restart with the custom coverage as well
     utils.stop_all_containers(docker_client)
@@ -81,8 +82,9 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
 
     # Re-start Navitia to make sure all changesgtfs_zip_file_name are applied with default and custom coverages
     utils.stop_all_containers(docker_client)
+    '''
     is_up = utils.start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
-                                             navitia_docker_compose_file_name)
+                                             navitia_docker_compose_ondemand_file_path, navitia_docker_compose_file_name)
 
     # If it's up - delete the old gtfs and osm files
     if is_up:
@@ -103,16 +105,19 @@ default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_fi
         navitia_docker_compose_ondemand_file_name, gtfs_file_path, gtfs_zip_file_name = utils.get_config_params()
 
 try:
+
     # Get the docker service client
     docker_client = utils.get_docker_service_client()
+    '''
     containers = docker_client.containers.list(filters={"name": "worker"})
     if len(containers) == 0:
         _log.error("Navitia docker is down, run 'docker-compose up' in the navitia-docker-compose repo folder")
         raise Exception
     # Get the worker container
     worker_con = containers[0]
-
+    '''
     default_cov_eos_date = ""
+    '''
     # For production env. we have default coverage and secondary-cov coverage so back up is needed
     if cfg.get_service_date == "auto":
         # Get the current start of production dates of default coverage for post-processing comparison
@@ -138,7 +143,7 @@ try:
 
     # Generate the Transfers file required for Navitia and add to GTFS
     utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path)
-
+    '''
     if cfg.get_service_date == "auto":
         process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path,
                                              navitia_docker_compose_ondemand_file_path, cfg.osmpath, cfg.osm_file_name,

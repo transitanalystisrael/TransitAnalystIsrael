@@ -421,7 +421,7 @@ def generate_gtfs_with_transfers(gtfs_file_name, gtfs_file_path):
     _log.info("Added transfers.txt to %s", gtfs_file_path_name)
 
 
-def copy_osm_and_gtfs_to_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name, cov_name):
+def  copy_osm_and_gtfs_to_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name, cov_name):
     """
     Copy GTFS and OSM files into the input folder of default coverage for creating a new Navitia graph
     :param worker_con: docker worker container
