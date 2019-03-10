@@ -230,10 +230,10 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_co
         return False
 
         # run the docker- compose and redirect logs to prevent from printing in the output
-    navitia_docker_start_command = ["docker-compose", "-f", "docker-compose.yml", "-f",
-                                    navitia_docker_compose_file_name, "up"]
 
-    subprocess.Popen(navitia_docker_start_command, cwd=navitia_docker_compose_file_path, stderr=subprocess.DEVNULL,
+    navitia_docker_start_command = "docker-compose -f docker-compose.yml -f " + navitia_docker_compose_file_name + " up"
+
+    subprocess.Popen(navitia_docker_start_command, shell=True, cwd=navitia_docker_compose_file_path, stderr=subprocess.DEVNULL,
                      stdout=subprocess.DEVNULL)
 
     # Longer wait time is required because images are being re-downloaded
@@ -274,7 +274,12 @@ def is_cov_exists(container, coverage_name):
     _log.info("Checking if %s exists in /srv/ed/output of %s", coverage_name, container.name)
     file_list_command = "/bin/sh -c \"ls\""
     exit_code, output = container.exec_run(cmd=file_list_command, stdout=True, workdir="/srv/ed/output/")
-    return coverage_name in str(output)
+    exists = coverage_name in str(output)
+    if exists:
+        _log.info("%s exists in /srv/ed/output of %s", coverage_name, container.name)
+    else:
+        _log.info("%s doesn't exists in /srv/ed/output of %s", coverage_name, container.name)
+    return exists
 
 def backup_past_coverage(container, coverage_name):
     """
