@@ -28,10 +28,9 @@ def get_config_params():
     navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"
     navitia_docker_compose_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose"
     navitia_docker_compose_ondemand_file_name = ""
-    navitia_docker_compose_ondemand_file_path = ""
+    navitia_docker_compose_ondemand_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose" / "custom_compose"
     if cfg.get_service_date == "on_demand":
             navitia_docker_compose_ondemand_file_name = "navitia-docker-ondemand-" + cfg.gtfsdate + ".yml"
-            navitia_docker_compose_ondemand_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose" / "custom_compose"
             secondary_custom_coverage_name = "ondemand-" + cfg.gtfsdate
             if not Path.is_dir(navitia_docker_compose_file_path):
                 os.mkdir(navitia_docker_compose_file_path)
