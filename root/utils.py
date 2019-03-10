@@ -121,7 +121,7 @@ def check_coverage_running(url, coverage_name):
 
     # Get the status of the coverage as Json
     json_data = json.loads(response.text)
-    if "status" not in json_data or "running" not in json_data["status"]["status"]:
+    if "running" not in json_data["regions"][0]['status']:
         _log.info("%s coverage is down", coverage_name)
         return False
     else:
@@ -190,9 +190,9 @@ def start_navitia_with_default_coverage(navitia_docker_compose_file_path, extend
 
     # Longer wait time is required because images are being re-downloaded
     if extend_wait_time:
-        t_wait = 60 * 5
+        t_wait = 60 * 10
     else:
-        t_wait = 120
+        t_wait = 60 * 4
     _log.info("Waiting %s seconds to validate Navitia docker is up and running", t_wait)
     time.sleep(t_wait)
 
