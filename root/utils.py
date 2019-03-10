@@ -233,7 +233,7 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_co
 
     navitia_docker_start_command = "docker-compose -f docker-compose.yml -f " + navitia_docker_compose_file_name + " up"
 
-    subprocess.Popen(navitia_docker_start_command, cwd=navitia_docker_compose_file_path, stderr=subprocess.DEVNULL,
+    subprocess.Popen(navitia_docker_start_command, shell=True, cwd=navitia_docker_compose_file_path, stderr=subprocess.DEVNULL,
                      stdout=subprocess.DEVNULL)
 
     # Longer wait time is required because images are being re-downloaded
