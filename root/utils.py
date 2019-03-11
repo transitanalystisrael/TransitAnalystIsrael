@@ -575,7 +575,8 @@ def createProgressBar(file_size, action='Downloading: '):
     widgets = [action, progressbar.Percentage(), ' ',
                progressbar.Bar(marker='#', left='[', right=']'),
                ' ', progressbar.ETA(), ' ', progressbar.FileTransferSpeed()]
-    pbar = progressbar.ProgressBar(widgets=widgets, maxval=file_size)
+    # We're increasing the file suze by 10% because sometimes the file split causes cahnges in total size
+    pbar = progressbar.ProgressBar(widgets=widgets, maxval=(file_size*1.1))
     pbar.start()
     return pbar
 
