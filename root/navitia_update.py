@@ -89,8 +89,8 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
 
     # If it's up - delete the old gtfs and osm files
     if is_up:
-        utils.delete_file_from_host(osm_file_name)
-        utils.delete_file_from_host(gtfs_file_name)
+        utils.delete_file_from_host(Path(os.getcwd()).parent / osm_file_path / osm_file_name)
+        utils.delete_file_from_host(Path(os.getcwd()).parent / gtfs_file_path / gtfs_file_name)
 
     #Get the current worker container
     worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
