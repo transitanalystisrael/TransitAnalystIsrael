@@ -5,14 +5,17 @@
 # can be replaced with smart algorithem to deal with edge cases...
 #
 import transitanalystisrael_config as cfg
+import process_date
 import os
 from pathlib import Path
 import shutil
 
+processdate = process_date.get_date_now()
+
 cwd = Path.cwd()
 
-prefile = 'stopsinmuni_pre_edit_'+cfg.gtfsdate+'.txt'
-postfile = 'stopsinmuni_post_edit_'+cfg.gtfsdate+'.txt'
+prefile = 'stopsinmuni_pre_edit_'+processdate+'.txt'
+postfile = 'stopsinmuni_post_edit_'+processdate+'.txt'
 
 os.chdir(cwd.parent / cfg.processedpath)
 shutil.copy(prefile, postfile)

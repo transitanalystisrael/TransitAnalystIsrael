@@ -3,12 +3,15 @@
 #
 # GTFS pre processing
 import transitanalystisrael_config as cfg
+import process_date
 import israel_geo_split
 import agency_txt2js
 import stops_txt2js
 import stop_types
 
-israel_geo_split.main(cfg.gtfsdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath)
-agency_txt2js.main(cfg.gtfsdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath)
-stops_txt2js.main(cfg.gtfsdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath)
-stop_types.main(cfg.gtfsdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath)
+processdate = process_date.get_date_now()
+
+israel_geo_split.main(processdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath)
+agency_txt2js.main(processdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath)
+stops_txt2js.main(processdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath)
+stop_types.main(processdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath)

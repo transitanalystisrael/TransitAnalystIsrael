@@ -2,7 +2,7 @@
 from builtins import Exception
 
 import transitanalystisrael_config as cfg
-
+import process_date
 from logger import _log
 import os
 from pathlib import Path
@@ -60,9 +60,10 @@ def gtfs_unzip():
     :return:
     """
     try:
-        gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate + ".zip"
+        processdate = process_date.get_date_now()
+        gtfs_zip_file_name = cfg.gtfsdirbase + processdate + ".zip"
         unzip_gtfs(gtfs_zip_file_name, cfg.gtfspath, _log)
-        remove_bom_characters_from_unzipped_files(os.path.join(cfg.gtfspath, cfg.gtfsdirbase+cfg.gtfsdate))
+        remove_bom_characters_from_unzipped_files(os.path.join(cfg.gtfspath, cfg.gtfsdirbase+processdate))
     except Exception as e:
         raise e
 

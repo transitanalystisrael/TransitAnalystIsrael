@@ -24,27 +24,22 @@
 print('----------------- count the number of trips per day tpd for all lines (unique routes) --------------------------')
 print('generate js file of routes with name trips per day and shape geometry')
 import transitanalystisrael_config as cfg
+import process_date
 import high_freq_lines_w_tpd_v7
 import time
 #
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
-#def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, freqtpdmin):
-#
-high_freq_lines_w_tpd_v7.main(cfg.gtfsdate, cfg.processedpath, cfg.gtfsdirbase+'_south', cfg.processedpath, cfg.sstarttimeall, cfg.sstoptimeall, cfg.areatpdmin)
+processdate = process_date.get_date_now()
+
+high_freq_lines_w_tpd_v7.main(processdate, cfg.processedpath, cfg.gtfsdirbase+'_south', cfg.processedpath, cfg.sstarttimeall, cfg.sstoptimeall, cfg.areatpdmin)
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
-#
-#def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, freqtpdmin):
-#
-high_freq_lines_w_tpd_v7.main(cfg.gtfsdate, cfg.processedpath, cfg.gtfsdirbase+'_north', cfg.processedpath, cfg.sstarttimeall, cfg.sstoptimeall, cfg.areatpdmin)
+
+high_freq_lines_w_tpd_v7.main(processdate, cfg.processedpath, cfg.gtfsdirbase+'_north', cfg.processedpath, cfg.sstarttimeall, cfg.sstoptimeall, cfg.areatpdmin)
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
-#
-#def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, freqtpdmin):
-#
-high_freq_lines_w_tpd_v7.main(cfg.gtfsdate, cfg.processedpath, cfg.gtfsdirbase+'_jerusalem', cfg.processedpath, cfg.sstarttimeall, cfg.sstoptimeall, cfg.areatpdmin)
+
+high_freq_lines_w_tpd_v7.main(processdate, cfg.processedpath, cfg.gtfsdirbase+'_jerusalem', cfg.processedpath, cfg.sstarttimeall, cfg.sstoptimeall, cfg.areatpdmin)
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
-#
-#def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, freqtpdmin):
-#
-high_freq_lines_w_tpd_v7.main(cfg.gtfsdate, cfg.processedpath, cfg.gtfsdirbase+'_telavivmetro', cfg.processedpath, cfg.sstarttimeall, cfg.sstoptimeall, cfg.areatpdmin)
+
+high_freq_lines_w_tpd_v7.main(processdate, cfg.processedpath, cfg.gtfsdirbase+'_telavivmetro', cfg.processedpath, cfg.sstarttimeall, cfg.sstoptimeall, cfg.areatpdmin)
 print("Local current time :", time.asctime( time.localtime(time.time()) ))

@@ -8,13 +8,14 @@
 #
 
 import transitanalystisrael_config as cfg
+import process_date
 import trip_ids_at_stops_merge_in_muni_perday_v5
 import time
 #
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
-#
+processdate = process_date.get_date_now()
 
-trip_ids_at_stops_merge_in_muni_perday_v5.main(cfg.gtfsdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath, cfg.serviceweekstartdate)
+trip_ids_at_stops_merge_in_muni_perday_v5.main(processdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath, processdate)
 
 print("Local current time :", time.asctime( time.localtime(time.time()) ))

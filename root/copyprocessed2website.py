@@ -4,11 +4,14 @@
 # copy and rename files from processed dir to website_current dir or website_yyyymmdd dir for on demand date
 #
 import transitanalystisrael_config as cfg
+import process_date
 import shutil
 import os
 from pathlib import Path
 
 cwd = Path.cwd()
+
+processdate = process_date.get_date_now()
 
 no_data_dir = cwd.parent / cfg.websitelocalnodatapath
 current_dir = cwd.parent / cfg.websitelocalcurrentpath
@@ -75,50 +78,50 @@ else : # on_demand date
 # now add the data files from processed dir and change names to remove dates
 #
 
-print('date to remove from file names : ', cfg.gtfsdate)
+print('date to remove from file names : ', processdate)
 #  lines_on_street
-shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "lines_on_street" / "agency.js")
-shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+cfg.gtfsdate+"jerusalem.js"),dstdir / "lines_on_street" / "route_freq_jerusalem.js")
-shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+cfg.gtfsdate+"north.js"),dstdir / "lines_on_street" / "route_freq_north.js")
-shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+cfg.gtfsdate+"south.js"),dstdir / "lines_on_street" / "route_freq_south.js")
-shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+cfg.gtfsdate+"telavivmetro.js"),dstdir / "lines_on_street" / "route_freq_telavivmetro.js")
+shutil.copyfile(srcdir / ("agency_"+processdate+".js"),dstdir / "lines_on_street" / "agency.js")
+shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+processdate+"jerusalem.js"),dstdir / "lines_on_street" / "route_freq_jerusalem.js")
+shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+processdate+"north.js"),dstdir / "lines_on_street" / "route_freq_north.js")
+shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+processdate+"south.js"),dstdir / "lines_on_street" / "route_freq_south.js")
+shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+processdate+"telavivmetro.js"),dstdir / "lines_on_street" / "route_freq_telavivmetro.js")
 #line_freq
-shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "line_freq" / "agency.js")
-shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+cfg.gtfsdate+".js"),dstdir / "line_freq" / "route_freq.js")
+shutil.copyfile(srcdir / ("agency_"+processdate+".js"),dstdir / "line_freq" / "agency.js")
+shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+processdate+".js"),dstdir / "line_freq" / "route_freq.js")
 #muni_fairsharescore
-shutil.copyfile(srcdir / ("israel_city_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_fairsharescore" / "israel_city_boarders_w_properties.js")
-shutil.copyfile(srcdir / ("israel_town_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_fairsharescore" / "israel_town_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("israel_city_boarders_w_properties_"+processdate+"_"+processdate+".js"),dstdir / "muni_fairsharescore" / "israel_city_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("israel_town_boarders_w_properties_"+processdate+"_"+processdate+".js"),dstdir / "muni_fairsharescore" / "israel_town_boarders_w_properties.js")
 #muni_score_lists_and_charts
 shutil.copyfile(srcdir / ("muni_builtdensityscore_xy.js"),dstdir / "muni_score_lists_and_charts" / "muni_builtdensityscore_xy.js")
 shutil.copyfile(srcdir / ("muni_fairsharescore_xy.js"),dstdir / "muni_score_lists_and_charts" / "muni_fairsharescore_xy.js")
 shutil.copyfile(srcdir / ("muni_transitscore_xy.js"),dstdir / "muni_score_lists_and_charts" / "muni_transitscore_xy.js")
 #muni_tpd_per_line
-shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "muni_tpd_per_line" / "agency.js")
-shutil.copyfile(srcdir / ("israel_city_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_tpd_per_line" / "israel_city_boarders_w_properties.js")
-shutil.copyfile(srcdir / ("israel_town_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_tpd_per_line" / "israel_town_boarders_w_properties.js")
-shutil.copyfile(srcdir / ("muni_w_tpd_per_line_"+cfg.gtfsdate+".js"),dstdir / "muni_tpd_per_line" / "muni_w_tpd_per_line.js")
+shutil.copyfile(srcdir / ("agency_"+processdate+".js"),dstdir / "muni_tpd_per_line" / "agency.js")
+shutil.copyfile(srcdir / ("israel_city_boarders_w_properties_"+processdate+"_"+processdate+".js"),dstdir / "muni_tpd_per_line" / "israel_city_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("israel_town_boarders_w_properties_"+processdate+"_"+processdate+".js"),dstdir / "muni_tpd_per_line" / "israel_town_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("muni_w_tpd_per_line_"+processdate+".js"),dstdir / "muni_tpd_per_line" / "muni_w_tpd_per_line.js")
 #muni_transitscore
-shutil.copyfile(srcdir / ("israel_city_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_transitscore" / "israel_city_boarders_w_properties.js")
-shutil.copyfile(srcdir / ("israel_town_boarders_w_properties_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "muni_transitscore" / "israel_town_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("israel_city_boarders_w_properties_"+processdate+"_"+processdate+".js"),dstdir / "muni_transitscore" / "israel_city_boarders_w_properties.js")
+shutil.copyfile(srcdir / ("israel_town_boarders_w_properties_"+processdate+"_"+processdate+".js"),dstdir / "muni_transitscore" / "israel_town_boarders_w_properties.js")
 #stops_near_trainstops_editor
-shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "stops_near_trainstops_editor" / "agency.js")
-shutil.copyfile(srcdir / ("stopsneartrainstop_pre_edit_"+cfg.gtfsdate+".js"),dstdir / "stops_near_trainstops_editor" / "stopsneartrainstop_pre_edit.js")
-shutil.copyfile(srcdir / ("stops_"+cfg.gtfsdate+".js"),dstdir / "stops_near_trainstops_editor" / "stops.js")
-shutil.copyfile(srcdir / ("trainstop_w_tpd_per_line_"+cfg.gtfsdate+".js"),dstdir / "stops_near_trainstops_editor" / "trainstop_w_tpd_per_line.js")
-shutil.copyfile(srcdir / ("train_stops_"+cfg.gtfsdate+".js"),dstdir / "stops_near_trainstops_editor" / "train_stops.js")
+shutil.copyfile(srcdir / ("agency_"+processdate+".js"),dstdir / "stops_near_trainstops_editor" / "agency.js")
+shutil.copyfile(srcdir / ("stopsneartrainstop_pre_edit_"+processdate+".js"),dstdir / "stops_near_trainstops_editor" / "stopsneartrainstop_pre_edit.js")
+shutil.copyfile(srcdir / ("stops_"+processdate+".js"),dstdir / "stops_near_trainstops_editor" / "stops.js")
+shutil.copyfile(srcdir / ("trainstop_w_tpd_per_line_"+processdate+".js"),dstdir / "stops_near_trainstops_editor" / "trainstop_w_tpd_per_line.js")
+shutil.copyfile(srcdir / ("train_stops_"+processdate+".js"),dstdir / "stops_near_trainstops_editor" / "train_stops.js")
 #tpd_at_stops_per_line
-shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "tpd_at_stops_per_line" / "agency.js")
-shutil.copyfile(srcdir / ("stops_w_tpd_per_line_"+cfg.gtfsdate+"_"+cfg.gtfsdate+".js"),dstdir / "tpd_at_stops_per_line" / "stops_w_tpd_per_line.js")
+shutil.copyfile(srcdir / ("agency_"+processdate+".js"),dstdir / "tpd_at_stops_per_line" / "agency.js")
+shutil.copyfile(srcdir / ("stops_w_tpd_per_line_"+processdate+"_"+processdate+".js"),dstdir / "tpd_at_stops_per_line" / "stops_w_tpd_per_line.js")
 #tpd_near_trainstops_per_line
-shutil.copyfile(srcdir / ("agency_"+cfg.gtfsdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "agency.js")
-shutil.copyfile(srcdir / ("stopswtrainstopids_"+cfg.gtfsdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "stopswtrainstopids.js")
-shutil.copyfile(srcdir / ("trainstop_w_tpd_per_line_"+cfg.gtfsdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "trainstop_w_tpd_per_line.js")
-shutil.copyfile(srcdir / ("train_stops_"+cfg.gtfsdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "train_stops.js")
+shutil.copyfile(srcdir / ("agency_"+processdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "agency.js")
+shutil.copyfile(srcdir / ("stopswtrainstopids_"+processdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "stopswtrainstopids.js")
+shutil.copyfile(srcdir / ("trainstop_w_tpd_per_line_"+processdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "trainstop_w_tpd_per_line.js")
+shutil.copyfile(srcdir / ("train_stops_"+processdate+".js"),dstdir / "tpd_near_trainstops_per_line" / "train_stops.js")
 #transitscore
 shutil.copyfile(srcdir / ("israel_city_boarders.js"),dstdir / "transitscore" / "israel_city_boarders.js")
 shutil.copyfile(srcdir / ("israel_town_boarders.js"),dstdir / "transitscore" / "israel_town_boarders.js")
-shutil.copyfile(srcdir / ("ts_lookup_israel"+cfg.gtfsdate+".js"),dstdir / "transitscore" / "ts_lookup.js")
-shutil.copyfile(srcdir / ("ts_rendered_israel"+cfg.gtfsdate+".png"),dstdir / "transitscore" / "ts_rendered.png")
+shutil.copyfile(srcdir / ("ts_lookup_israel"+processdate+".js"),dstdir / "transitscore" / "ts_lookup.js")
+shutil.copyfile(srcdir / ("ts_rendered_israel"+processdate+".png"),dstdir / "transitscore" / "ts_rendered.png")
 
 print(os.listdir(dstdir))
 

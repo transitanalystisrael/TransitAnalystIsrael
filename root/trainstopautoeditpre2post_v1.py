@@ -5,6 +5,7 @@
 #
 print('----------------- stops near train station auto editor pre to post txt file --------------------------')
 import transitanalystisrael_config as cfg
+import process_date
 from datetime import date
 from datetime import timedelta
 import time
@@ -13,11 +14,13 @@ from pathlib import Path
 
 cwd = Path.cwd()
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
+
+processdate = process_date.get_date_now()
 #_________________________________
 #
 # input:
 parent_path = cwd.parent / cfg.processedpath
-servicedate = cfg.gtfsdate
+servicedate = processdate
 refservicedate = cfg.autoeditrefdate
 ref_post_txt_filein = 'stopsneartrainstop_post_edit'+'_'+refservicedate+'.txt'
 ref_pre_txt_filein = 'stopsneartrainstop_pre_edit'+'_'+refservicedate+'.txt'

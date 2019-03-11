@@ -12,6 +12,7 @@ from io import BytesIO
 import generate_transfers_table
 from logger import _log
 import transitanalystisrael_config as cfg
+import process_date
 from pathlib import Path
 from datetime import datetime as dt
 import glob
@@ -35,7 +36,8 @@ def get_config_params():
             if not Path.is_dir(navitia_docker_compose_file_path):
                 os.mkdir(navitia_docker_compose_file_path)
     gtfs_file_path = Path(os.getcwd()).parent / cfg.gtfspath
-    gtfs_zip_file_name = cfg.gtfsdirbase + cfg.gtfsdate + ".zip"
+    processdate = process_date.get_date_now()
+    gtfs_zip_file_name = cfg.gtfsdirbase + processdate + ".zip"
     return default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_file_path, \
            navitia_docker_compose_file_name, navitia_docker_compose_ondemand_file_path, \
            navitia_docker_compose_ondemand_file_name, gtfs_file_path, gtfs_zip_file_name

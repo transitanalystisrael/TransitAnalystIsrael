@@ -8,13 +8,14 @@
 #
 
 import transitanalystisrael_config as cfg
+import process_date
 import tpd_at_stops_per_line_v2
 import time
 #
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
-#
+processdate = process_date.get_date_now()
 
-tpd_at_stops_per_line_v2.main(cfg.gtfsdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath, cfg.serviceweekstartdate)
+tpd_at_stops_per_line_v2.main(processdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath, processdate)
 
 print("Local current time :", time.asctime( time.localtime(time.time()) ))

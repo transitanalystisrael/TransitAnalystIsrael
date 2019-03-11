@@ -4,6 +4,7 @@
 #
 # """
 import transitanalystisrael_config as cfg
+import process_date
 import time
 import sys
 from dateutil import parser
@@ -97,6 +98,7 @@ def get_gtfs_file_from_url_ftp(url, file_name_on_server, _log):
             size = 0
 
             local_file_name = cfg.gtfsdirbase
+            processdate = process_date.get_date_now()
             ftp.dir("", file_lines.append)
             for line in file_lines:
                 tokens = line.split(maxsplit=4)
@@ -104,8 +106,7 @@ def get_gtfs_file_from_url_ftp(url, file_name_on_server, _log):
                 if name == file_name_on_server:
                     time_str = tokens[0]
                     actual_time = parser.parse(time_str)
-                    local_file_name = local_file_name + str(actual_time.strftime('%Y') +  actual_time.strftime('%m')
-                                                            + actual_time.strftime('%d')) + ".zip"
+                    local_file_name = local_file_name + processdate + ".zip"
                     size = float(tokens[2])
 
             pardir = Path(os.getcwd()).parent

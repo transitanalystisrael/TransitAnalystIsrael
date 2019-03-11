@@ -20,15 +20,18 @@
 print('----------------- count the number of trips per day tpd for all lines (unique routes) --------------------------')
 print('generate js file of routes with name max trips per day and shape geometry')
 import transitanalystisrael_config as cfg
+import process_date
 import high_freq_lines_w_tpd_v7
 import time
 #
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
+processdate = process_date.get_date_now()
+
 #def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, freqtpdmin):
 #high_freq_lines_w_tpd_v7.main('20181021', 'C:\\transitanalyst\\gtfs\\', 'israel', 'C:\\transitanalyst\\processed\\', '00:00:00', '24:00:00', 60)
 #
 
-high_freq_lines_w_tpd_v7.main(cfg.gtfsdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath, cfg.sstarttimeall, cfg.sstoptimeall, cfg.freqtpdmin)
+high_freq_lines_w_tpd_v7.main(processdate, cfg.gtfspath, cfg.gtfsdirbase, cfg.processedpath, cfg.sstarttimeall, cfg.sstoptimeall, cfg.freqtpdmin)
 
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
