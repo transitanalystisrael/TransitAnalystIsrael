@@ -40,6 +40,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
                                          navitia_docker_compose_file_name, default_coverage_name, default_cov_eos_date,
                                          _log):
 
+    start_processing_time = datetime.datetime.now()
     # Re-start Navitia docker with default coverage only in order to process the OSM & GTFS
     # Later we will restart with the custom coverage as well
     utils.stop_all_containers(docker_client)
@@ -66,15 +67,15 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
                                                            navitia_docker_compose_file_name)
 
     # After 20 minutes - test that both osm and gtfs conversions are done
-    success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30)
+    success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30, start_processing_time)
 
     # If it didn't succeed, give it 30 more minutes
     if not success:
-        success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30)
+        success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30, start_processing_time)
 
     # If it didn't succeed, give it 30 more minutes
     if not success:
-        success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30)
+        success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30, start_processing_time)
 
     if not success:
         _log.error("After 90 minutes - tasks aren't completed - connect to server for manual inspection")
