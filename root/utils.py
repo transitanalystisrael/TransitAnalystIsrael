@@ -476,8 +476,8 @@ def validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, time_to_wait,
                 ####################
                 ####################
                 print("####################" + line)
-                print("start_processing_time" + start_processing_time)
-                print("time_of_line" + time_of_line)
+                print("start_processing_time" + str(start_processing_time))
+                print("time_of_line" + str(time_of_line))
                 if start_processing_time < time_of_line:
                     ed2nav_completed = True
                     break
