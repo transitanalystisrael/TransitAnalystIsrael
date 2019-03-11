@@ -52,7 +52,7 @@ ttm_server_on = 'aws_ec2'
 
 # common config
 gtfsdate = '20190310'
-serviceweekstartdate = '20190310'
+serviceweekstartdate = '20190310' # currently must be the same as serviceweekstartdate
 gtfsdirbase = 'israel'
 gtfs_url = 'gtfs.mot.gov.il'
 gtfs_file_name_on_mot_server = 'israel-public-transportation.zip' 
