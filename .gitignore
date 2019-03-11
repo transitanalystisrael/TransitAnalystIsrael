@@ -13,6 +13,7 @@ AWS Lambda function/myDeploymentPackage.zip
 AWS Lambda function/function_with_details1.py
 processed/
 website_current/
+website_20*
 website_past/
 root/venv/
 root/logs/
