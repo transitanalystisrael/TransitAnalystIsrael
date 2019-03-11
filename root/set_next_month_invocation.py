@@ -11,7 +11,7 @@ next_month_operation_date = process_date.get_auto_date_nextmonth() # The date th
 next_month_operation_date = dt.strptime(next_month_operation_date, '%Y%m%d')
 next_mont_invocatio_date = next_month_operation_date - datetime.timedelta(days=1) # The date that the product starts update
 # Set to run in the next day only once at 22:30
-scheduleExpression = next_mont_invocatio_date.strftime("cron(30 22 %m %d ? %Y)") #cron(30 12 11 03 ? 2019)
+scheduleExpression = next_mont_invocatio_date.strftime("cron(30 22 %d %m ? %Y)") #cron(30 12 11 03 ? 2019)
 response = client.put_rule(
     Name="GTFS-Monthly-Timer",
     ScheduleExpression=scheduleExpression,
