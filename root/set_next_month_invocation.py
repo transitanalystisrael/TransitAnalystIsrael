@@ -14,6 +14,6 @@ next_mont_invocatio_date = next_month_operation_date - datetime.timedelta(days=1
 scheduleExpression = next_mont_invocatio_date.strftime("cron(30 22 %m %d ? %Y)") #cron(30 12 11 03 ? 2019)
 response = client.put_rule(
     Name="GTFS-Monthly-Timer",
-    ScheduleExpression='scheduleExpression',
+    ScheduleExpression=scheduleExpression,
     State='ENABLED'
 )
