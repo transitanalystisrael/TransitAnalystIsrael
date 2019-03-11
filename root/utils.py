@@ -451,22 +451,43 @@ def validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, time_to_wait,
     _log.info("I'm back! Verifying that the conversions took place")
     # Success status look like Task tyr.binarisation.ed2nav[feac06ca-51f7-4e39-bf1d-9541eaac0988] succeeded
     # and tyr.binarisation.gtfs2ed[feac06ca-51f7-4e39-bf1d-9541eaac0988] succeeded
-    with open("tyr_worker_output.txt", "w", encoding="UTF-8") as tyr_worker_output:
+
+    ####################
+    ####################
+    ####################
+    ####################
+    ####################
+    tyr_worker_outputname = "tyr_worker_output" + str(time.time()) + ".txt"
+
+    with open(tyr_worker_outputname, "w", encoding="UTF-8") as tyr_worker_output:
         tyr_worker_output.write(worker_con.logs().decode('utf-8'))
     tyr_worker_output.close()
 
     ed2nav_completed = False
-    with open("tyr_worker_output.txt", "r", encoding="UTF-8") as tyr_worker_output:
+    with open(tyr_worker_outputname, "r", encoding="UTF-8") as tyr_worker_output:
         lines = tyr_worker_output.readlines()
         for line in reversed(lines):
             if re.compile(r'tyr\.binarisation\.ed2nav\[\S*\] succeeded').search(line):
                 time_of_line = re.findall(r'\d{1,4}-\d{1,2}-\d{1,2}\b \d{1,2}:\d{1,2}:\d{1,2}', line)
                 time_of_line = dt.strptime(time_of_line[0], '%Y-%m-%d %H:%M:%S')
+                ####################
+                ####################
+                ####################
+                ####################
+                ####################
+                print("####################" + line)
+                print("start_processing_time" + start_processing_time)
+                print("time_of_line" + time_of_line)
                 if start_processing_time < time_of_line:
                     ed2nav_completed = True
                     break
+    ####################
+    ####################
+    ####################
+    ####################
+    ####################
 
-    os.remove("tyr_worker_output.txt")
+    # os.remove(tyr_worker_outputname)
     if ed2nav_completed:
         _log.info("OSM conversion task ed2nav, GTFS conversion task gtfs2ed  and ed2nav are successful")
         return True
