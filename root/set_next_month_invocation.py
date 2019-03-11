@@ -1,6 +1,6 @@
 import boto3
 
-client = boto3.client('events')
+client = boto3.client('events',region_name='eu-central-1')
 response = client.put_rule(
     Name="test",
     # ScheduleExpression='string',
