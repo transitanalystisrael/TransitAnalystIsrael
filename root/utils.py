@@ -168,6 +168,10 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
     """
 
     # Check that the current default coverage is up-to-date by comparing sop dates
+    stop_all_containers(docker_client)
+
+    is_up = start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
+                                       default_coverage_name, True)
     default_cov_sop_date = get_coverage_start_production_date(default_coverage_name)
     if default_cov_prev_sop_date == default_cov_sop_date:
         _log.error("The %s coverage seems not to be up-to-date following update attempts.\n Production date stayed the "
