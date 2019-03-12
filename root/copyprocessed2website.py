@@ -7,6 +7,7 @@ import transitanalystisrael_config as cfg
 import process_date
 import shutil
 import os
+import utils
 from pathlib import Path
 
 cwd = Path.cwd()
@@ -163,6 +164,13 @@ if cfg.get_service_date == 'auto' :
 		os.remove(out_dir / tempjsfile)
 	else :
 		print (in_dir / jsfile, ' does not exist')
+
+#
+# if running on AWS then erase all files from processed dir
+#
+if utils.is_aws_machine(): 
+	shutil.rmtree(cwd.parent / cfg.processedpath)
+	os.mkdir(cwd.parent / cfg.processedpath)
 
 
 '''
