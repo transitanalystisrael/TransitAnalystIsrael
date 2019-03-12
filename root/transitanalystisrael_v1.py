@@ -11,10 +11,10 @@ update_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
 
 try:
 
-    if cfg.get_service_date == 'auto' :
-        # get gtfs files and osm file
-        _log.info("Download OSM & GTFS")
-        import gtfs_osm_download
+    # if cfg.get_service_date == 'auto' :
+    #     # get gtfs files and osm file
+    #     _log.info("Download OSM & GTFS")
+    #     import gtfs_osm_download
 
     # #unzip gtfs file
     # import gtfs_unzip
