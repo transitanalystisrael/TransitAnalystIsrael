@@ -60,8 +60,8 @@ serviceweekstartdate = '20190302'
 	a. Run the Docker Desktop for Windows application and wait for it to come up.
 	b. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
 	c. Right-click and select run "Git Bash Here" to open a terminal window.
-	d. type at the prompt "docker-compose up"
-		$ docker-compose up
+	d. type at the prompt "docker-compose -f compose\ files/docker-compose-secondary-cov.yml -p navitia-docker-compose up"
+		$ docker-compose -f compose\ files/docker-compose-secondary-cov.yml -p navitia-docker-compose up
 
 5. Run transitanalystisrael_v1.py with python3
 	a. open a window in the pythonpath (as in the config file) e.g. C:\git\TransitAnalystIsrael\root
