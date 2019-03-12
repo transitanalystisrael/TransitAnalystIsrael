@@ -96,8 +96,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
                                         navitia_docker_compose_file_name)
 
     elif cfg.get_service_date == "on_demand":
-        is_changes_applied = utils.validate_graph_changes_applied(coverage_name, coverage_name, cov_sop_date,
-                                                                  docker_client)
+        is_changes_applied = utils.validate_graph_changes_applied(coverage_name, coverage_name)
 
     # If it's up - delete the old gtfs and osm files
     if is_changes_applied:
