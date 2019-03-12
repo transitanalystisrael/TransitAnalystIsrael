@@ -36,24 +36,24 @@
 #ttm_server_on = 'none'
 
 #On demand date on local pc
-get_service_date = 'on_demand'
-python_processing = 'local_pc'
-ttm_graph_processing = 'local_pc'
-web_client_hosted_on = 'local_pc'
-ttm_server_on = 'local_pc'
-
-#On demand date on local pc no TTM
 #get_service_date = 'on_demand'
 #python_processing = 'local_pc'
-#ttm_graph_processing = 'none'
+#ttm_graph_processing = 'local_pc'
 #web_client_hosted_on = 'local_pc'
-#ttm_server_on = 'none'
+#ttm_server_on = 'local_pc'
+
+#On demand date on local pc no TTM
+get_service_date = 'on_demand'
+python_processing = 'local_pc'
+ttm_graph_processing = 'none'
+web_client_hosted_on = 'local_pc'
+ttm_server_on = 'none'
 
 
 # common config
 # note - gtfsdate and serviceweekstartdate must be the same!!! (untill all scripts support different dates...)
-gtfsdate = '20190202'
-serviceweekstartdate = '20190202'
+gtfsdate = '20190303'
+serviceweekstartdate = '20190303'
 autodatefile = 'auto_dates_to_process.json'
 gtfsdirbase = 'israel'
 gtfs_url = 'gtfs.mot.gov.il'
