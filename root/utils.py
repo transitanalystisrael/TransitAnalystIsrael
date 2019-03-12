@@ -26,21 +26,20 @@ def get_config_params():
     # Get parameters
     default_coverage_name = cfg.default_coverage_name
     secondary_custom_coverage_name = cfg.secondary_custom_coverage_name
-    navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"
-    navitia_docker_compose_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose"
-    navitia_docker_compose_ondemand_file_name = ""
-    navitia_docker_compose_ondemand_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose" / "custom_compose"
+    # navitia_docker_compose_file_name = "docker-israel-custom-instances.yml"-needed only when 2 coverages should be up
+    # Currently we only bring up one coverage and it's always the previous month to be aligned with past and current
+    # websites. The regular coverage (most current) file is: "docker-compose.yml"
+    coverage_name = secondary_custom_coverage_name
+    navitia_docker_compose_file_name = "docker-compose-secondary-cov.yml"
+    navitia_docker_compose_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose" / "compose files"
     if cfg.get_service_date == "on_demand":
-            navitia_docker_compose_ondemand_file_name = "navitia-docker-ondemand-" + cfg.gtfsdate + ".yml"
-            secondary_custom_coverage_name = "ondemand-" + cfg.gtfsdate
-            if not Path.is_dir(navitia_docker_compose_file_path):
-                os.mkdir(navitia_docker_compose_file_path)
+        navitia_docker_compose_file_name = "navitia-docker-custom-" + cfg.gtfsdate + ".yml"
+        coverage_name = "ondemand-" + cfg.gtfsdate
     gtfs_file_path = Path(os.getcwd()).parent / cfg.gtfspath
     processdate = process_date.get_date_now()
     gtfs_zip_file_name = cfg.gtfsdirbase + processdate + ".zip"
-    return default_coverage_name, secondary_custom_coverage_name, navitia_docker_compose_file_path, \
-           navitia_docker_compose_file_name, navitia_docker_compose_ondemand_file_path, \
-           navitia_docker_compose_ondemand_file_name, gtfs_file_path, gtfs_zip_file_name
+    return default_coverage_name, coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name, \
+           gtfs_file_path, gtfs_zip_file_name
 
 
 
@@ -157,7 +156,8 @@ def get_coverage_start_production_date(coverage_name):
         return start_production_date
 
 
-def validate_graph_changes_applied(default_coverage_name, secondary_custom_coverage_name, default_cov_sop_date, worker_con):
+def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, default_cov_prev_sop_date, docker_client,
+                                        navitia_docker_compose_file_path, navitia_docker_compose_file_name):
     """
     Validate that the secondary_custom_coverage has the original start of production date of the previous default
     coverage and that the default cov has a now different date (usually later one)
@@ -167,29 +167,53 @@ def validate_graph_changes_applied(default_coverage_name, secondary_custom_cover
     :return: whether the graph changes were applied
     """
 
-    if cfg.get_service_date == "auto":
-        # Check that the current default coverage is up-to-date by comparing sop dates
-        if get_coverage_start_production_date(default_coverage_name) == default_cov_sop_date:
-            _log.error("The %s coverage seems not to be up-to-date following update attempts.\n Production date stayed the "
-                       "same. ", default_coverage_name)
-            raise Exception
-        # Check that the current secondary coverage is up-to-date by comparing to the original default sop date
-        if is_cov_exists(worker_con, secondary_custom_coverage_name) \
-                and not get_coverage_start_production_date(secondary_custom_coverage_name) == default_cov_sop_date:
-            _log.error("The %s coverage seems not to be up-to-date following update attempts.\n Production date should be "
-                       "the same as old %s coverage date", secondary_custom_coverage_name, default_coverage_name)
-            raise Exception
-        else:
-            _log.info(" %s and %s coverages start of production dates are updated.\nCoverages were updated successfully",
-                      default_coverage_name, secondary_custom_coverage_name)
+    # Check that the current default coverage is up-to-date by comparing sop dates
+    default_cov_sop_date = get_coverage_start_production_date(default_coverage_name)
+    if default_cov_prev_sop_date == default_cov_sop_date:
+        _log.error("The %s coverage seems not to be up-to-date following update attempts.\n Production date stayed the "
+                   "same. ", default_coverage_name)
+        return False
+    else:
+        _log.info("%s coverage is now updated with new start-of-production date %s", default_coverage_name,
+                  default_cov_sop_date)
 
-    elif cfg.get_service_date == "on_demand":
-        if get_coverage_start_production_date(secondary_custom_coverage_name) == "":
-            _log.error("The %s coverage seems not to be up-to-date following update attempts.\n No production date",
-                       secondary_custom_coverage_name)
-            raise Exception
+    # Check that the coverage_name (the previous one) is up-to-date by comparing sop dates
+    stop_all_containers(docker_client)
 
-def start_navitia_with_default_coverage(navitia_docker_compose_file_path, extend_wait_time=False):
+    is_up = start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
+                                       coverage_name, True)
+    if not is_up:
+        _log.error("The %s coverage seems not to be up", coverage_name)
+    cov_sop_date = get_coverage_start_production_date(coverage_name)
+
+    if cov_sop_date  != default_cov_prev_sop_date:
+        _log.error("The %s coverage seems not to be up-to-date following update attempts.\n Production date is "
+                   "%s and should be %s. ", coverage_name, cov_sop_date ,default_cov_prev_sop_date)
+        return False
+    _log.info("%s coverage is now updated with new start-of-production date %s", coverage_name,
+              cov_sop_date)
+    return True
+
+def validate_graph_changes_applied(coverage_name, cov_prev_sop_date):
+    """
+    Validate that the coverage has a different start of production date different from before
+    :param coverage_name:
+    :param cov_prev_sop_date: the start-of-production date before data processing has started
+    :return:
+    """
+
+    cov_sop_date = get_coverage_start_production_date(coverage_name)
+    if cov_sop_date == "" or cov_prev_sop_date == cov_sop_date:
+        _log.error("The %s coverage seems not to be up-to-date following update attempts."
+                   "\n No production date or date isn't updated following data processing",
+                   coverage_name)
+        return False
+
+    _log.info("%s coverage is now updated with new start-of-production date %s", coverage_name, cov_sop_date)
+    return True
+
+def start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
+                                       coverage_name, extend_wait_time=False):
     """
     Start Navitia server with only default coverage (using docker-compose)
     :param navitia_docker_compose_file_path: path where docker-compose file exists
@@ -201,30 +225,30 @@ def start_navitia_with_default_coverage(navitia_docker_compose_file_path, extend
     _log.info("Attempting to start Navitia with default coverage")
 
     # run the docker- compose and redirect logs to prevent from printing in the output
-    navitia_docker_start_command = "docker-compose up"
+    navitia_docker_start_command = "docker-compose -f" + navitia_docker_compose_file_name + " -p navitia-docker-compose up"
+
     subprocess.Popen(navitia_docker_start_command, shell=True, cwd=navitia_docker_compose_file_path, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
     # Longer wait time is required because images are being re-downloaded
     if extend_wait_time:
         t_wait = 60 * 10
     else:
-        t_wait = 60 * 4
+        t_wait = 60 * 3
     _log.info("Waiting %s seconds to validate Navitia docker is up and running", t_wait)
     time.sleep(t_wait)
 
     # Check if default coverage is up and running
-    default_coverage_name = "default"
-    is_default_up = check_coverage_running(get_navitia_url_for_cov_status(default_coverage_name), default_coverage_name)
+    is_default_up = check_coverage_running(get_navitia_url_for_cov_status(coverage_name), coverage_name)
     if not is_default_up:
         return False
     return True
 
 
-def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
-                               navitia_docker_compose_ondemand_file_path, navitia_docker_compose_file_name,
-                               extend_wait_time=False):
+def start_navitia_w_default_and_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
+                                           navitia_docker_compose_custom_file_path, navitia_docker_compose_file_name,
+                                           extend_wait_time=False):
     """
-    Start Navitia server with default and secondary coverages (using custom docker-compose file)
+    Start Navitia server with default and custom coverages (using custom docker-compose file)
 
     :param secondary_custom_coverage_name:
     :param navitia_docker_compose_file_path: path where docker-compose file exists
@@ -234,62 +258,66 @@ def start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_co
     :return:  Whether Navitia was started successfully with default and secondary coverages
     """
 
+    _log.error("This method isn't currently used because 2 corages require server with at least 10GB RAM available for "
+               "docker.\nEach coverage requires about 3.5 RAM when running")
+    raise Exception
     # Verifying the custom file has another coverage named secondary_custom_coverage_name which isn't "default"
-    _log.info("Attempting to start Navitia with default coverage and %s coverage", secondary_custom_coverage_name)
-    navitia_docker_compose_file = open(os.path.join(navitia_docker_compose_ondemand_file_path,navitia_docker_compose_file_name), mode='r')
-    navitia_docker_compose_file_contents = navitia_docker_compose_file.read()
-    navitia_docker_compose_file.close()
+    # _log.info("Attempting to start Navitia with default coverage and %s coverage", secondary_custom_coverage_name)
+    # navitia_docker_compose_custom_file = open(os.path.join(navitia_docker_compose_custom_file_path,
+    #                                                        navitia_docker_compose_file_name), mode='r')
+    # navitia_docker_compose_custom_file_contents = navitia_docker_compose_custom_file.read()
+    # navitia_docker_compose_custom_file.close()
+    #
+    # if secondary_custom_coverage_name != "default" \
+    #         and not secondary_custom_coverage_name in navitia_docker_compose_custom_file_contents:
+    #     _log.error("The custom configuration does not include a coverage area named: %s. Fix config, restart docker "
+    #                "and start again", secondary_custom_coverage_name)
+    #     return False
+    #
+    #     # run the docker- compose and redirect logs to prevent from printing in the output
+    # regular_docker_compose_file_full_path = str(Path(navitia_docker_compose_file_path) / "docker-compose.yml")
+    # navitia_docker_start_command = "docker-compose -f " + regular_docker_compose_file_full_path + " -f " + \
+    #                                navitia_docker_compose_file_name + " -p navitia-docker-compose up"
+    #
+    # subprocess.Popen(navitia_docker_start_command, shell=True, cwd=navitia_docker_compose_custom_file_path, stderr=subprocess.DEVNULL,
+    #                  stdout=subprocess.DEVNULL)
+    # # Longer wait time is required because images are being re-downloaded
+    # if extend_wait_time:
+    #     t_wait = 60 * 5
+    # else:
+    #     t_wait = 240
+    # _log.info("Waiting %s seconds to validate Navitia docker is up and running", t_wait)
+    # time.sleep(t_wait)
+    #
+    # # Check if default and secondary_custom_coverage_name regions are up and running
+    # if cfg.get_service_date == 'auto':
+    #     default_coverage_name = "default"
+    #     is_default_up = check_coverage_running(get_navitia_url_for_cov_status(default_coverage_name), default_coverage_name)
+    #     if not is_default_up:
+    #         return False
+    # is_secondary_up = check_coverage_running(get_navitia_url_for_cov_status(secondary_custom_coverage_name),
+    #                                          secondary_custom_coverage_name)
+    # if not is_secondary_up:
+    #     return False
+    # return True
 
-    if secondary_custom_coverage_name != "default" \
-            and not secondary_custom_coverage_name in navitia_docker_compose_file_contents:
-        _log.error("The custom configuration does not include a coverage area named: %s. Fix config, restart docker "
-                   "and start again", secondary_custom_coverage_name)
-        return False
-
-        # run the docker- compose and redirect logs to prevent from printing in the output
-    regular_docker_compose_file_full_path = str(Path(navitia_docker_compose_file_path) / "docker-compose.yml")
-    navitia_docker_start_command = "docker-compose -f " + regular_docker_compose_file_full_path + " -f " + \
-                                   navitia_docker_compose_file_name + " up"
-
-    subprocess.Popen(navitia_docker_start_command, shell=True, cwd=navitia_docker_compose_ondemand_file_path, stderr=subprocess.DEVNULL,
-                     stdout=subprocess.DEVNULL)
-
-    # Longer wait time is required because images are being re-downloaded
-    if extend_wait_time:
-        t_wait = 60 * 5
-    else:
-        t_wait = 240
-    _log.info("Waiting %s seconds to validate Navitia docker is up and running", t_wait)
-    time.sleep(t_wait)
-
-    # Check if default and secondary_custom_coverage_name regions are up and running
-    default_coverage_name = "default"
-    is_default_up = check_coverage_running(get_navitia_url_for_cov_status(default_coverage_name), default_coverage_name)
-    is_secondary_up = check_coverage_running(get_navitia_url_for_cov_status(secondary_custom_coverage_name),
-                                             secondary_custom_coverage_name)
-    if not is_default_up or not is_secondary_up:
-        return False
-    return True
-
-def generate_ondemand_docker_config_file(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
-                                                   navitia_docker_compose_ondemand_file_path,
-                                                   navitia_docker_compose_ondemand_file_name):
+def generate_ondemand_docker_config_file(navitia_docker_compose_file_path, navitia_docker_compose_file_name):
     '''
-    Creates a custom docker-compose file for on-demand environment
+    Creates a custom docker-compose file for on-demand environment from the docker-israel-custom-instances.yml file
     '''
-    navitia_docker_compose_file = open(os.path.join(navitia_docker_compose_file_path, navitia_docker_compose_file_name),
+    navitia_docker_compose_file = open(os.path.join(navitia_docker_compose_file_path, 'docker-compose.yml'),
                                        mode='r')
     navitia_docker_compose_file_contents = navitia_docker_compose_file.read()
     navitia_docker_compose_file.close()
 
-    custom_ondemand_docker_file_contents = navitia_docker_compose_file_contents.replace("secondary-cov",
+    custom_custom_docker_file_contents = navitia_docker_compose_file_contents.replace("default",
                                                                                         "ondemand-" + cfg.gtfsdate)
 
-    with open(os.path.join(navitia_docker_compose_ondemand_file_path, navitia_docker_compose_ondemand_file_name),
-              mode='w+') as custom_ondemand_docker_file:
-        custom_ondemand_docker_file.write(custom_ondemand_docker_file_contents)
-    custom_ondemand_docker_file.close()
-    _log.info("Created custom docker-compose file: %s", navitia_docker_compose_ondemand_file_name)
+    with open(os.path.join(navitia_docker_compose_file_path, navitia_docker_compose_file_name),
+              mode='w+') as custom_custom_docker_file:
+        custom_custom_docker_file.write(custom_custom_docker_file_contents)
+    custom_custom_docker_file.close()
+    _log.info("Created custom docker-compose file: %s", navitia_docker_compose_file_name)
 
 
 def move_current_to_past(container, source_cov_name, dest_cov_name):
@@ -376,9 +404,10 @@ def delete_file_from_host(file_name):
     Delete a file from the host running this script
     :param file_name: the file name to be deleted
     """
-    delete_command = "rm " + file_name
-    subprocess.Popen(delete_command, shell=True)
-    _log.info("Finished deleting %s from host", file_name)
+    if os.path.isfile(file_name):
+        delete_command = "rm " + file_name
+        subprocess.Popen(delete_command, shell=True)
+        _log.info("Finished deleting %s from host", file_name)
 
 
 def stop_all_containers(docker_client):
@@ -451,13 +480,7 @@ def validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, time_to_wait,
     _log.info("I'm back! Verifying that the conversions took place")
     # Success status look like Task tyr.binarisation.ed2nav[feac06ca-51f7-4e39-bf1d-9541eaac0988] succeeded
     # and tyr.binarisation.gtfs2ed[feac06ca-51f7-4e39-bf1d-9541eaac0988] succeeded
-
-    ####################
-    ####################
-    ####################
-    ####################
-    ####################
-    tyr_worker_outputname = "tyr_worker_output" + str(time.time()) + ".txt"
+    tyr_worker_outputname = "tyr_worker_output.txt"
 
     with open(tyr_worker_outputname, "w", encoding="UTF-8") as tyr_worker_output:
         tyr_worker_output.write(worker_con.logs().decode('utf-8'))
@@ -470,24 +493,10 @@ def validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, time_to_wait,
             if re.compile(r'tyr\.binarisation\.ed2nav\[\S*\] succeeded').search(line):
                 time_of_line = re.findall(r'\d{1,4}-\d{1,2}-\d{1,2}\b \d{1,2}:\d{1,2}:\d{1,2}', line)
                 time_of_line = dt.strptime(time_of_line[0], '%Y-%m-%d %H:%M:%S')
-                ####################
-                ####################
-                ####################
-                ####################
-                ####################
-                print("####################" + line)
-                print("start_processing_time" + str(start_processing_time))
-                print("time_of_line" + str(time_of_line))
                 if start_processing_time < time_of_line:
                     ed2nav_completed = True
                     break
-    ####################
-    ####################
-    ####################
-    ####################
-    ####################
-
-    # os.remove(tyr_worker_outputname)
+    os.remove(tyr_worker_outputname)
     if ed2nav_completed:
         _log.info("OSM conversion task ed2nav, GTFS conversion task gtfs2ed  and ed2nav are successful")
         return True
@@ -495,8 +504,7 @@ def validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, time_to_wait,
         _log.error("After %s minutes - tasks aren't completed", time_to_wait)
         return False
 
-def validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_custom_coverage_name,
-                                          navitia_docker_compose_file_path, navitia_docker_compose_ondemand_file_path,
+def validate_osm_gtfs_convertion_to_graph_is_running(docker_client, coverage_name, navitia_docker_compose_file_path,
                                                      navitia_docker_compose_file_name):
     """
     Validates that the conversion of gtfs & OSM to Navitia graph is undergoing (continious process).
@@ -517,7 +525,8 @@ def validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_cu
     if not beat_con:
         # restarting tyr_beat
         _log.info("tyr_beat is down, attempting to re-run")
-        tyr_beat_start_command = "docker-compose up tyr_beat"
+        tyr_beat_start_command = "docker-compose -f" + navitia_docker_compose_file_name + " -p navitia-docker-compose" \
+                                                                                          " up tyr_beat"
         time_beat_restarted = dt.utcnow()
         with open("tyr_beat_output.txt", "w", encoding="UTF-8") as tyr_beat_output:
             subprocess.Popen(tyr_beat_start_command, cwd=navitia_docker_compose_file_path,
@@ -556,10 +565,10 @@ def validate_osm_gtfs_convertion_to_graph_is_running(docker_client, secondary_cu
             _log.info("%s image is removed", beat_image_id)
 
             # re-run navitia docker-compose which re-downloads the tyr_beat container
-            _log.info("Restarting docker with default coverage and custom coverage: %s",
-                      secondary_custom_coverage_name)
-            start_navitia_w_custom_cov(secondary_custom_coverage_name, navitia_docker_compose_file_path,
-                                       navitia_docker_compose_ondemand_file_path, navitia_docker_compose_file_name, True)
+            _log.info("Restarting docker with %s coverage",
+                      coverage_name)
+            start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
+                                               coverage_name, True)
         # removing the log file
         os.remove("tyr_beat_output.txt")
 
