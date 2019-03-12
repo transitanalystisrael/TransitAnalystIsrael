@@ -36,7 +36,8 @@ from logger import _log
 
 
 def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path,
-                                         navitia_docker_compose_file_name, coverage_name, default_coverage_name,
+                                         navitia_docker_compose_file_name, navitia_docker_compose_default_file_name,
+                                         coverage_name, default_coverage_name,
                                          cov_eos_date, osm_file_path, osm_file_name,
                                          gtfs_file_path, gtfs_file_name, _log):
 
@@ -83,7 +84,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
     # If it didn't succeed, give it 30 more minutes
     if not success:
         success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30, start_processing_time)
-    success = True
+
     if not success:
         _log.error("After 90 minutes - tasks aren't completed - connect to server for manual inspection")
         raise Exception
@@ -93,7 +94,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
     if cfg.get_service_date == "auto":
         is_changes_applied = utils.validate_auto_graph_changes_applied(coverage_name, default_coverage_name,
                                 cov_eos_date, docker_client, navitia_docker_compose_file_path,
-                                        navitia_docker_compose_file_name)
+                                        navitia_docker_compose_file_name, navitia_docker_compose_default_file_name)
 
     elif cfg.get_service_date == "on_demand":
         is_changes_applied = utils.validate_graph_changes_applied(coverage_name, coverage_name)
@@ -108,8 +109,8 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
 
 
 # config variables to be moved to config-file downstrem
-default_coverage_name, coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name, gtfs_file_path, \
-    gtfs_zip_file_name = utils.get_config_params()
+default_coverage_name, coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name, \
+navitia_docker_compose_default_file_name, gtfs_file_path, gtfs_zip_file_name = utils.get_config_params()
 
 try:
 
@@ -149,7 +150,8 @@ try:
     utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path)
 
     process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path,
-                                         navitia_docker_compose_file_name, coverage_name, default_coverage_name,
+                                         navitia_docker_compose_file_name, navitia_docker_compose_default_file_name,
+                                         coverage_name, default_coverage_name,
                                          cov_sop_date, cfg.osmpath, cfg.osm_file_name,
                                          gtfs_file_path, gtfs_zip_file_name, _log)
 

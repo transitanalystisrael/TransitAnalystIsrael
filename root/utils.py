@@ -31,6 +31,7 @@ def get_config_params():
     # websites. The regular coverage (most current) file is: "docker-compose.yml"
     coverage_name = secondary_custom_coverage_name
     navitia_docker_compose_file_name = "docker-compose-secondary-cov.yml"
+    navitia_docker_compose_default_file_name =  "docker-compose.yml"
     navitia_docker_compose_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose" / "compose files"
     if cfg.get_service_date == "on_demand":
         navitia_docker_compose_file_name = "navitia-docker-custom-" + cfg.gtfsdate + ".yml"
@@ -39,7 +40,7 @@ def get_config_params():
     processdate = process_date.get_date_now()
     gtfs_zip_file_name = cfg.gtfsdirbase + processdate + ".zip"
     return default_coverage_name, coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name, \
-           gtfs_file_path, gtfs_zip_file_name
+           navitia_docker_compose_default_file_name, gtfs_file_path, gtfs_zip_file_name
 
 
 
@@ -157,7 +158,8 @@ def get_coverage_start_production_date(coverage_name):
 
 
 def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, default_cov_prev_sop_date, docker_client,
-                                        navitia_docker_compose_file_path, navitia_docker_compose_file_name):
+                                        navitia_docker_compose_file_path, navitia_docker_compose_file_name,
+                                        navitia_docker_compose_default_file_name):
     """
     Validate that the secondary_custom_coverage has the original start of production date of the previous default
     coverage and that the default cov has a now different date (usually later one)
@@ -170,8 +172,8 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
     # Check that the current default coverage is up-to-date by comparing sop dates
     stop_all_containers(docker_client)
 
-    is_up = start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
-                                       default_coverage_name, True)
+    start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_default_file_name,
+                                       default_coverage_name, False)
     default_cov_sop_date = get_coverage_start_production_date(default_coverage_name)
     if default_cov_prev_sop_date == default_cov_sop_date:
         _log.error("The %s coverage seems not to be up-to-date following update attempts.\n Production date stayed the "
@@ -185,7 +187,7 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
     stop_all_containers(docker_client)
 
     is_up = start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
-                                       coverage_name, True)
+                                       coverage_name, False)
     if not is_up:
         _log.error("The %s coverage seems not to be up", coverage_name)
     cov_sop_date = get_coverage_start_production_date(coverage_name)
@@ -241,7 +243,7 @@ def start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia
     _log.info("Waiting %s seconds to validate Navitia docker is up and running", t_wait)
     time.sleep(t_wait)
 
-    # Check if default coverage is up and running
+    # Check if coverage is up and running
     is_default_up = check_coverage_running(get_navitia_url_for_cov_status(coverage_name), coverage_name)
     if not is_default_up:
         return False
