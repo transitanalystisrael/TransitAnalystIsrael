@@ -99,13 +99,10 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
     elif cfg.get_service_date == "on_demand":
         is_changes_applied = utils.validate_graph_changes_applied(coverage_name, coverage_name)
 
-    # If it's up - delete the old gtfs and osm files
-    if is_changes_applied:
+    # If it's up - delete the old gtfs and osm files - only from AWS machines
+    if is_changes_applied and utils.is_aws_machine():
         utils.delete_file_from_host(Path(os.getcwd()).parent / osm_file_path / osm_file_name)
         utils.delete_file_from_host(Path(os.getcwd()).parent / gtfs_file_path / gtfs_file_name)
-
-
-
 
 
 # config variables to be moved to config-file downstrem

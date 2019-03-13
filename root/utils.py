@@ -34,7 +34,7 @@ def get_config_params():
     navitia_docker_compose_default_file_name =  "docker-compose.yml"
     navitia_docker_compose_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose" / "compose files"
     if cfg.get_service_date == "on_demand":
-        navitia_docker_compose_file_name = "navitia-docker-custom-" + cfg.gtfsdate + ".yml"
+        navitia_docker_compose_file_name = "navitia-docker-ondemand-" + cfg.gtfsdate + ".yml"
         coverage_name = "ondemand-" + cfg.gtfsdate
     gtfs_file_path = Path(os.getcwd()).parent / cfg.gtfspath
     processdate = process_date.get_date_now()
@@ -180,8 +180,8 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
                    "same. ", default_coverage_name)
         return False
     else:
-        _log.info("%s coverage is now updated with new start-of-production date %s", default_coverage_name,
-                  default_cov_sop_date)
+        _log.info("%s coverage is now updated with new start-of-production date %s\n."
+                  "Can be accessed via %s%s", coverage_name, default_cov_sop_date, cfg.time_map_server_url, coverage_name)
 
     # Check that the coverage_name (the previous one) is up-to-date by comparing sop dates
     stop_all_containers(docker_client)
@@ -196,8 +196,8 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
         _log.error("The %s coverage seems not to be up-to-date following update attempts.\n Production date is "
                    "%s and should be %s. ", coverage_name, cov_sop_date ,default_cov_prev_sop_date)
         return False
-    _log.info("%s coverage is now updated with new start-of-production date %s", coverage_name,
-              cov_sop_date)
+    _log.info("%s coverage is now updated with new start-of-production date %s\n."
+              "Can be accessed via %s%s", coverage_name, cov_sop_date, cfg.time_map_server_url, coverage_name)
     return True
 
 def validate_graph_changes_applied(coverage_name, cov_prev_sop_date):
@@ -411,8 +411,7 @@ def delete_file_from_host(file_name):
     :param file_name: the file name to be deleted
     """
     if os.path.isfile(file_name):
-        delete_command = "rm " + file_name
-        subprocess.Popen(delete_command, shell=True)
+        os.remove(file_name)
         _log.info("Finished deleting %s from host", file_name)
 
 
