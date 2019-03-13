@@ -105,9 +105,6 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
         utils.delete_file_from_host(Path(os.getcwd()).parent / gtfs_file_path / gtfs_file_name)
 
 
-
-
-
 # config variables to be moved to config-file downstrem
 default_coverage_name, coverage_name, navitia_docker_compose_file_path, navitia_docker_compose_file_name, \
 navitia_docker_compose_default_file_name, gtfs_file_path, gtfs_zip_file_name = utils.get_config_params()
@@ -147,7 +144,7 @@ try:
         utils.generate_ondemand_docker_config_file(navitia_docker_compose_file_path, navitia_docker_compose_file_name)
 
     # Generate the Transfers file required for Navitia and add to GTFS
-    # utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path)
+    utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path)
 
     process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path,
                                          navitia_docker_compose_file_name, navitia_docker_compose_default_file_name,
