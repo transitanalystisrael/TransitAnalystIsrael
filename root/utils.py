@@ -411,8 +411,7 @@ def delete_file_from_host(file_name):
     :param file_name: the file name to be deleted
     """
     if os.path.isfile(file_name):
-        delete_command = "rm " + file_name
-        subprocess.Popen(delete_command, shell=True)
+        os.remove(file_name)
         _log.info("Finished deleting %s from host", file_name)
 
 
