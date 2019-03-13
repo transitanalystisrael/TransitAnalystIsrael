@@ -8,11 +8,11 @@
 #
 
 #Monthly auto update on AWS EC2 and S3
-#get_service_date = 'auto'
-#python_processing = 'aws_ec2'
-#ttm_graph_processing = 'aws_ec2'
-#web_client_hosted_on = 'aws_s3'
-#ttm_server_on = 'aws_ec2'
+get_service_date = 'auto'
+python_processing = 'aws_ec2'
+ttm_graph_processing = 'aws_ec2'
+web_client_hosted_on = 'aws_s3'
+ttm_server_on = 'aws_ec2'
 
 #Monthly auto update on local pc
 #get_service_date = 'auto'
@@ -43,11 +43,11 @@
 #ttm_server_on = 'local_pc'
 
 #On demand date on local pc no TTM
-get_service_date = 'on_demand'
-python_processing = 'local_pc'
-ttm_graph_processing = 'none'
-web_client_hosted_on = 'local_pc'
-ttm_server_on = 'none'
+# get_service_date = 'on_demand'
+# python_processing = 'local_pc'
+# ttm_graph_processing = 'none'
+# web_client_hosted_on = 'local_pc'
+# ttm_server_on = 'none'
 
 
 # common config
