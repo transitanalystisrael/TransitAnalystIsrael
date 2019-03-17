@@ -32,7 +32,7 @@ def get_config_params():
     coverage_name = secondary_custom_coverage_name
     navitia_docker_compose_file_name = "docker-compose-secondary-cov.yml"
     navitia_docker_compose_default_file_name =  "docker-compose.yml"
-    navitia_docker_compose_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose" / "compose files"
+    navitia_docker_compose_file_path = Path(os.getcwd()).parent.parent / "navitia-docker-compose" / "compose_files"
     if cfg.get_service_date == "on_demand":
         navitia_docker_compose_file_name = "navitia-docker-ondemand-" + cfg.gtfsdate + ".yml"
         coverage_name = "ondemand-" + cfg.gtfsdate
