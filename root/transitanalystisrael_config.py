@@ -104,6 +104,7 @@ autoeditrefdate = '20181021'
 current_or_past = 'current'
 default_coverage_name = 'default'
 secondary_custom_coverage_name = 'secondary-cov'
+on_demand_coverage_prefix = 'ondemand-'
 # transit_time_map url config - local or AWS API Getway for Transit Analyst production
 # local address should be: "http://localhost:9191"
 # time_map_server_url = "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/"
