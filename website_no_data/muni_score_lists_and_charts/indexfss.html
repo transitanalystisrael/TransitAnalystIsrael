@@ -124,17 +124,25 @@ td {
 	outline:none;
 	border-color:#aaa;
 }
+
+.buttons-container {
+	display: flex;
+	justify-content: space-evenly;
+}
+
 .sort {
-	padding:8px 30px;
 	border-radius: 6px;
 	border:none;
 	display:inline-block;
 	color:#fff;
 	text-decoration: none;
 	background-color: #28a8e0;
-	height:30px;
+	height:40px;
+	text-align: center;
 	align-content: center;
+	width: 120px;
 }
+
 .sort:hover {
 	cursor: pointer;
 	text-decoration: none;
@@ -144,7 +152,7 @@ td {
 	outline:none;
 }
 .sort:before {
-	display:inline-block;
+	display:none;
 	width: 0;
 	height: 0;
 	border-left: 5px solid transparent;
@@ -156,6 +164,7 @@ td {
 	right:-5px;
 }
 .sort.asc:before {
+	display:inline-block;
 	width: 0;
 	height: 0;
 	border-left: 5px solid transparent;
@@ -167,6 +176,7 @@ td {
 	right:-5px;
 }
 .sort.desc:before {
+	display:inline-block;
 	width: 0;
 	height: 0;
 	border-left: 5px solid transparent;
@@ -239,7 +249,7 @@ td {
 <script type="text/javascript" src=muni_fairsharescore_xy.js></script>
 
 <div class="topnav">
-	<button type="button" onclick="display_built_den_score()">מדד צפיפות בנייה</button>
+	<button type="button" onclick="display_built_den_score()">מדד צפיפות בנויה</button>
 	<button type="button" onclick="display_fair_share_score()">מדד חלוקה הוגנת</button>
 	<button type="button" onclick="display_transit_score()">מדד תחבורה ציבורית</button>
 </div>
@@ -414,12 +424,10 @@ td {
 	<div class="column side">
 		<div id="towns">
 			<input class="search" placeholder="חפשו או לחצו על הכפתורים למיון" /><br>
-			<button class="sort" data-sort="name">
-				שם הישוב
-			</button>
-			<button class="sort" data-sort="FairShareScore">
-				חלוקה הוגנת
-			</button>
+			<div class="buttons-container">
+				<button class="sort name" data-sort="name">שם הישוב</button>
+				<button class="sort" data-sort="FairShareScore">מדד חלוקה הוגנת</button>
+			</div>
 			<table>
 				<!-- IMPORTANT, class="list" have to be at tbody -->
 				<tbody class="list"></tbody>
