@@ -33,17 +33,19 @@
 	<style>
 		#map { width: 100%; height: 95%; }
 
-		.info { max-height: 500px; max-width: 200px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
-		.info h4 { margin: 0 0 5px; color: #777; }
+		.info { max-height: 500px; max-width: 300px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.95); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+		.info h3 { margin: 0 0 5px; color: #777; }
+		.info ul { padding-right: 20px; text-align: right}
+		.info li { max-width: 270px }
 		.freq-table tbody td { text-align: center;}
 		.freq-list .freq-table thead th { max-width: 50px;}
 
-		.legend { height: auto; max-width: 100px; text-align: center; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
+		.legend { height: auto; max-width: 100px; text-align: center; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.95); padding: 6px 8px; border-radius: 5px;}
 		.legend i { width: 18px; height: 18px; float:left; margin-right: 4px; opacity: 1.0; }
 		.legend h3 {margin: 0px 0px 5px 0px;}
 
 
-		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
+		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.95); padding: 6px 8px; border-radius: 5px;}
 		.savefilecontrol i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 	</style>
 
@@ -145,16 +147,13 @@
 			//console.log(ts_tpdperline);
 			ts_tpdperline.forEach(dispFunction);
 		}
-		this._div.innerHTML =
-        '<div class="freq-list">' +
-        '<h4>תדירות אוטובוסים יומית בסמוך לתחנות רכבת</h4>'
-        +  (props ?
+        var table_data_string  = props ?
             '<table class="freq-table">' +
             '    <thead>' +
             '        <tr>' +
             '            <th>תחנת רכבת</th>' +
-            '            <th>סך נסיעות רכבת יומי</th>' +
-            '            <th>סך נסיעות אוטובוסים יומי</th>' +
+            '            <th>תדירות רכבת יומית</th>' +
+            '            <th>תדירות אוטובוסים יומית</th>' +
             '        </tr>' +
             '    </thead>' +
             '    <tbody>' +
@@ -171,16 +170,23 @@
             '        <tr>' +
             '            <th>מפעילה</th>' +
             '            <th>מספר קו</th>' +
-            '            <th>נסיעות ליום (לכיוון)</th>' +
+            '            <th>תדירות יומית (לשני כיוונים)</th>' +
             '        </tr>' +
             '    </thead>' +
             '    <tbody>' +
             displaystring +
             '    </tbody>' +
             '</table>' +
-            '</>'
-            : 'השתמשו בעכבר על מנת להציג נתונים על תחנה<br> או בחרו תחנת רכבת ונקודת עניין להצגת התחבורה  הישירה ביניהן');
+            '</>' : "";
 
+		this._div.innerHTML =
+        	'<div class="freq-list">' +
+        	'<h3>תדירות אוטובוסים יומית בסמוך לתחנות רכבת</h3>'
+            + '<ul class="instructions">' +
+            	'<li>העבירו את העכבר מעל לתחנה להצגת הנתונים</li>' +
+            	'<li>בחרו נקודת עניין ותחנת רכבת להצגת התחבורה הישירה ביניהן</li>' +
+            	table_data_string +
+			'</ul>';
 
 		function dispFunction(linetpd){
 			var agency_id = linetpd["line_name"].split('-')[0];
@@ -308,20 +314,19 @@
             var html =
                 '<div class="freq-list popup-list">' +
                 '<h3>נסיעות בין נקודת עניין ותחנת הרכבת</h3>' +
+                '<h4>תדירות יומית (לשני כיוונים): ' + totaltpd.toString() + '</h4>' +
                 '<table class="freq-table">' +
                 '    <thead>' +
                 '        <tr>' +
                 '            <th>מפעילה</th>' +
                 '            <th>מספר קו</th>' +
-                '            <th>נסיעות ליום (לכיוון)</th>' +
+                '            <th>תדירות יומית (לשני כיוונים)</th>' +
                 '        </tr>' +
                 '    </thead>' +
                 '    <tbody>' +
                 displaystring +
                 '    </tbody>' +
                 '</table>' +
-				// '<br>Total tpd: "+ totaltpd.toString()+'
-                '<h3>סך נסיעות יומי לכיוון: ' + totaltpd.toString() + '</h3>' +
                 '</>';
 
 			popup
@@ -468,11 +473,13 @@
 						s_tpdperline.push({line_name:key, tpd:value});
 					});
 				//console.log(s_tpdperline);
+				var totaltpd = 0;
 				s_tpdperline.sort(function(a, b){return b.tpd - a.tpd});
 				s_tpdperline.forEach(dispFunction);
 				var html =
                     '<div class="freq-list popup-list">' +
 					'<h3>נסיעות בסמוך לנקודת עניין</h3>' +
+                    '<h4>תדירות יומית (לשני כיוונים): ' + totaltpd.toString() + '</h4>' +
                     '<table class="freq-table">' +
                     '    <thead>' +
                     '        <tr>' +
@@ -498,6 +505,7 @@
 				var agency_id = linetpd["line_name"].split('-')[0];
 				var route_short_name = linetpd["line_name"].split('-')[1];
 				var tpd = linetpd["tpd"]
+                totaltpd += tpd;
                 displaystring +=
                     '<tr>' +
                     '	<td>' + agencies[agency_id] + '</td>' +

@@ -33,7 +33,7 @@
 	<style>
 		#map { width: 100%; height: 95%; }
 
-		.info { direction: rtl; align-content: center; width: 250px; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+		.info { direction: rtl; align-content: center; width: 250px; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: rgba(255,255,255,0.95); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
 		.info h4 { margin: 0 0 5px; color: #777; }
         .info h3 { margin: 0 0 5px; color: #777; }
 
@@ -136,7 +136,7 @@
 		this._div.innerHTML = '<h3>בחרו אזור בישראל להצגת<br>נתוני תדירות יומית ברחובות</h3>' +
 			(props ? 'לחצו להצגת נתונים של ' +
 			'<b>' + regions_in_Hebrew[props.region_name] + '</b>'
-			: 'השתמשו בסמן להצגת פרטים על כל איזור');
+			: 'השתמשו בעכבר להצגת פרטים על כל איזור');
 	};
 
 	info.addTo(map);

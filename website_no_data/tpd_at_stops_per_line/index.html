@@ -32,19 +32,21 @@
 	<style>
 		#map { width: 100%; height: 95%; }
 
-		.info { max-height: 500px; max-width: 250px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
-		.info h4 { margin: 0 0 5px; color: #777; }
+		.info { max-height: 500px; max-width: 300px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: rgba(255,255,255,0.95); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+		.info ul { padding-right: 20px; text-align: right}
+		.info li { max-width: 270px }
+		.info h3 { margin: 0 0 5px; color: #777; }
 		.freq-table tbody td { text-align: center;}
 
-		.legend { height: auto; max-width: 100px; text-align: center; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
+		.legend { height: auto; max-width: 100px; text-align: center; line-height: 18px; color: #555; background: rgba(255,255,255,0.95); padding: 6px 8px; border-radius: 5px;}
 		.legend i { width: 18px; height: 18px; float:left; margin-right: 4px; opacity: 1.0; }
 		.legend h3 {margin: 0px 0px 5px 0px;}
 
-		.stopStyle { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
-		.stopStyle i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
-		.stopStyle  h3 {margin: 0px 0px 5px 0px;}
+		.stopStyle { direction: rtl; line-height: 18px; color: #555; background: rgba(255,255,255,0.95); padding: 6px 8px; border-radius: 5px;}
+		.stopStyle i {text-align: right; width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
+		.stopStyle  h3 {text-align: center;  margin: 0px 0px 5px 0px;}
 
-		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
+		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: rgba(255,255,255,0.95); padding: 6px 8px; border-radius: 5px;}
 		.savefilecontrol i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 		</style>
 
@@ -170,48 +172,55 @@
 			display_averagetpdatstop = props.averagetpdatstop;
 			display_maxtpdatstop = props.maxtpdatstop;
 		}
-		this._div.innerHTML =
-            '<div class="freq-list">' +
-			'<h4>תדירות נסיעות יומית בתחנה</h4>'
-			+  (props ?
+        table_data_string =
+            props ?
             '<table class="freq-table">' +
             '    <thead>' +
             '        <tr>' +
             '            <th>מזהה תחנה</th>' +
-            '            <th>ממוצע נסיעות יומי</th>' +
-            '            <th>סך נסיעות יומי</th>' +
+            '            <th>ממוצע תדירות יומית בשבוע</th>' +
+            '            <th>תדירות יומית מקסימלית בשבוע</th>' +
             '        </tr>' +
             '    </thead>' +
             '    <tbody>' +
-					'<tr>' +
-					'	<td>' + display_stop_id + '</td>' +
-					'	<td>' +  display_averagetpdatstop + '</td>' +
-					'   <td>' + display_maxtpdatstop + '</td>' +
-					'</tr>' +
+            '<tr>' +
+            '	<td>' + display_stop_id + '</td>' +
+            '	<td>' +  display_averagetpdatstop + '</td>' +
+            '   <td>' + display_maxtpdatstop + '</td>' +
+            '</tr>' +
             '    </tbody>' +
             '</table>' +
-			'</br>' +
+            '</br>' +
             '<table class="freq-table">' +
             '    <thead>' +
             '        <tr>' +
             '            <th>מפעילה</th>' +
             '            <th>מספר קו</th>' +
-            '            <th>נסיעות ליום (לכיוון)</th>' +
+            '            <th>תדירות יומית (לכיוון)</th>' +
             '        </tr>' +
             '    </thead>' +
             '    <tbody>' +
-					displaystring +
+            displaystring +
             '    </tbody>' +
             '</table>' +
-            '</>'
-			: 'השתמשו בעכבר על מנת להציג נתונים על תחנה');
+            '</>' : '';
+
+		this._div.innerHTML =
+            '<div class="freq-list">' +
+            '<h3>תדירות נסיעות יומית בתחנה</h3>'
+            + '<ul class="instructions">' +
+            	'<li>העבירו את העכבר מעל לתחנה להצגת הנתונים</li>' +
+            	'<li>לחצו על התחנה על מנת לקבע את הבחירה</li>' +
+             	table_data_string +
+			'</ul>';
 
 		function dispFunction(linetpd){
 			var agency_id = linetpd["line_name"].split('-')[0];
 			var route_short_name = linetpd["line_name"].split('-')[1];
 			var tpd = linetpd["tpd"]
+            var tr = tpd >= slidervalue ? '<tr class="freq-route">' : '<tr>' ;
 			displaystring +=
-                '<tr>' +
+                tr +
                 '	<td>' + agencies[agency_id] + '</td>' +
                 '	<td>' + route_short_name + '</td>' +
                 '   <td>' + tpd + '</td>' +
@@ -425,7 +434,7 @@
                 '<i style="background:' + getColor(from) + '"> </i> ' +
                 from + (to ? '&ndash;' + to : '+'));
         }
-		div.innerHTML = '<h3>תדירות נסיעות יומית בתחנה</h3>'+labels.join('<br>');
+		div.innerHTML = '<h3>תדירות יומית בתחנה</h3>'+labels.join('<br>');
 		return div;
 	};
 	legend.addTo(map);
