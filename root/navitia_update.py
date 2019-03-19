@@ -47,7 +47,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
     # Later we will restart with the custom coverage as well
     utils.stop_all_containers(docker_client)
     if cfg.get_service_date == "auto":
-        utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
+        utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_default_file_name,
                                                  default_coverage_name)
     elif cfg.get_service_date == "on_demand":
         utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
@@ -67,7 +67,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
     # Validate the conversion process takes place by ensuring tyr_beat is up
     if cfg.get_service_date == "auto":
         utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, default_coverage_name,
-                                                               navitia_docker_compose_file_path,
+                                                               navitia_docker_compose_default_file_name,
                                                                navitia_docker_compose_file_name)
     elif cfg.get_service_date == "on_demand":
         utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, coverage_name,
