@@ -51,8 +51,8 @@ ttm_server_on = 'aws_ec2'
 
 # common config
 # note - gtfsdate and serviceweekstartdate must be the same!!! (untill all scripts support different dates...)
-gtfsdate = '20190303'
-serviceweekstartdate = '20190303'
+gtfsdate = '20190311'
+serviceweekstartdate = '20190311'
 autodatefile = 'auto_dates_to_process.json'
 gtfsdirbase = 'israel'
 gtfs_url = 'gtfs.mot.gov.il'
@@ -105,7 +105,7 @@ default_coverage_name = 'default'
 secondary_custom_coverage_name = 'secondary-cov'
 on_demand_coverage_prefix = 'ondemand-'
 # transit_time_map url config - local or AWS API Getway for Transit Analyst production
-# local address should be: "http://localhost:9191"
-# time_map_server_url = "https://ll7ijshrc0.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/"
-time_map_server_url = "http://localhost:9191/v1/coverage/"
+time_map_server_aws_url = "https://enjayfolml.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap"
+time_map_server_local_url = "http://localhost:9191/v1/coverage/"
+
 

@@ -231,7 +231,7 @@ def start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia
     _log.info("Attempting to start Navitia with %s coverage", coverage_name)
 
     # run the docker- compose and redirect logs to prevent from printing in the output
-    navitia_docker_start_command = "docker-compose -f" + navitia_docker_compose_file_name + " -p navitia-docker-compose up"
+    navitia_docker_start_command = "docker-compose -f" + navitia_docker_compose_file_name + " -p navitia-docker-compose up --remove-orphans"
 
     subprocess.Popen(navitia_docker_start_command, shell=True, cwd=navitia_docker_compose_file_path, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
@@ -283,7 +283,7 @@ def start_navitia_w_default_and_custom_cov(secondary_custom_coverage_name, navit
     #     # run the docker- compose and redirect logs to prevent from printing in the output
     # regular_docker_compose_file_full_path = str(Path(navitia_docker_compose_file_path) / "docker-compose.yml")
     # navitia_docker_start_command = "docker-compose -f " + regular_docker_compose_file_full_path + " -f " + \
-    #                                navitia_docker_compose_file_name + " -p navitia-docker-compose up"
+    #                                navitia_docker_compose_file_name + " -p navitia-docker-compose up --remove-orphans"
     #
     # subprocess.Popen(navitia_docker_start_command, shell=True, cwd=navitia_docker_compose_custom_file_path, stderr=subprocess.DEVNULL,
     #                  stdout=subprocess.DEVNULL)
