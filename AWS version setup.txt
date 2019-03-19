@@ -81,6 +81,7 @@ sudo apt install python3-pip
 sudo apt-get install python3-gdal
 pip3 install logger docker progressbar2  requests argparse httplib2 oauth2client boto3 apiclient
 
+pip3 install zipfile
 pip3 install logger 
 pip3 install shapely
 pip3 install geopy

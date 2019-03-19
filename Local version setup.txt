@@ -38,3 +38,4 @@ pypiwin32
 piwin32 
 pythoncom
 win32api
+zipfile

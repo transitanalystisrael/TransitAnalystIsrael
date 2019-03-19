@@ -33,10 +33,12 @@
 	<style>
 		#map { width: 100%; height: 95%; }
 
-		.info { direction: rtl; max-height: 500px; max-width: 230px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
-		.info h4 { margin: 0 0 5px; color: #777; }
+		.info { direction: rtl; max-height: 500px; max-width: 300px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: rgba(255,255,255,0.95); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+		.info ul { padding-right: 20px;}
+		.info li { max-width: 250px }
+		.info h3 { margin: 0 0 5px; color: #777; }
 
-		.legend { max-width: 100px; text-align: center; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
+		.legend { max-width: 100px; text-align: center; line-height: 18px; color: #555; background: rgba(255,255,255,0.95); padding: 6px 8px; border-radius: 5px;}
 		.legend i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 		.legend h3 {margin: 0px 0px 5px 0px;}
 
@@ -140,7 +142,7 @@
 	info.update = function (props) {
 		var displaystring = '';
 		var tpdperline = [];
-
+		var table_data_string = '';
 		if (props) {
 			Object.entries(munisWtpdperline[props.muni_id].tpdperline_dict).forEach(entry =>
 				{ let key = entry[0]; let value = entry[1];
@@ -148,23 +150,20 @@
 				});
 			tpdperline.sort(function(a, b){return b.tpd - a.tpd});
 			tpdperline.forEach(dispFunction);
-		}
-		this._div.innerHTML = '<h4>מדד תחבורה ציבורית לישוב<br>ותדירות יומית של כל הקווים בישוב</h4>'
-			+  (props ?
-                // props.muni_name + ' - ' + props.transitscore + ' , ' + munisWtpdperline[props.muni_id].maxday_muni_tpd+'</b>'
-                '<div class="freq-list ">' +
-				'<table class="freq-table">' +
+
+            table_data_string = '<div class="freq-list ">' +
+                '<table class="freq-table">' +
                 '    <thead>' +
                 '        <tr>' +
                 '            <th>ישוב</th>' +
                 '            <th>מדד עוצמת תח"צ בישוב</th>' +
-                '            <th>סך נסיעות אוטובוסים יומי</th>' +
+                '            <th>תדירות נסיעות יומית</th>' +
                 '        </tr>' +
                 '    </thead>' +
                 '    <tbody>' +
                 '<tr>' +
                 '	<td>' + props.muni_name_h  + '</td>' +
-                '	<td>' +   props.transitscore + '</td>' +
+                '	<td>' +   Math.round(props.transitscore) + '</td>' +
                 '   <td>' + munisWtpdperline[props.muni_id].maxday_muni_tpd + '</td>' +
                 '</tr>' +
                 '    </tbody>' +
@@ -175,7 +174,7 @@
                 '        <tr>' +
                 '            <th>מפעילה</th>' +
                 '            <th>מספר קו</th>' +
-                '            <th>נסיעות ליום (לשני הכיוונים)</th>' +
+                '            <th>תדירות יומית (ל-2 כיוונים)</th>' +
                 '        </tr>' +
                 '    </thead>' +
                 '    <tbody>' +
@@ -183,7 +182,13 @@
                 '    </tbody>' +
                 '</table>' +
                 '</>'
-				: 'הציבו את הסמן מעל ישוב ולחצו לבחירה');
+        };
+		this._div.innerHTML = '<h3>מדד תחבורה ציבורית לישוב<br>ותדירות יומית של כל הקווים בישוב</h3>'
+			+ '<ul class="instructions">' +
+              '<li>העבירו את העכבר מעל לישוב להצגת שמו</li>' +
+              '<li>לחצו על כל נקודה במפה להצגת מדד עוצמת התח"צ</li>' +
+			+  table_data_string+
+			  '</ul>';
 
 		function dispFunction(linetpd){
             var agency_id = linetpd["line_name"].split('-')[0];
@@ -262,7 +267,7 @@
 		if (!freezHighlight) {
 			var layer = e.target;
 			layer.setStyle({
-				weight: 1,
+				weight: 5,
 				color: '#666',
 				dashArray: '',
 				fillOpacity: 0.7

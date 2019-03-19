@@ -33,6 +33,7 @@ import transitanalystisrael_config as cfg
 import os
 from pathlib import Path
 from logger import _log
+import zipfile
 
 
 def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path,
@@ -147,8 +148,10 @@ try:
     if cfg.get_service_date == "on_demand":
         utils.generate_ondemand_docker_config_file(navitia_docker_compose_file_path, navitia_docker_compose_file_name)
 
-    # Generate the Transfers file required for Navitia and add to GTFS
-    utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path)
+    # Generate the Transfers file required for Navitia and add to GTFS - only if the zip file doesn't already contain it
+    if "transfers.txt" not in zipfile.ZipFile(gtfs_zip_file_name).namelist():
+        utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path)
+
 
     process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path,
                                          navitia_docker_compose_file_name, navitia_docker_compose_default_file_name,

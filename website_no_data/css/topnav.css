@@ -48,6 +48,10 @@
   direction: rtl;
 }
 
+.leaflet-control-layers {
+  direction: rtl;
+}
+
 #about { padding: 8px 20px; font: 18px/20px Arial, Helvetica, sans-serif; background: white; border-radius: 5px; }
 
 .freq-list {
@@ -60,6 +64,15 @@
   overflow-y: auto;
 }
 
+.freq-list.popup-list p
+{
+  font-weight: bold;
+  margin-bottom: 0px;
+
+}
+
+.freq-list.popup-list h4 { margin: 0 0 5px; color: #777; }
+
 .freq-table {
   text-align: right;
   direction: rtl;
@@ -67,6 +80,7 @@
   border-collapse: collapse;
   border-spacing: 0;
   font: normal 13px Arial, sans-serif;
+  align-self: center;
 }
 .freq-table thead th {
   text-align: center;
@@ -76,6 +90,7 @@
   padding: 10px;
   text-shadow: 1px 1px 1px #fff;
   max-width: 45px;
+  border-bottom: solid 1px darkgrey;
 }
 .freq-table tbody td {
   border: solid 1px #DDEEEE;
@@ -84,6 +99,10 @@
   text-shadow: 1px 1px 1px #fff;
   word-wrap: break-word;
   max-width: 45px;
+}
+
+.freq-table tbody tr.freq-route {
+  background-color: rgba(192, 198, 190, 0.3);
 }
 
 #towns {

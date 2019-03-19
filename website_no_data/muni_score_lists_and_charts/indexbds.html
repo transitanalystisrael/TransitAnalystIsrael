@@ -11,7 +11,7 @@
   gtag('config', 'UA-130620396-1');
 </script>
 
-	<title>דירוג תחבורה ציבורית בין ישובים - מדד צפיפות בנייה</title>
+	<title>דירוג תחבורה ציבורית בין ישובים - מדד צפיפות בנויה</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -145,17 +145,24 @@ td {
 	outline:none;
 	border-color:#aaa;
 }
+
 .sort {
-	padding:8px 30px;
 	border-radius: 6px;
 	border:none;
 	display:inline-block;
 	color:#fff;
 	text-decoration: none;
 	background-color: #28a8e0;
-	height:30px;
+	height:40px;
+	text-align: center;
 	align-content: center;
+	max-width: 200px;
 }
+
+.sort.name {
+	width: 90px
+}
+
 .sort:hover {
 	cursor: pointer;
 	text-decoration: none;
@@ -165,7 +172,7 @@ td {
 	outline:none;
 }
 .sort:before {
-	display:inline-block;
+	display:none;
 	width: 0;
 	height: 0;
 	border-left: 5px solid transparent;
@@ -177,6 +184,7 @@ td {
 	right:-5px;
 }
 .sort.asc:before {
+	display:inline-block;
 	width: 0;
 	height: 0;
 	border-left: 5px solid transparent;
@@ -188,6 +196,7 @@ td {
 	right:-5px;
 }
 .sort.desc:before {
+	display:inline-block;
 	width: 0;
 	height: 0;
 	border-left: 5px solid transparent;
@@ -243,7 +252,7 @@ td {
 	<button type="button" onclick="displayAbout()">About - אודות</button>
 	<button type="button" onclick="displayHome()">דף הבית</button>
 	<div class="main-button">
-		<button type="button" onclick="displaySelf()">דירוג תחבורה ציבורית בין ישובים - מדד צפיפות בנייה</button>
+		<button type="button" onclick="displaySelf()">דירוג תחבורה ציבורית בין ישובים - מדד צפיפות בנויה</button>
 	</div>
 </div>
 <div id="about" style="display: none;">
@@ -260,7 +269,7 @@ td {
 <script type="text/javascript" src=muni_builtdensityscore_xy.js></script>
 
 <div class="topnav">
-	<button type="button" onclick="display_built_den_score()">מדד צפיפות בנייה</button>
+	<button type="button" onclick="display_built_den_score()">מדד צפיפות בנויה</button>
 	<button type="button" onclick="display_fair_share_score()">מדד חלוקה הוגנת</button>
 	<button type="button" onclick="display_transit_score()">מדד תחבורה ציבורית</button>
 </div>
@@ -318,7 +327,7 @@ td {
 			var builtdensityscoreData = {
 				labels: chartx.slice(xlow, xhigh),
 				datasets: [{
-					label: 'דירוג ישובים לפי מדד צפיפות בנייה',
+					label: 'דירוג ישובים לפי מדד צפיפות בנויה',
 					data: charty.slice(xlow, xhigh),
 					backgroundColor: barColor.slice(xlow, xhigh),
 					borderColor: barColor.slice(xlow, xhigh),
@@ -435,12 +444,8 @@ td {
 	<div class="column side">
 		<div id="towns">
 			<input class="search" placeholder="חפשו או לחצו על הכפתורים למיון" /><br>
-			<button class="sort" data-sort="name">
-				שם הישוב
-			</button>
-			<button class="sort" data-sort="BuiltDensityScore">
-				מדד צפיפות בנייה
-			</button>
+			<button class="sort name" data-sort="name">שם הישוב</button>
+			<button class="sort" data-sort="BuiltDensityScore">צפיפות בנויה (אנשים לקמ"ר בנוי)</button>
 			<table>
 				<!-- IMPORTANT, class="list" have to be at tbody -->
 				<tbody class="list"></tbody>

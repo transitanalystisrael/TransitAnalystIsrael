@@ -32,14 +32,15 @@
 	<style>
 		#map { width: 100%; height: 95%; }
 
-		.info { height: 500px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+		.info { height: 500px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: rgba(255,255,255,0.95); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
 		.info h4 { margin: 0 0 5px; color: #777; }
 
-		.legend { height: auto; max-width: 100px; text-align: center; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
+
+		.legend { height: auto; max-width: 100px; text-align: center; line-height: 18px; color: #555; background: rgba(255,255,255,0.95); padding: 6px 8px; border-radius: 5px;}
 		.legend i { width: 18px; height: 18px; float:left; margin-right: 4px; opacity: 1.0; }
 		.legend h3 {margin: 0px 0px 5px 0px;}
 
-		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: white; background: rgba(255,255,255,0.8); padding: 6px 8px; border-radius: 5px;}
+		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: rgba(255,255,255,0.95); padding: 6px 8px; border-radius: 5px;}
 		.savefilecontrol i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
 	</style>
 
@@ -143,14 +144,14 @@
 	info.update = function () {
 		this._div.innerHTML =
 			'<div class="freq-list">' +
-			'<h4>תדירות קווי אוטובוס בישראל</h4>' +
+			'<h3>תדירות קווי אוטובוס בישראל</h3>' +
             '<h5>' + linesShownCount + ' קווים עם יותר מ-' + slidervalue + ' נסיעות' + '</h5>' +
 			'<table class="freq-table">' +
             '    <thead>' +
             '        <tr>' +
             '            <th>מפעילה</th>' +
             '            <th>מספר קו</th>' +
-            '            <th>נסיעות ליום (לכיוון)</th>' +
+            '            <th>תדירות יומית (לכיוון)</th>' +
             '        </tr>' +
             '    </thead>' +
 			'    <tbody>' +
@@ -273,9 +274,7 @@
 		var linestring = ''
 		var tpdperlinearray = intersectingFeatures.map(function(o) {
 			totaltpd += o.feature.properties.maxtpdperroute;
-			return (o.feature.properties.maxtpdperroute >= slidervalue) ?
-				[o.feature.properties.maxtpdperroute, o.feature.properties.route_short_name, agencies[o.feature.properties.agency_id]]:
-				[o.feature.properties.maxtpdperroute, o.feature.properties.route_short_name, agencies[o.feature.properties.agency_id]];
+			return [o.feature.properties.maxtpdperroute, o.feature.properties.route_short_name, agencies[o.feature.properties.agency_id]];
 		})
 
 
@@ -288,8 +287,9 @@
             var tpd = linetpd[0]
             var route_short_name = linetpd[1];
             var agency_name = linetpd[2];
+            var tr = tpd >= slidervalue ? '<tr class="freq-route">' : '<tr>' ;
             displaystring +=
-                '<tr>' +
+            	tr +
                 '	<td>' + agency_name + '</td>' +
                 '	<td>' + route_short_name + '</td>' +
                 '   <td>' + tpd + '</td>' +
@@ -302,15 +302,17 @@
               '        <tr>' +
               '            <th>מפעילה</th>' +
               '            <th>מספר קו</th>' +
-              '            <th>נסיעות ליום (לכיוון)</th>' +
+			  '            <th>תדירות יומית (לכיוון)</th>' +
               '        </tr>' +
               '    </thead>' +
               '    <tbody>' +
             displaystring +
               '    </tbody>' +
               '</table>' +
-             '<br/>ממוצע מספר הנסיעות לשעה לכיוון:'+ '<br/>' + Math.round(10*totaltpd/2/20)/10 +
-              '</>';
+			'<p>' +
+			'סך הנסיעות היומי:'+ '<br/>' + totaltpd+
+            '</p>' +
+			'</>';
 
 
 		map.openPopup(html, e.latlng, {
@@ -434,7 +436,7 @@
 				from + (to ? '&ndash;' + to : '+'));
 		}
 
-        div.innerHTML = '<h3>תדירות נסיעות יומית לכיוון</h3>'+labels.join('<br>');
+        div.innerHTML = '<h3>תדירות יומית לכיוון</h3>'+labels.join('<br>');
 		return div;
 	};
 

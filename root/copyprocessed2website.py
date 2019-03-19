@@ -168,9 +168,10 @@ if cfg.get_service_date == 'auto' :
 #
 # if running on AWS then erase all files from processed dir
 #
-if utils.is_aws_machine(): 
-	shutil.rmtree(cwd.parent / cfg.processedpath)
-	os.mkdir(cwd.parent / cfg.processedpath)
+if utils.is_aws_machine():
+	os.chdir(cwd.parent)
+	shutil.rmtree(cfg.processedpath)
+	os.mkdir(cfg.processedpath)
 
 
 '''
