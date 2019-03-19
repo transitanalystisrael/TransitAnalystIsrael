@@ -3,7 +3,7 @@ import process_date
 from datetime import datetime as dt
 import utils
 import datetime
-import win32com.client
+
 from pathlib import Path
 import sys
 
@@ -27,6 +27,7 @@ def set_next_invocation_date(main_script_name):
             State='ENABLED'
         )
     else:
+        import win32com.client
         scheduler = win32com.client.Dispatch('Schedule.Service')
         scheduler.Connect()
         root_folder = scheduler.GetFolder('\\')
