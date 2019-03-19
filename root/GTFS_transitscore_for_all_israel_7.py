@@ -117,8 +117,8 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath):
 	gridorglat = ilminlat # grid origin lat
 	gridorglon = ilminlon # grid origin lon
 
-	lat100 = 0.0011100 # grid step of 100m
-	lon100 = 0.0009600 # grid step of 100m
+	lat100 = 0.0009000 # grid step of 100m
+	lon100 = 0.0010500 # grid step of 100m
 
 	grid_id = lambda lat, lon: (int((float(lat)-gridorglat)//lat100), int((float(lon)-gridorglon)//lon100));
 	print('minlatlon grid_id ', grid_id(minlat, minlon))
