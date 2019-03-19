@@ -63,11 +63,11 @@ try:
     # _log.info("Gzip big files")
     # import gzip_big_files
     # #
-    if cfg.web_client_hosted_on == 'aws_s3' :
-        #upload files to cloud website dir from local website dir
-        _log.info("Upload website to AWS S3")
-        import upload2aws_s3
-
+    # if cfg.web_client_hosted_on == 'aws_s3' :
+    #     #upload files to cloud website dir from local website dir
+    #     _log.info("Upload website to AWS S3")
+    #     import upload2aws_s3
+    #
     if cfg.ttm_graph_processing != 'none' :
         #process TTM files
         _log.info("Update Navitia Time Map server")
