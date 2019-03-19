@@ -60,8 +60,8 @@ serviceweekstartdate = '20190302'
 	a. Run the Docker Desktop for Windows application and wait for it to come up.
 	b. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
 	c. Right-click and select run "Git Bash Here" to open a terminal window.
-	d. type at the prompt "docker-compose -f compose\ files/docker-compose-secondary-cov.yml -p navitia-docker-compose up"
-		$ docker-compose -f compose\ files/docker-compose-secondary-cov.yml -p navitia-docker-compose up
+	d. type at the prompt "docker-compose -f compose_files/navitia-docker-ondemand-yyyymmdd.yml -p navitia-docker-compose up" e.g. for 20190302
+$ docker-compose -f compose_files/navitia-docker-ondemand-20190302.yml -p navitia-docker-compose up
 
 5. Run transitanalystisrael_v1.py with python3
 	a. open a window in the pythonpath (as in the config file) e.g. C:\git\TransitAnalystIsrael\root
@@ -73,6 +73,31 @@ serviceweekstartdate = '20190302'
 7. Run the TransitAnalystIsrael
 	a. open a window in the websitelocalondemandpath (as in the config file) e.g. C:\git\TransitAnalystIsrael\website_20190302
 	b. doubleclick on index.html
+
+===================================================================================================================================
+
+8. When done, stop and quit
+	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
+	b. Right-click and select run "Git Bash Here" to open a terminal window.
+	c. stop the navitia docker containers by typing at the prompt: "docker stop $(docker ps -a -q)" e.g.
+$ docker stop $(docker ps -a -q)
+	d. close the browser window where transitanalistisrael is running
+	e. rightclick on the Docker icon and select "Quit Docker Desktop"
+	f. you can now shutdown your PC.
+
+====================================================================================================================================
+
+9. To restart TransitAnalystIsrael for an existing on-demand date	
+	a. Run the Docker Desktop for Windows application and wait for it to come up.
+	b. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
+	c. Right-click and select run "Git Bash Here" to open a terminal window.
+	d. type at the prompt "docker-compose -f compose_files/navitia-docker-ondemand-yyyymmdd.yml -p navitia-docker-compose up" e.g. for 20190302
+$ docker-compose -f compose_files/navitia-docker-ondemand-20190302.yml -p navitia-docker-compose up
+	e. open a window in the websitelocalondemandpath (as in the config file) e.g. C:\git\TransitAnalystIsrael\website_20190302
+	f. doubleclick on index.html 
+	
+	
+
 
 
 

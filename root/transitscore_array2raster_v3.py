@@ -33,8 +33,8 @@ def main(gtfsdate, gtfsdirbase, processedpath):
 	ilminlat = 29.490000 # Israel min lat
 	ilminlon = 34.280000 # Israel min lon
 
-	lat100 = 0.0011100 # grid step of 100m
-	lon100 = 0.0009600 # grid step of 100m
+	lat100 = 0.0009000 # grid step of 100m
+	lon100 = 0.0010500 # grid step of 100m
 
 	#
 	# load file

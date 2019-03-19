@@ -199,23 +199,6 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 
 	filein.close()
 
-	'''
-	ilminlat = 29.490000 # Israel min lat
-	ilminlon = 34.280000 # Israel min lon
-	ilmaxlat = 33.290000 # Israel max lat
-	ilmaxlon = 35.840000 # Israel max lon
-
-	gridorglat = ilminlat # grid origin lat
-	gridorglon = ilminlon # grid origin lon
-
-	lat100 = 0.0011100 # grid step of 100m
-	lon100 = 0.0009600 # grid step of 100m
-
-	grid_id = lambda lat, lon: (int((float(lat)-gridorglat)//lat100), int((float(lon)-gridorglon)//lon100));
-	print 'minlatlon grid_id ', grid_id(minlat, minlon)
-	print 'maxlatlon grid_id ', grid_id(maxlat, maxlon)
-	'''
-
 	#
 	# scan stop_times.txt to populate trip_id set per stop in the stops dict
 	#
