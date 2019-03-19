@@ -112,6 +112,8 @@ if cfg.get_service_date == 'auto' :
 	print('********** upload to AWS S3 cloud *************')
 	current_localdir = cwd.parent / cfg.websitelocalcurrentpath
 	temp_localdir = cwd.parent / cfg.temppath
+	if not os.path.isdir(temp_localdir):
+		os.mkdir(temp_localdir)
 	print('current_localdir : ',current_localdir)
 
 	os.chdir(current_localdir)
