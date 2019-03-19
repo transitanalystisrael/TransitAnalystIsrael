@@ -183,7 +183,9 @@ if cfg.get_service_date == 'auto' :
 	#
 	# download js config file to temp dir, edit file, then upload
 	#download
-	s3.Bucket('transitanalystisrael-past').download_file('docs/transitanalystisrael_config.js', temp_localdir / 'transitanalystisrael_config.js')
+	config_file_full_path = temp_localdir / 'transitanalystisrael_config.js'
+	config_file_full_path = config_file_full_path.as_posix()
+	s3.Bucket('transitanalystisrael-past').download_file('docs/transitanalystisrael_config.js', config_file_full_path)
 	#edit
 	jsfile = 'transitanalystisrael_config.js'
 	tempjsfile = 'temp_config.js'
