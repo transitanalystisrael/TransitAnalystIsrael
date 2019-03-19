@@ -149,7 +149,7 @@ try:
         utils.generate_ondemand_docker_config_file(navitia_docker_compose_file_path, navitia_docker_compose_file_name)
 
     # Generate the Transfers file required for Navitia and add to GTFS - only if the zip file doesn't already contain it
-    if "transfers.txt" not in zipfile.ZipFile(gtfs_zip_file_name).namelist():
+    if "transfers.txt" not in zipfile.ZipFile(Path(gtfs_file_path) / gtfs_zip_file_name).namelist():
         utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path)
 
 
