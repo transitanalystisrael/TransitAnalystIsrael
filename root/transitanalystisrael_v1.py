@@ -13,19 +13,19 @@ import process_date
 update_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
 
 try:
-    next_month_operation_date = datetime.datetime.strptime(process_date.get_auto_date_nextmonth(), '%Y%m%d')
-    _log.info("Setting the next date update to be %s", next_month_operation_date)
 
     ####################
     ####################
     ####################
     ####################
+    # next_month_operation_date = datetime.datetime.strptime(process_date.get_auto_date_nextmonth(), '%Y%m%d')
+    # _log.info("Setting the next date update to be %s", next_month_operation_date)
     # set_next_month_invocation.set_next_invocation_date(os.path.basename(__file__))
 
-    if cfg.get_service_date == 'auto':
-        #get gtfs files and osm file
-        _log.info("Download OSM & GTFS")
-        import gtfs_osm_download
+    # if cfg.get_service_date == 'auto':
+        # #get gtfs files and osm file
+        # _log.info("Download OSM & GTFS")
+        # import gtfs_osm_download
 
     #unzip gtfs file
     import gtfs_unzip
