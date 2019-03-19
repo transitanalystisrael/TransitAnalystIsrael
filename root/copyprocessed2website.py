@@ -172,7 +172,7 @@ if utils.is_aws_machine():
 	os.chdir(cwd.parent)
 	shutil.rmtree(cfg.processedpath)
 	os.mkdir(cfg.processedpath)
-
+	os.chdir(cwd.parent / cfg.pythonpath)
 
 '''
 # old code for getting to all files in dir...
