@@ -18,7 +18,7 @@ try:
         next_month_operation_date = datetime.datetime.strptime(next_month_operation_date, '%Y%m%d')
         next_mont_invocation_date = next_month_operation_date - datetime.timedelta(days=1)  # The date that the product starts update
         next_mont_invocation_date = next_mont_invocation_date.strftime('%d/%b/%Y')
-        _log.info("Setting the next data update date to be %s 10PM local time.", next_mont_invocation_date)
+        _log.info("Setting the next data update date to be %s 10:30PM local time.", next_mont_invocation_date)
         set_next_month_invocation.set_next_invocation_date(os.path.basename(__file__))
     #
     # if cfg.get_service_date == 'auto':
