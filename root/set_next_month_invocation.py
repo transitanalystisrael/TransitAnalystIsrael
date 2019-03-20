@@ -52,6 +52,8 @@ def set_next_invocation_date(main_script_name):
         task_def.RegistrationInfo.Description = 'Transit Analyst Israel Updater'
         task_def.Settings.Enabled = True
         task_def.Settings.StopIfGoingOnBatteries = False
+        task_def.Settings.WakeToRun = True
+        task_def.Settings.StartWhenAvailable = False
 
         # Register task
         # If task already exists, it will be updated
