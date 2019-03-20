@@ -197,7 +197,7 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
         _log.error("The %s coverage seems not to be up", coverage_name)
     cov_sop_date = get_coverage_start_production_date(coverage_name)
 
-    if cov_sop_date  != default_cov_prev_sop_date:
+    if cov_sop_date != "" and cov_sop_date != default_cov_prev_sop_date:
         _log.error("The %s coverage seems not to be up-to-date following update attempts.\n Production date is "
                    "%s and should be %s. ", coverage_name, cov_sop_date ,default_cov_prev_sop_date)
         return False
