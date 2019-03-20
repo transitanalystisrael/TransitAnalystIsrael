@@ -18,13 +18,13 @@ try:
         _log.info("Setting the next date update to be %s", next_month_operation_date)
         set_next_month_invocation.set_next_invocation_date(os.path.basename(__file__))
 
-    # if cfg.get_service_date == 'auto':
-        # #get gtfs files and osm file
-        # _log.info("Download OSM & GTFS")
-        # import gtfs_osm_download
+    if cfg.get_service_date == 'auto':
+        #get gtfs files and osm file
+        _log.info("Download OSM & GTFS")
+        import gtfs_osm_download
 
     # unzip gtfs file
-    # import gtfs_unzip
+    import gtfs_unzip
 
     # copy static files to processed dir
     _log.info("Loading static files")
@@ -68,10 +68,10 @@ try:
     _log.info("Gzip big files")
     import gzip_big_files
 
-    # if cfg.web_client_hosted_on == 'aws_s3' :
-    #     #upload files to cloud website dir from local website dir
-    #     _log.info("Upload website to AWS S3")
-    #     import upload2aws_s3
+    if cfg.web_client_hosted_on == 'aws_s3' :
+        #upload files to cloud website dir from local website dir
+        _log.info("Upload website to AWS S3")
+        import upload2aws_s3
 
     if cfg.ttm_graph_processing != 'none' :
         # process TTM files
