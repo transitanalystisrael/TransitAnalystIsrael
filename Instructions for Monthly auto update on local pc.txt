@@ -45,8 +45,8 @@ On demand date on local pc
 	a. Run the Docker Desktop for Windows application and wait for it to come up.
 	b. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
 	c. Right-click and select run "Git Bash Here" to open a terminal window.
-	d. type at the prompt "docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up" e.g. for 20190302
-$ docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up
+	d. type at the prompt "docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up  --remove-orphans" e.g. for 20190302
+$ docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up  --remove-orphans
 
 5. Run transitanalystisrael_v1.py with python3
 	a. open a window in the pythonpath (as in the config file) e.g. C:\git\TransitAnalystIsrael\root
@@ -55,7 +55,22 @@ $ docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose u
 
 6. Wait about 4.5 hours for the scripts to run to completion
 
-7. Run the TransitAnalystIsrael
+7. Copy the newly created graph as secondary-cov to support current & past versions
+	a. Open Power Shell
+	b. connect to the docker worker contrinaer:
+	$ docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
+	c. Change directory to the graphs folder:
+	cd /srv/ed/output
+	d. Copy the graph:
+	cp  default.nav.lz4 secondary-cov.nav.lz4
+
+8. Stop and Re-start Navitia servers:
+	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
+	b. Right-click and select run "Git Bash Here" to open a terminal window.
+	c. stop the navitia docker containers by typing at the prompt: "docker stop $(docker ps -a -q)" e.g.
+	d. After stop is completed, d. type at the prompt "docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up  --remove-orphans"
+
+9. Run the TransitAnalystIsrael
 	a. open a window in the TransitAnalystIsrael\website_current 
 	b. doubleclick on index.html
 	
@@ -77,8 +92,8 @@ $ docker stop $(docker ps -a -q)
 	a. Run the Docker Desktop for Windows application and wait for it to come up.
 	b. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
 	c. Right-click and select run "Git Bash Here" to open a terminal window.
-	d. type at the prompt "docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up" e.g. for 20190302
-$ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up
+	d. type at the prompt "docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up --remove-orphans"
+$ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up  --remove-orphans
 	e. open a window in the TransitAnalystIsrael\website_current 
 	f. doubleclick on index.html 
 	

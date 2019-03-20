@@ -11,7 +11,7 @@ def set_next_invocation_date(main_script_name):
     # Update the GTFS-Monthly-Timer rule with the next date
     next_month_operation_date = process_date.get_auto_date_nextmonth() # The date that the product should already be working
     next_month_operation_date = dt.strptime(next_month_operation_date, '%Y%m%d')
-    next_mont_invocation_date = next_month_operation_date - datetime.timedelta(days=1) # The date that the product starts update
+    next_month_invocation_date = next_month_operation_date - datetime.timedelta(days=1) # The date that the product starts update
 
     
     # AWS Machine
@@ -20,7 +20,7 @@ def set_next_invocation_date(main_script_name):
         client = boto3.client('events',region_name='eu-central-1')
 
         # Set to run in the next day only once at 22:30
-        scheduleExpression = next_mont_invocation_date.strftime("cron(30 22 %d %m ? %Y)") #cron(30 12 11 03 ? 2019)
+        scheduleExpression = next_month_invocation_date.strftime("cron(30 22 %d %m ? %Y)") #cron(30 12 11 03 ? 2019)
         response = client.put_rule(
             Name="GTFS-Monthly-Timer",
             ScheduleExpression=scheduleExpression,
@@ -34,7 +34,7 @@ def set_next_invocation_date(main_script_name):
         task_def = scheduler.NewTask(0)
 
         # Create trigger
-        start_time = next_mont_invocation_date + datetime.timedelta(hours=22)
+        start_time = next_month_invocation_date + datetime.timedelta(hours=22)
 
         TASK_TRIGGER_TIME = 1
         trigger = task_def.Triggers.Create(TASK_TRIGGER_TIME)
