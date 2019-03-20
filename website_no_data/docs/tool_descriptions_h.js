@@ -18,7 +18,7 @@ var descHtool9 = '<b>רמת נגישות בתח"צ לתחנות רכבת</b><br>
 
 var descHtool10 = '<b>מפת ניידות</b><br>הצגה של האזורים הנגישים בטווח זמן נבחר של נסיעה בתחבורה ציבורית, רכיבה על אופניים או הליכה מ/אל מיקום נבחר.<br>מוצג על גבי מפת חום אינטרקטיבית עם צבעים לחיווי טווחי זמן שונים (15, 30, 45 דקות וכיו"ב).<br>שימושי לניתוח נגישות ממקום נבחר למקומות עבודה, מסודות חינוך, שירותי בריאות, תחנות רכבת, שירותים עירוניים ועוד.<br>כמו כן, שימושי להשוואת רמת הנגישות להזדמנויות של שכונות שונות בישוב.';
 
-var startD = new Date(cfg_gtfsdate.slice(0,4), cfg_gtfsdate.slice(4,6)-1, cfg_gtfsdate.slice(6)); // js months are 0-11
+var startD = new Date(gtfs_start_date.slice(0,4), gtfs_start_date.slice(4,6)-1, gtfs_start_date.slice(6)); // js months are 0-11
 var endD = new Date();
 endD.setTime(startD.getTime() + 6*24*60*60*1000);
 var servicePeriodH = '<br><br>תקופת השירות שנותחה'+' : '+startD.toDateString()+' - '+endD.toDateString();

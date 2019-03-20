@@ -209,6 +209,7 @@
 </footer>
 
 <script src="docs/transitanalystisrael_config.js" ></script>
+<script src="docs/gtfs_start_date.js" ></script>
 <script src="docs/tool_descriptions_h.js" ></script>
 <script>
 	document.getElementById("desc_h_tool1").innerHTML = descHtool1;
@@ -221,7 +222,7 @@
 	document.getElementById("desc_h_tool8").innerHTML = descHtool8;
 	document.getElementById("desc_h_tool9").innerHTML = descHtool9;
 	document.getElementById("desc_h_tool10").innerHTML = descHtool10;
-	var startDay = new Date(cfg_gtfsdate.slice(0,4), cfg_gtfsdate.slice(4,6)-1, cfg_gtfsdate.slice(6)); //js months are 0-11
+	var startDay = new Date(gtfs_start_date.slice(0,4), gtfs_start_date.slice(4,6)-1, gtfs_start_date.slice(6)); //js months are 0-11
 	var endDay = new Date();
 	endDay.setTime(startDay.getTime() + 6*24*60*60*1000);
 	document.getElementById("service_period").innerHTML = ' '+startDay.toDateString()+' - '+endDay.toDateString()+ ' : תקופת השירות שנותחה';

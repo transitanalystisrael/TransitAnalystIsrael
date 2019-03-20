@@ -18,7 +18,7 @@ var descEtool9 = '<b>Accessible level of service to and at train stations</b><br
 
 var descEtool10 = '<b>TransitTimeMap</b><br>Accessible area for a given duration of travel from/to a location by transit (or bike or walking).<br>Useful for analyzing access by transit to jobs, education, health services, train stops, municipal services, etc…<br>Also useful for comparing levels of  accessibility for different neighborhoods in a town or city.';
 
-var startD = new Date(cfg_gtfsdate.slice(0,4), cfg_gtfsdate.slice(4,6)-1, cfg_gtfsdate.slice(6)); // js months are 0-11
+var startD = new Date(gtfs_start_date.slice(0,4), gtfs_start_date.slice(4,6)-1, gtfs_start_date.slice(6)); // js months are 0-11
 var endD = new Date();
 endD.setTime(startD.getTime() + 6*24*60*60*1000);
 var servicePeriodE = '<br><br>Service Week Analyzed : '+startD.toDateString()+' to '+endD.toDateString();

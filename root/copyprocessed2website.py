@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # 
 # copy and rename files from processed dir to website_current dir or website_yyyymmdd dir for on demand date
+# output js file gtfs_start_date.js to folder docs to use as date in the web tools regardless if website_yyyymmdd, website_current or website_past
 #
 import transitanalystisrael_config as cfg
 import process_date
@@ -13,6 +14,7 @@ from pathlib import Path
 cwd = Path.cwd()
 
 processdate = process_date.get_date_now()
+jsfileout = 'gtfs_start_date.js'
 
 no_data_dir = cwd.parent / cfg.websitelocalnodatapath
 current_dir = cwd.parent / cfg.websitelocalcurrentpath
@@ -23,7 +25,6 @@ print ('current_dir = ',current_dir)
 print ('past_dir = ',past_dir)
 print ('on_demand_dir = ',on_demand_dir)
 print ('cfg.get_service_date = ',cfg.get_service_date)
-
 
 srcdir = cwd.parent / cfg.processedpath
 if cfg.get_service_date == 'auto' : 
@@ -126,6 +127,15 @@ shutil.copyfile(srcdir / ("ts_rendered_israel"+processdate+".png"),dstdir / "tra
 
 print(os.listdir(dstdir))
 
+#
+# output js file gtfs_start_date.js to folder docs to use as date in the web tools regardless if website_yyyymmdd, website_current or website_past
+#
+fileout = open(dstdir / "docs" / jsfileout, 'w', encoding="utf8") # save results in file
+postsline = 'var gtfs_start_date = "'+processdate+'"\n'
+print(postsline)
+fileout.write(postsline)
+fileout.close()
+print('saved file: ', str(dstdir / "docs"  / jsfileout))
 
 if cfg.get_service_date == 'auto' : 
 	#
