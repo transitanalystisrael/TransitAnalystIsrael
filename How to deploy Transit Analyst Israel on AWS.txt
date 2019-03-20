@@ -7,22 +7,76 @@ Steps to Deploy Israel transit Analyst Alpha Version on AWS
 
 
 Trnaist Map Deployment - Steps:
-1. Launch EC2 instance and run the docker container:
-====================================================
-0. Update the instance OS:	
-	$ sudo yum update
-a. Start a new Linux EC2 instance with at leat 4 GB RAM and 10GB EBS storage - Acquire the needed ssh .pem key and save it!
-	The following ports should be exposed for 
-		inbound traffic: TCP 80 (http), TCP 22 (ftp), TCP 9191 (navitia)
-		outbound traffic: all
-	Work with a Putty terminal to SSH into the instance using the keys: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html
-	We used this tutorial https://www.ybrikman.com/writing/2015/11/11/running-docker-aws-ground-up/) for instiating an EC2 isntance for Docker
-   
-b. Install Git on the EC2 instance: 
-	$sudo yum install -y git
-c. Install Python3 and modules:
-	$ sudo yum install python3
-	$ python3 -m pip install --user docker progressbar2 python-dateutil oauth2client google-api-python-client
+1. Launch EC2 instance - Ubuntu Server 18.04 LTS):
+=================================================
+(We originally used this article as a basis for this setup: https://www.ybrikman.com/writing/2015/11/11/running-docker-aws-ground-up/)
+a. Instance Type: Select t3.large instance with 2 vCPUs and 8GB RAM.
+b. Instance Details: leaeve as is and click "next"
+c. Add Storage: Enter 30GB
+d. add Tags: leaeve as is and click "next"
+e. Select a security group that has prots 9191 and 20 open. If doesn't exist, create a new one with the following rules:
+     Type            Protocol  Port Range   Source    
+i.   HTTP            TCP        80       0.0.0.0/0
+ii.  HTTP            TCP        80       ::/0
+iii. Custom TCP Rule TCP        9191     0.0.0.0/0
+iv.  SSH             TCP        22       0.0.0.0/0
+
+f. Launch - save the key in accessible location
+
+2. Assign an Elastic IP (static IP)
+===================================
+Each time EC2 is re-started it is assigned with new Public IP. We will assign it a static IP called Elastic IP. As long as the instance is up and running, the use of the elastic IP isn't charged.
+
+a. Access the Elastic IP page via the EC2 console (under NETWORK & SECURITY)
+b. Click "Allocate New Address" -> VPC -> Confirm
+c. Right-click on the new address -> Associate Address -> select the newly created instance -> allow re-association -> Click "Associate"
+
+4. Assign IAM roles
+===================
+The EC2 will upload items to your S3 buckets, take keys from the S3 bucket and also modify the AWS Lambda function that triggers the monthly update.
+In order to do that, we grant him permissions using proper IAM roles.
+a. Access the IAM roles page 
+
+####################################################
+####################################################
+####################################################
+####################################################
+####################################################
+####################################################
+####################################################
+####################################################
+
+3. Acces via Putty for terminal operations
+==========================================
+a. Get Putty for Windows from: https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+
+b. Follow the steps here to generate a .ppk file that will allow you to connect to the EC2 instance using putty: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html
+
+c. The user should be in the host name filed, e.g. "ubuntu@18.185.174.211" where the IP is the public IP (elastic IP we assigned earlier) of the EC2 which can be obtained from the AWS EC2 console.
+
+4. Install required Software:
+=============================
+a. Git and Python3.6 is already installed.
+b. Install Docker for Ubuntu 18-04 (taken from: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04):
+$ sudo apt install apt-transport-https ca-certificates curl software-properties-common
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+$ sudo apt update
+$ apt-cache policy docker-ce
+$ sudo apt install docker-ce
+
+To verify installation:
+$ sudo systemctl status docker
+
+Add priviliges for easy terminal work:
+$ sudo usermod -aG docker ${USER}
+
+c. Install docker-compose (taken from https://docs.docker.com/compose/install/ - linux tab):
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+$ sudo chmod +x /usr/local/bin/docker-compose
+
+
+
 d. Pull Navitia docker project (adjusted to our needs) from: https://github.com/shakedk/navitia-docker-compose
 e. Install docker and docker-compose tools (or as detailed here: https://gist.github.com/benfogel/041e3c4b8b856cdcdfd8d9d5aa0a7f73):
 	$ sudo amazon-linux-extras install docker

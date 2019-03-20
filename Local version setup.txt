@@ -1,34 +1,29 @@
 Minimum Requirements:
 =====================
-- 16 GB of RAM *8 will be allocated for Docker)
+- 16 GB of RAM )8 will be allocated for Docker)
 
 Install required Software:
 ==========================
 * Git with Git-bash (https://git-scm.com/downloads)
-* Docker for Windows
+* Docker for Windows (https://www.docker.com/products/docker-desktop)
 * GDAL for widnows: https://trac.osgeo.org/gdal/wiki/OSGeo4W
-* c++
-* Gzip : http://gnuwin32.sourceforge.net/packages/gzip.htm , make sure to add the location of gzip.exe to the windoes PATH variable
-* Python 3.7 (https://www.python.org/ftp/python/3.7.2/python-3.7.2.exe)
-* Python 3 dependencies:
-python3 -m pip install logger docker progressbar2 requests argparse httplib2 apiclient boto3 gdal
+* Gzip : http://gnuwin32.sourceforge.net/packages/gzip.htm , make sure to add the location of gzip.exe to the windows PATH variable
+* Python 3.7 (https://www.python.org/ftp/python/3.7.2/python-3.7.2.exe) , make sure to add the location of gzip.exe to the windows PATH variable
 
-no need to pip install the following as they are already included in the default install of python3.7 : json zipfile tarfile re csv math 
 
-Make sure you have the following python3(!) modules installed. 
+Python 3 modules:
+===================
+1. No need to pip install the following as they are already included in the default install of python3.7 : json zipfile tarfile re csv math 
+
+2. Install the following modules. 
+Use the following command: python3 -m pip install <module name>
 To list all modules installed, you can use the python command: >>> help("modules")
 =====================================================================================
 logger
 docker
 progressbar2
-json
 requests
-zipfile
-tarfile
-re
 argparse
-csv
-math
 httplib2
 oauth2client
 base64
@@ -36,9 +31,10 @@ mimetypes
 email
 apiclient
 boto3
-gdal
+gdal (from https://github.com/OSGeo/gdal then use pytohn3 -m pip install <downlaoded file>)
+shapely (from https://github.com/Toblerity/Shapely then use pytohn3 -m pip install <downlaoded file>)
 pypiwin32
 piwin32 
 pythoncom
 win32api
-zipfile
+

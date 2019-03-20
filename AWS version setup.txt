@@ -6,7 +6,7 @@ Minimum Requirements:
 Install required Software:
 ==========================
 * Docker for Windows / Linux
-* GDAL for widnows: https://trac.osgeo.org/gdal/wiki/OSGeo4W ### For AWS: https://gist.github.com/mojodna/2f596ca2fca48f08438e
+* GDAL for AWS: https://gist.github.com/mojodna/2f596ca2fca48f08438e
 * Gzip
 * Python3 
 
@@ -58,13 +58,7 @@ Make sure you have the following python3(!) modules installed:
 ==============================================================
 
 AWS EC2 Ubuntu should have proper IAM role to access the transit-analyst-key-bucket ("Navitia_EC2_to_S3") through instance settingsinthe EC2 console
-UBUNTU
-=======
-change the time of the server to ISR:
-<<<<<<COMPLETE>>>>>
-docker installation:
-https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04 - complete both steps until and including:
-su - ${USER} 
+
 
 docker compose for linux: https://docs.docker.com/compose/install/ (go to linux tab)
 
@@ -79,8 +73,7 @@ sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update
 sudo apt install python3-pip
 sudo apt-get install python3-gdal
-pip3 install logger docker progressbar2  requests argparse httplib2 oauth2client boto3 apiclient
-
+pip3 install docker 
 pip3 install zipfile
 pip3 install logger 
 pip3 install shapely
@@ -95,7 +88,7 @@ pip3 install boto3
 pip3 install google-api-python-client
 pip3 install google-auth
 pip3 install google-auth-httplib2
-
+pip3 install apiclient
 
 
 clone gits
