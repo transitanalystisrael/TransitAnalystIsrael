@@ -112,6 +112,8 @@ if cfg.get_service_date == 'auto' :
 	print('********** upload to AWS S3 cloud *************')
 	current_localdir = cwd.parent / cfg.websitelocalcurrentpath
 	temp_localdir = cwd.parent / cfg.temppath
+	if not os.path.isdir(temp_localdir):
+		os.mkdir(temp_localdir)
 	print('current_localdir : ',current_localdir)
 
 	os.chdir(current_localdir)
@@ -183,7 +185,9 @@ if cfg.get_service_date == 'auto' :
 	#
 	# download js config file to temp dir, edit file, then upload
 	#download
-	s3.Bucket('transitanalystisrael-past').download_file('docs/transitanalystisrael_config.js', temp_localdir / 'transitanalystisrael_config.js')
+	config_file_full_path = temp_localdir / 'transitanalystisrael_config.js'
+	config_file_full_path = config_file_full_path.as_posix()
+	s3.Bucket('transitanalystisrael-past').download_file('docs/transitanalystisrael_config.js', config_file_full_path)
 	#edit
 	jsfile = 'transitanalystisrael_config.js'
 	tempjsfile = 'temp_config.js'

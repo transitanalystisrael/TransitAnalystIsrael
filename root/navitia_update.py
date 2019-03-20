@@ -47,7 +47,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
     # Later we will restart with the custom coverage as well
     utils.stop_all_containers(docker_client)
     if cfg.get_service_date == "auto":
-        utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
+        utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_default_file_name,
                                                  default_coverage_name)
     elif cfg.get_service_date == "on_demand":
         utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
@@ -67,7 +67,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
     # Validate the conversion process takes place by ensuring tyr_beat is up
     if cfg.get_service_date == "auto":
         utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, default_coverage_name,
-                                                               navitia_docker_compose_file_path,
+                                                               navitia_docker_compose_default_file_name,
                                                                navitia_docker_compose_file_name)
     elif cfg.get_service_date == "on_demand":
         utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, coverage_name,
@@ -149,7 +149,7 @@ try:
         utils.generate_ondemand_docker_config_file(navitia_docker_compose_file_path, navitia_docker_compose_file_name)
 
     # Generate the Transfers file required for Navitia and add to GTFS - only if the zip file doesn't already contain it
-    if "transfers.txt" not in zipfile.ZipFile(gtfs_zip_file_name).namelist():
+    if "transfers.txt" not in zipfile.ZipFile(Path(gtfs_file_path) / gtfs_zip_file_name).namelist():
         utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path)
 
 

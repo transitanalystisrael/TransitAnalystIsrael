@@ -6,23 +6,30 @@ import datetime
 import utils
 
 from logger import _log
+import set_next_month_invocation
+import os
+import process_date
 
 update_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
 
 try:
+    if cfg.get_service_date == 'auto':
+        next_month_operation_date = datetime.datetime.strptime(process_date.get_auto_date_nextmonth(), '%Y%m%d')
+        _log.info("Setting the next date update to be %s", next_month_operation_date)
+        set_next_month_invocation.set_next_invocation_date(os.path.basename(__file__))
 
-    if cfg.get_service_date == 'auto' :
+    if cfg.get_service_date == 'auto':
         #get gtfs files and osm file
         _log.info("Download OSM & GTFS")
         import gtfs_osm_download
 
-    #unzip gtfs file
+    # unzip gtfs file
     import gtfs_unzip
-    #
+
     # copy static files to processed dir
     _log.info("Loading static files")
     import load_static_files
-    #
+
     # process gtfs files to create files in processed dir for use by js in website tools
     _log.info("GTFS pre-processing")
     import gtfs_preprocessing
@@ -48,28 +55,34 @@ try:
     import trainstopautoeditpre2post_v1 # you can also manually edit the pre file to create the post file and rerun the script with this commented out
     _log.info("TPD near train stops")
     import tpd_near_trainstops_per_line
-    #
+
     # convert the py file to js to use in index.html js code
     _log.info("Convert py config file to js config file")
     import config_py2js
-    #
+
     # copy files from processed dir with date in name to local website dir for testing. rename files to remove date from filenames
     _log.info("Copy processed files to website")
     import copyprocessed2website
-    #
+
     # gzip big data files for upload to cloud
     _log.info("Gzip big files")
     import gzip_big_files
-    #
+
     if cfg.web_client_hosted_on == 'aws_s3' :
         #upload files to cloud website dir from local website dir
         _log.info("Upload website to AWS S3")
         import upload2aws_s3
 
     if cfg.ttm_graph_processing != 'none' :
-        #process TTM files
+        # process TTM files
         _log.info("Update Navitia Time Map server")
         import navitia_update
+
+    if utils.is_aws_machine():
+        _log.exception("Done successfully")
+        utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Completed - see logs")
+    else:
+        _log.exception("Done successfully")
 
 
 # Send e-mail everything is completed - only on automatic script on AWS
