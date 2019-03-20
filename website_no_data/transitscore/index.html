@@ -151,7 +151,7 @@
 	//var imageUrl = 'ts.png',
 	//var imageUrl = 'ts_3857_template2.png',
 
-	imageBounds = [[29.49000, 34.28000], [33.28620, 35.8438400]];
+	imageBounds = [[29.49000, 34.28000], [33.285300, 35.843450]];
 	L.imageOverlay(imageUrl, imageBounds, {opacity: 0.5}).addTo(map);
 
 	ilminlat = 29.490000; // Israel min lat
@@ -160,8 +160,8 @@
 	gridorglat = ilminlat; // grid origin lat
 	gridorglon = ilminlon; // grid origin lon
 
-	lat100 = 0.0011100; // grid step of 100m
-	lon100 = 0.0009600; // grid step of 100m
+	lat100 = 0.000900; // grid step of 100m
+	lon100 = 0.001050; // grid step of 100m
 
 	// grid_id = lambda lat, lon: (int((float(lat)-gridorglat)//lat100), int((float(lon)-gridorglon)//lon100));
 	function grid_id(lat, lon) {
