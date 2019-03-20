@@ -105,7 +105,7 @@ default_coverage_name = 'default'
 secondary_custom_coverage_name = 'secondary-cov'
 on_demand_coverage_prefix = 'ondemand-'
 # transit_time_map url config - local or AWS API Getway for Transit Analyst production
-time_map_server_aws_url = "https://enjayfolml.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap"
+time_map_server_aws_url = "https://enjayfolml.execute-api.eu-central-1.amazonaws.com/NavitiaTimeMap/"
 time_map_server_local_url = "http://localhost:9191/v1/coverage/"
 
 

@@ -168,6 +168,11 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
     :param default_cov_sop_date: start of production date of original default coverage (before changes applied)
     :return: whether the graph changes were applied
     """
+    if cfg.ttm_server_on == "aws_ec2":
+        time_map_server_url = cfg.time_map_server_aws_url;
+    else:
+        time_map_server_url = cfg.time_map_server_local_url;
+
 
     # Check that the current default coverage is up-to-date by comparing sop dates
     stop_all_containers(docker_client)
@@ -181,7 +186,7 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
         return False
     else:
         _log.info("%s coverage is now updated with new start-of-production date %s\n."
-                  "Can be accessed via %s%s", coverage_name, default_cov_sop_date, cfg.time_map_server_url, coverage_name)
+                  "Can be accessed via %s%s", coverage_name, default_cov_sop_date, time_map_server_url, coverage_name)
 
     # Check that the coverage_name (the previous one) is up-to-date by comparing sop dates
     stop_all_containers(docker_client)
@@ -197,7 +202,7 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
                    "%s and should be %s. ", coverage_name, cov_sop_date ,default_cov_prev_sop_date)
         return False
     _log.info("%s coverage is now updated with new start-of-production date %s\n."
-              "Can be accessed via %s%s", coverage_name, cov_sop_date, cfg.time_map_server_url, coverage_name)
+              "Can be accessed via %s%s", coverage_name, cov_sop_date, time_map_server_url, coverage_name)
     return True
 
 def validate_graph_changes_applied(coverage_name, cov_prev_sop_date):
@@ -207,6 +212,10 @@ def validate_graph_changes_applied(coverage_name, cov_prev_sop_date):
     :param cov_prev_sop_date: the start-of-production date before data processing has started
     :return:
     """
+    if cfg.ttm_server_on == "aws_ec2":
+        time_map_server_url = cfg.time_map_server_aws_url;
+    else:
+        time_map_server_url = cfg.time_map_server_local_url;
 
     cov_sop_date = get_coverage_start_production_date(coverage_name)
     if cov_sop_date == "" or cov_prev_sop_date == cov_sop_date:
@@ -215,7 +224,9 @@ def validate_graph_changes_applied(coverage_name, cov_prev_sop_date):
                    coverage_name)
         return False
 
-    _log.info("%s coverage is now updated with new start-of-production date %s", coverage_name, cov_sop_date)
+    _log.info("%s coverage is now updated with new start-of-production date %s\n."
+              "Can be accessed via %s%s", coverage_name, cov_sop_date, time_map_server_url,
+              coverage_name)
     return True
 
 def start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
