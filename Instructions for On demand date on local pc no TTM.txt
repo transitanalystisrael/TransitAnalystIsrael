@@ -11,8 +11,8 @@ On demand date on local pc no TTM
 
 0. Set up a PC for local production without TTM - Transit Time Map. see instructions document "Set up a PC for local production without Transit Time Map"
 	a. The starting dir structure under TransitAnalystIsrael (the name of this parent dir is not important and can be different) is explained below:
-		gtfs 					- GTFS unzipped dir is placed in this dir
-		processed 				- this dir can start out empty, it will hold all the processed data files produced by the python scripts
+		gtfs 					- GTFS zipped dir is placed in this dir, it will be unzipped by the script and the unzipped dir will be placed here
+		processed 				- this dir can start out empty or be missing altogether, it will hold all the processed data files produced by the python scripts
 		root					- this dir holds the python scripts that process the GTFS files about 50 files. See the flows presentation to see how they are used.
 		static_data				- this dir holds the 8 or so data files that do not change every month. They are copied into the processed dir before processing starts.
 		website_no_data			- this dir holds the client side html and js code for the tools, without the processed data. 
