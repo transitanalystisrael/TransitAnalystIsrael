@@ -31,7 +31,7 @@ for tooldir in toolslist:
 		filesize = os.path.getsize(filepath)
 		if filename.endswith(".js") and filesize > int(cfg.bigjs2gzip) :
 			print('  ',filepath, filesize)
-			os.system('"gzip -9 -k -f ' + filepath.as_posix())
+			os.system('gzip -9 -k -f ' + filepath.as_posix())
 
 print(os.listdir(gzip_dir))
 
