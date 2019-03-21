@@ -619,7 +619,10 @@ def send_log_to_email(subject, message):
     :return: Whether the e-mail was sent successfully
     """
 
-    path = Path.cwd() / "logs" / '*'
+    path = Path.home() / "TransitAnalystIsrael" / "root" / "logs"
+    if not os.path.isdir(path):
+        _log.error("%s isn't the logs directory. Please fix log directory as in code")
+    path = path / '*'
     list_of_files = glob.glob(str(path))  # * means all if need specific format then *.csv
     attached_file = max(list_of_files, key=os.path.getctime)
     return send_email.create_msg_and_send_email(subject, message, attached_file)
