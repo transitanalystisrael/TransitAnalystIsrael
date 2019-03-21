@@ -16,9 +16,8 @@ try:
     if cfg.get_service_date == 'auto':
         next_month_operation_date = process_date.get_auto_date_nextmonth()  # The date that the product should already be working
         next_month_operation_date = datetime.datetime.strptime(next_month_operation_date, '%Y%m%d')
-        next_month_invocation_date = next_month_operation_date - datetime.timedelta(days=1)  # The date that the product starts update
-        next_month_invocation_date = next_month_invocation_date.strftime('%d/%b/%Y')
-        _log.info("Setting the next data update date to be %s 10:30PM local time.", next_month_invocation_date)
+        next_month_operation_date = next_month_operation_date + datetime.timedelta(hours=22) + datetime.timedelta(minutes=30)
+        _log.info("Setting the next data update date to be %s local time.", next_month_operation_date)
         set_next_month_invocation.set_next_invocation_date(os.path.basename(__file__))
 
     if cfg.get_service_date == 'auto':
