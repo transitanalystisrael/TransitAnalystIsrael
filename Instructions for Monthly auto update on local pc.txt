@@ -18,7 +18,7 @@ Monthly auto update on local pc
 									See the flows presentation to see how they are used.
 		static_data				- this dir holds the 8 or so data files that do not change every month. They are copied into the processed dir before processing starts.
 		website_no_data			- this dir holds the client side html and js code for the tools, without the processed data. 
-									the files in this dir are copied into the on-demand date dir website_yyyymmdd together with the processed data to create the tools
+									the files in this dir are copied into the dir website_current together with the processed data to create the tools
 		website_current			- this output dir will hold the tools and processed data to display for the current month
 		website_past			- this output dir will hold the tools and processed data to display for the past month
 
@@ -37,7 +37,7 @@ ttm_server_on = 'local_pc'
 	c. Save the config file
 
 2. Verify the dates for automatic dates are as you want them in the file \static_data\auto_dates_to_process.json
-   Notice that the dates represent the next production date in each month, the update itself will probably start after 10pm the day before.
+   Notice that the dates represent the next production date in each month, the update itself will probably start after 10pm on the same date.
 
    Save the json file if you performed any changes
 	
@@ -91,11 +91,11 @@ $ docker stop $(docker ps -a -q)
 
 ====================================================================================================================================
 
-11. To restart TransitAnalystIsrael for an existing on-demand date	
+11. To restart TransitAnalystIsrael for an existing auto date	
 	a. Run the Docker Desktop for Windows application and wait for it to come up.
 	b. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
 	c. Right-click and select run "Git Bash Here" to open a terminal window.
-	d. type at the prompt "docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up" e.g. for 20190302
+	d. type at the prompt "docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up" 
 $ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up
 	e. open a window in the TransitAnalystIsrael\website_current 
 	f. doubleclick on index.html 
