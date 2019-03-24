@@ -140,6 +140,7 @@
 		this.update();
 		return this._div;
 	};
+		
 
 	info.update = function () {
 		this._div.innerHTML =
@@ -150,7 +151,7 @@
             '    <thead>' +
             '        <tr>' +
             '            <th>מפעילה</th>' +
-            '            <th>מספר קו</th>' +
+            '            <th> מספר קו</th>' +
             '            <th>תדירות יומית (לכיוון)</th>' +
             '        </tr>' +
             '    </thead>' +
@@ -268,9 +269,6 @@
 		var totaltpd = 0;
 
 
-
-
-
 		var linestring = ''
 		var tpdperlinearray = intersectingFeatures.map(function(o) {
 			totaltpd += o.feature.properties.maxtpdperroute;
@@ -343,9 +341,9 @@
 		//info.update();
 	}
 
-//	function zoomToFeature(e) {
-//		map.fitBounds(e.target.getBounds());
-//	}
+	function zoomToFeature(e) {
+		map.fitBounds(e.getBounds());
+	}
 
 	function onEachFeature(feature, layer) {
 		layer.on({
@@ -363,6 +361,41 @@
 	}).addTo(map);
 
 	map.attributionControl.addAttribution('Route Freq data &copy; <a href="http://miu.org.il/">Merhav</a>');
+
+	var selectedlineagency = "";
+	var selectedlinenumber = "";
+	var selectedlinetpd = "";
+	function clicklinefunction(e){
+		var linename = e.target.innerHTML;
+		selectedlineagency = e.path[1].cells[0].innerText;
+		selectedlinenumber = e.path[1].cells[1].innerText;
+		selectedlinetpd = e.path[1].cells[2].innerText;
+		//console.log(linename);
+		//console.log(e.path);
+		//console.log(e.path[1].rowIndex);
+		//console.log(e.path[1].textContent);
+		//console.log(selectedlineagency, selectedlinenumber, selectedlinetpd);
+		var selectedFeatures = [];
+		map.eachLayer(function(layer){
+			if (typeof layer.feature !== 'undefined') {
+				var line = layer.feature.geometry.coordinates;
+				var lineprops = layer.feature.properties;
+				//console.log(lineprops);
+				if (lineprops.route_short_name == selectedlinenumber && lineprops.agency_name == selectedlineagency && lineprops.maxtpdperroute == selectedlinetpd) {
+					//console.log(layer.feature.properties.route_short_name);
+					selectedFeatures.push(layer);
+					//console.log(layer);
+					layer.setStyle({ weight: 10, color: "yellow", opacity: 1 });
+					zoomToFeature(layer);
+				}
+			}
+		})
+		// if at least one feature found, show it
+		//if (selectedFeatures.length) {
+			//console.log(selectedFeatures[0].feature.properties.maxtpdperroute);
+			//console.log(selectedFeatures[0].feature.properties.maxtpdperroute);
+		//}
+	}
 
 	function sliderChange(x) {
 		linesShownCount = 0;
@@ -389,7 +422,7 @@
             displaystring +=
 				'<tr>' +
                 '	<td>' + agencies[agency_id] + '</td>' +
-                '	<td>' + route_short_name + '</td>' +
+                '	<td onclick="clicklinefunction(event)">' + route_short_name + '</td>' +
                 '   <td>' + tpd + '</td>' +
             	'</tr>'
 
