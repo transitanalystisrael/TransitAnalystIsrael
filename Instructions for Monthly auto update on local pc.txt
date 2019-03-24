@@ -1,7 +1,7 @@
 Instructions for "Monthly auto update on local pc"
 
-On demand date on local pc
-	get_service_date = 'on_demand'
+Monthly auto update on local pc
+	get_service_date = 'auto'
 	python_processing = 'local_pc'
 	ttm_graph_processing = 'local_pc'
 	web_client_hosted_on = 'local_pc'
@@ -14,30 +14,30 @@ On demand date on local pc
 		gtfs 					- GTFS unzipped dir is placed in this dir
 		osm 					- Open Street Map file for Israel is downloaded to this dir for the TTM tool
 		processed 				- this dir can start out empty, it will hold all the processed data files produced by the python scripts
-		root					- this dir holds the python scripts that process the GTFS files about 50 files. See the flows presentation to see how they are used.
+		root					- this dir holds the python scripts that process the GTFS files about 50 files. 
+									See the flows presentation to see how they are used.
 		static_data				- this dir holds the 8 or so data files that do not change every month. They are copied into the processed dir before processing starts.
 		website_no_data			- this dir holds the client side html and js code for the tools, without the processed data. 
-									the files in this dir are copied into the on-demand date dir website_yyyymmdd together with the processed data to create the tools
+									the files in this dir are copied into the dir website_current together with the processed data to create the tools
+		website_current			- this output dir will hold the tools and processed data to display for the current month
+		website_past			- this output dir will hold the tools and processed data to display for the past month
 
-		website_current			- not used in this product. this output dir will hold the tools and processed data to display for the current month
-		website_past			- not used in this product. this output dir will hold the tools and processed data to display for the past month
-		AWS Lambda function 	- not used in this product. used only in Monthly auto update on AWS 
+		AWS Lambda function 	- used only in Monthly auto update on AWS 
 
 1. Update the config file - \root\transitanalystisrael_config.py 
 	a. remove "#" from the "Monthly auto update on local pc" to un-comment parameters to look as below:
 #Monthly auto update on local pc
-#get_service_date = 'auto'
-#python_processing = 'local_pc'
-#ttm_graph_processing = 'local_pc'
-#web_client_hosted_on = 'local_pc'
-#ttm_server_on = 'local_pc'
+get_service_date = 'auto'
+python_processing = 'local_pc'
+ttm_graph_processing = 'local_pc'
+web_client_hosted_on = 'local_pc'
+ttm_server_on = 'local_pc'
 
 	b. make sure all the rest of the 6 product processing configurations are commented out - have "#"in the first char of the line.
-	
 	c. Save the config file
 
 2. Verify the dates for automatic dates are as you want them in the file \static_data\auto_dates_to_process.json
-   Notice that the dates represent the next production date in each month, the update itself will probably start a date before.
+   Notice that the dates represent the next production date in each month, the update itself will probably start after 10pm on the same date.
 
    Save the json file if you performed any changes
 	
@@ -45,30 +45,33 @@ On demand date on local pc
 	a. Run the Docker Desktop for Windows application and wait for it to come up.
 	b. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
 	c. Right-click and select run "Git Bash Here" to open a terminal window.
-	d. type at the prompt "docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up  --remove-orphans" e.g. for 20190302
-$ docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up  --remove-orphans
+	d. type at the prompt "docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up" 
+$ docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up
 
 5. Run transitanalystisrael_v1.py with python3
 	a. open a window in the pythonpath (as in the config file) e.g. C:\git\TransitAnalystIsrael\root
 	b. type "cmd" in the bar on top to open a cmd terminal
-	c. at the prompt type 'python3 transitanalystisrael_v1.py' e.g. C:\git\TransitAnalystIsrael\root>python3 transitanalystisrael_v1.py
+	c. at the prompt type 'python3 transitanalystisrael_v1.py' e.g.
+C:\git\TransitAnalystIsrael\root>python3 transitanalystisrael_v1.py
 
 6. Wait about 4.5 hours for the scripts to run to completion
 
 7. Copy the newly created graph as secondary-cov to support current & past versions
 	a. Open Power Shell
 	b. connect to the docker worker contrinaer:
-	$ docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
+> docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
 	c. Change directory to the graphs folder:
-	cd /srv/ed/output
+root@9bb282f314b6:/usr/src/app# cd /srv/ed/output
 	d. Copy the graph:
-	cp  default.nav.lz4 secondary-cov.nav.lz4
+root@9bb282f314b6:/srv/ed/output# cp  default.nav.lz4 secondary-cov.nav.lz4
 
 8. Stop and Re-start Navitia servers:
 	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
 	b. Right-click and select run "Git Bash Here" to open a terminal window.
-	c. stop the navitia docker containers by typing at the prompt: "docker stop $(docker ps -a -q)" e.g.
-	d. After stop is completed, d. type at the prompt "docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up  --remove-orphans"
+	c. stop the navitia docker containers by typing at the prompt:
+$ docker stop $(docker ps -a -q)
+	d. After stop is completed, type at the prompt 
+$ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up  --remove-orphans
 
 9. Run the TransitAnalystIsrael
 	a. open a window in the TransitAnalystIsrael\website_current 
@@ -77,7 +80,7 @@ $ docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose u
 	
 ===================================================================================================================================
 
-8. When done, stop and quit
+10. When done, stop and quit
 	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
 	b. Right-click and select run "Git Bash Here" to open a terminal window.
 	c. stop the navitia docker containers by typing at the prompt: "docker stop $(docker ps -a -q)" e.g.
@@ -88,12 +91,12 @@ $ docker stop $(docker ps -a -q)
 
 ====================================================================================================================================
 
-9. To restart TransitAnalystIsrael for an existing on-demand date	
+11. To restart TransitAnalystIsrael for an existing auto date	
 	a. Run the Docker Desktop for Windows application and wait for it to come up.
 	b. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
 	c. Right-click and select run "Git Bash Here" to open a terminal window.
-	d. type at the prompt "docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up --remove-orphans"
-$ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up  --remove-orphans
+	d. type at the prompt "docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up" 
+$ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up
 	e. open a window in the TransitAnalystIsrael\website_current 
 	f. doubleclick on index.html 
 	
