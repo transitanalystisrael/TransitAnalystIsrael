@@ -157,13 +157,32 @@ def get_coverage_start_production_date(coverage_name):
         start_production_date = json_data["regions"][0]["start_production_date"]
         return start_production_date
 
+def check_prod_date_is_valid_using_heat_map(time_map_server_url, coverage_name, expected_valid_date):
+    """
+    Simulating UI action for heat map query with expected_valid_date
+    :return: whether expected_valid_date is in production date
+    """
+    heat_map_url = time_map_server_url + coverage_name + \
+                   "/heat_maps?max_duration=3600&from=34.79041%3B32.073443&datetime=" + expected_valid_date + \
+                   "T080000+02:00&resolution=200"
+
+    response = requests.get(heat_map_url)
+    # Get the status of the coverage as Json
+    json_data = json.loads(response.text)
+    if "error" not in json_data:
+        return True
+    elif json_data['error']['message'] == "date is not in data production period":
+        return False
+    return True
+
 
 def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, default_cov_prev_sop_date, docker_client,
                                         navitia_docker_compose_file_path, navitia_docker_compose_file_name,
                                         navitia_docker_compose_default_file_name):
     """
-    Validate that the secondary_custom_coverage has the original start of production date of the previous default
-    coverage and that the default cov has a now different date (usually later one)
+    Validate that the new default coverage returns results for heat map query for current_start_service_date (as in dates file
+    or gtfs date) and that secondary-cov has results for the previous production date of the default.
+
     :param default_coverage_name: The coverage that gets a new (usually more recent) start of production date
     :param secondary_custom_coverage_name: The coverage that gets a the original default_coverage start of production date
     :param default_cov_sop_date: start of production date of original default coverage (before changes applied)
@@ -177,22 +196,24 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
     else:
         time_map_server_url = cfg.time_map_server_local_url
 
-
     # Check that the current default coverage is up-to-date by comparing sop dates
     stop_all_containers(docker_client)
 
     start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_default_file_name,
                                        default_coverage_name, False)
-    current_default_prod_date = get_coverage_start_production_date(default_coverage_name)
 
-    if current_default_prod_date != "":
-        current_default_prod_date = dt.strptime(current_default_prod_date, "%Y%m%d")
-    if current_default_prod_date == "" or current_start_service_date < current_default_prod_date:
+    if current_start_service_date!= "":
+        current_start_service_date = dt.strptime(current_start_service_date, "%Y%m%d")
+
+    # if current_default_prod_date == "" or current_start_service_date < current_default_prod_date:
+    if not check_prod_date_is_valid_using_heat_map(time_map_server_url, default_coverage_name,
+                                                   current_start_service_date.strftime("%Y%m%d")):
         _log.error("The %s coverage seems not to be up-to-date following update attempts.", default_coverage_name)
         return False
     else:
+        current_default_prod_date = get_coverage_start_production_date(default_coverage_name)
         _log.info("%s coverage is up-to-date with production date %s", default_coverage_name,
-                  current_default_prod_date.strftime("%Y%m%d"))
+                  current_default_prod_date)
 
     # Check that the coverage_name (the previous one) is up-to-date by comparing sop dates
     stop_all_containers(docker_client)
@@ -207,32 +228,32 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
                   "copy the generated default.nav.lz4 graph to secondary-cov.nav.lz4 - See docs.")
         return True
 
-    cov_sop_date = dt.strptime(cov_sop_date, "%Y%m%d")
-
-    if past_start_service_date > cov_sop_date:
-        _log.error("The %s coverage seems not to be up-to-date following update attempts.\n%s production date is "
-                   "%s and should have been %s", coverage_name, coverage_name, cov_sop_date.strftime("%Y%m%d"),
+    # if past_start_service_date > cov_sop_date:
+    if not check_prod_date_is_valid_using_heat_map(time_map_server_url, coverage_name,
+                                                   current_start_service_date.strftime("%Y%m%d")):
+        _log.error("The %s coverage seems not to be up-to-date following update attempts.\n%s production date is "                   
+                   "%s and should have been %s", coverage_name, coverage_name, past_start_service_date.strftime("%Y%m%d"),
                    past_start_service_date.strftime("%Y%m%d"))
         return False
     _log.info("%s coverage is now updated with new start-of-production date %s. "
-              "Can be accessed via %s%s", coverage_name, cov_sop_date.strftime("%Y%m%d"), time_map_server_url,
+              "Can be accessed via %s%s", coverage_name, past_start_service_date.strftime("%Y%m%d"), time_map_server_url,
               coverage_name)
     return True
 
-def validate_graph_changes_applied(coverage_name, cov_prev_sop_date):
+def validate_graph_changes_applied(coverage_name):
     """
     Validate that the coverage has a different start of production date different from before
-    :param coverage_name:
-    :param cov_prev_sop_date: the start-of-production date before data processing has started
-    :return:
     """
+    current_start_service_date = process_date.get_date_now()
+
     if cfg.ttm_server_on == "aws_ec2":
         time_map_server_url = cfg.time_map_server_aws_url
     else:
         time_map_server_url = cfg.time_map_server_local_url
 
     cov_sop_date = get_coverage_start_production_date(coverage_name)
-    if cov_sop_date == "" or cov_prev_sop_date == cov_sop_date:
+    if cov_sop_date == "" or not check_prod_date_is_valid_using_heat_map(time_map_server_url, coverage_name,
+                                                                     current_start_service_date):
         _log.error("The %s coverage seems not to be up-to-date following update attempts."
                    "\n No production date or date isn't updated following data processing",
                    coverage_name)

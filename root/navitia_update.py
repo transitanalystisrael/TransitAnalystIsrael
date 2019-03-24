@@ -100,7 +100,7 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
             raise Exception
 
     elif cfg.get_service_date == "on_demand":
-        is_changes_applied = utils.validate_graph_changes_applied(coverage_name, coverage_name)
+        is_changes_applied = utils.validate_graph_changes_applied(coverage_name)
         if not is_changes_applied:
             raise Exception
 
@@ -119,7 +119,6 @@ try:
     # Get the docker service client
     docker_client = utils.get_docker_service_client()
 
-
     containers = docker_client.containers.list(filters={"name": "worker"})
     if len(containers) == 0:
         _log.error("Navitia docker is down, run 'docker-compose up' in the navitia-docker-compose repo folder")
@@ -127,6 +126,7 @@ try:
     # Get the worker container
     worker_con = containers[0]
 
+    default_cov_sop_date = ""
     # For production env. we have default coverage and secondary-cov coverage so back up is needed
     if cfg.get_service_date == "auto":
         # Get the current start of production dates of default coverage for post-processing comparison
@@ -148,7 +148,6 @@ try:
     # Generate the Transfers file required for Navitia and add to GTFS - only if the zip file doesn't already contain it
     if "transfers.txt" not in zipfile.ZipFile(Path(gtfs_file_path) / gtfs_zip_file_name).namelist():
         utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path)
-
 
     process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path,
                                          navitia_docker_compose_file_name, navitia_docker_compose_default_file_name,
