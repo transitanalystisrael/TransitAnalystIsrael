@@ -9,7 +9,7 @@ On demand date on local pc
 
 =============================================================================================
 
-0. Set up a PC for local production with TTM - Transit Time Map. see instructions document "Set up a PC for local production with Transit Time Map"
+0. Set up a PC for local production with TTM - Transit Time Map. see instructions document "Local version setup.txt"
 	a. The starting dir structure under TransitAnalystIsrael (the name of this parent dir is not important and can be different) is explained below:
 		gtfs 					- GTFS unzipped dir is placed in this dir
 		osm 					- Open Street Map file for Israel is downloaded to this dir for the TTM tool
@@ -46,7 +46,7 @@ serviceweekstartdate = '20190302'
 	d. save the config file
 
 2. Download or copy the GTFS zip file, rename and place in /gtfs/ directory
-	a. Locate GTFS files that corespond to a service start date that is equal to the on-demand date. Remeber that GTFS is uploaded to MOT servers (ftp://gtfs.mot.gov.il) at 10pm each day with a service start date of the next day. 
+	a. Locate GTFS files that corespond to a service start date that is equal to the on-demand date. Remeber that GTFS is uploaded to MOT servers (ftp://gtfs.mot.gov.il) at 10pm each day with a service start date of that same day. 
 	b. Download or copy the GTFS zip file
 	c. rename the GTFS zip file to be gtfsdirbase+gtfsdate+'.zip' (as in the config file) e.g. 'israel20190302.zip'
 	d. place the renamed GTFS zip file in the /gtfs/ directory e.g. C:\git\TransitAnalystIsrael\gtfs\israel20190302.zip
@@ -66,7 +66,8 @@ $ docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose u
 5. Run transitanalystisrael_v1.py with python3
 	a. open a window in the pythonpath (as in the config file) e.g. C:\git\TransitAnalystIsrael\root
 	b. type "cmd" in the bar on top to open a cmd terminal
-	c. at the prompt type 'python3 transitanalystisrael_v1.py' e.g. C:\git\TransitAnalystIsrael\root>python3 transitanalystisrael_v1.py
+	c. at the prompt type 'python3 transitanalystisrael_v1.py' e.g. 
+C:\git\TransitAnalystIsrael\root>python3 transitanalystisrael_v1.py
 
 6. Wait about 4.5 hours for the scripts to run to completion
 

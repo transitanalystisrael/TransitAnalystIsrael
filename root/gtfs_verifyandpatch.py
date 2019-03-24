@@ -10,6 +10,7 @@
 import time
 import csv
 from pathlib import Path
+from logger import _log
 
 cwd = Path.cwd()
 #
@@ -124,6 +125,26 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	
 	# >>> process loaded files
 	
+	# >>> process calendar - check that GTFS start date in calendar.txt is as expected - gtfsdate
+	service_ok_count = 0
+	service_problem_count = 0
+	service_problem_list = []
+	min_service_date = '21190101'
+	for service_id, [sunday,monday,tuesday,wednesday,thursday,friday,saturday,start_date,end_date] in calendar_dict.items() :
+		min_service_date = min(min_service_date, start_date, end_date)
+		if start_date >= gtfsdate and end_date >= gtfsdate :
+			service_ok_count +=1
+		else :
+			service_problem_count +=1
+			print('service_problem date before expected stat date: start_date, end_date, gtfsdate ', service_id, start_date, end_date, gtfsdate)
+			service_problem_list.append([service_id, start_date, end_date, gtfsdate])
+	print('service_ok_count : ', service_ok_count)
+	print('service_problem_count : ', service_problem_count)
+	if min_service_date != gtfsdate :
+		print('GTFS file start date in calendar.txt is not the same as expected start date : ', min_service_date, gtfsdate)
+		print('need to abort')
+		_log.error('GTFS file start date in calendar.txt is not the same as expected start date : %s %s', min_service_date, gtfsdate)
+		raise Exception
 	
 	# >>> process routes
 	routes_agency_id_ok_count = 0
