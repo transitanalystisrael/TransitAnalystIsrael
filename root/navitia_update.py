@@ -118,7 +118,7 @@ try:
 
     # Get the docker service client
     docker_client = utils.get_docker_service_client()
-    cov_sop_date = ""
+
 
     containers = docker_client.containers.list(filters={"name": "worker"})
     if len(containers) == 0:
@@ -132,9 +132,6 @@ try:
         # Get the current start of production dates of default coverage for post-processing comparison
         if utils.is_cov_exists(worker_con, default_coverage_name):
             default_cov_sop_date = utils.get_coverage_start_production_date(default_coverage_name)
-        if cov_sop_date is "":
-            # There is no default covereage yet, assiging old date
-            cov_sop_date = 19700101
 
         # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
         if utils.is_cov_exists(worker_con, coverage_name):
@@ -156,7 +153,7 @@ try:
     process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path,
                                          navitia_docker_compose_file_name, navitia_docker_compose_default_file_name,
                                          coverage_name, default_coverage_name,
-                                         cov_sop_date, cfg.osmpath, cfg.osm_file_name,
+                                         default_cov_sop_date, cfg.osmpath, cfg.osm_file_name,
                                          gtfs_file_path, gtfs_zip_file_name, _log)
 
 except Exception as e:
