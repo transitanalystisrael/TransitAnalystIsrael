@@ -75,7 +75,7 @@ def upload_localdir_w_gzip_to_bucket(localdir_from, bucket_to_name):
 			full_path = os.path.join(subdir, file)
 			filesize = os.path.getsize(full_path)
 			print('file, filesize : ',file, filesize)
-			if (file.endswith(".js") and filesize > int(cfg.bigjs2gzip)): # skip big js files that were gziped. only the gzip file will be uploaded
+			if (file.endswith(".js") and filesize > int(cfg.bigjs2gzip) and not subdir.endswith("dist")): # skip big js files that were gziped. only the gzip file will be uploaded. does not apply to dist dir that does not go through gzip.
 				print('skipped : ',full_path)
 			elif file.endswith(".gz"): # upload gzip file but remove .gz from the filename and add Metadata
 				with open(full_path, 'rb') as data:
@@ -97,6 +97,10 @@ def upload_localdir_w_gzip_to_bucket(localdir_from, bucket_to_name):
 				with open(full_path, 'rb') as data:
 					bucket2.put_object(Key=full_path[len(str(localdir_from))+1:].replace('\\','/'), Body=data, ContentType='image/jpeg')
 					print('image/jpg file : ',full_path)
+			elif (file.endswith(".ico") or file.endswith(".ICO")) : #upload with image metadata
+				with open(full_path, 'rb') as data:
+					bucket2.put_object(Key=full_path[len(str(localdir_from))+1:].replace('\\','/'), Body=data, ContentType='image/x-icon')
+					print('image/ico file : ',full_path)
 			elif file.endswith(".css") : #upload with image metadata
 				with open(full_path, 'rb') as data:
 					bucket2.put_object(Key=full_path[len(str(localdir_from))+1:].replace('\\','/'), Body=data, ContentType='text/css')
