@@ -42,53 +42,53 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
                                          cov_eos_date, osm_file_path, osm_file_name,
                                          gtfs_file_path, gtfs_file_name, _log):
 
-    # start_processing_time = datetime.datetime.utcnow() #We take the time in UTC because docker time is in UTC
-    # # Re-start Navitia docker with default coverage only in order to process the OSM & GTFS
-    # # Later we will restart with the custom coverage as well
-    # utils.stop_all_containers(docker_client)
-    # if cfg.get_service_date == "auto":
-    #     utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_default_file_name,
-    #                                              default_coverage_name)
-    # elif cfg.get_service_date == "on_demand":
-    #     utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
-    #                                              coverage_name)
-    #
-    # # Get the new worker container
-    # worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
-    #
-    # # Copy OSM & GTFS to the default coverage input folder on the worker container
-    # if cfg.get_service_date == "auto":
-    #     utils.copy_osm_and_gtfs_to_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name,
-    #                                    default_coverage_name)
-    # elif cfg.get_service_date == "on_demand":
-    #     utils.copy_osm_and_gtfs_to_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name,
-    #                                    coverage_name)
-    #
-    # # Validate the conversion process takes place by ensuring tyr_beat is up
-    # if cfg.get_service_date == "auto":
-    #     utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, default_coverage_name,
-    #                                                            navitia_docker_compose_default_file_name,
-    #                                                            navitia_docker_compose_file_name)
-    # elif cfg.get_service_date == "on_demand":
-    #     utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, coverage_name,
-    #                                                            navitia_docker_compose_file_path,
-    #                                                            navitia_docker_compose_file_name)
-    #
-    # worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
-    # # After 20 minutes - test that both osm and gtfs conversions are done
-    # success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 40, start_processing_time)
-    #
-    # # If it didn't succeed, give it 30 more minutes
-    # if not success:
-    #     success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30, start_processing_time)
-    #
-    # # If it didn't succeed, give it 30 more minutes
-    # if not success:
-    #     success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30, start_processing_time)
-    #
-    # if not success:
-    #     _log.error("After 90 minutes - tasks aren't completed - connect to server for manual inspection")
-    #     raise Exception
+    start_processing_time = datetime.datetime.utcnow() #We take the time in UTC because docker time is in UTC
+    # Re-start Navitia docker with default coverage only in order to process the OSM & GTFS
+    # Later we will restart with the custom coverage as well
+    utils.stop_all_containers(docker_client)
+    if cfg.get_service_date == "auto":
+        utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_default_file_name,
+                                                 default_coverage_name)
+    elif cfg.get_service_date == "on_demand":
+        utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
+                                                 coverage_name)
+
+    # Get the new worker container
+    worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
+
+    # Copy OSM & GTFS to the default coverage input folder on the worker container
+    if cfg.get_service_date == "auto":
+        utils.copy_osm_and_gtfs_to_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name,
+                                       default_coverage_name)
+    elif cfg.get_service_date == "on_demand":
+        utils.copy_osm_and_gtfs_to_cov(worker_con, osm_file_path, osm_file_name, gtfs_file_path, gtfs_file_name,
+                                       coverage_name)
+
+    # Validate the conversion process takes place by ensuring tyr_beat is up
+    if cfg.get_service_date == "auto":
+        utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, default_coverage_name,
+                                                               navitia_docker_compose_default_file_name,
+                                                               navitia_docker_compose_file_name)
+    elif cfg.get_service_date == "on_demand":
+        utils.validate_osm_gtfs_convertion_to_graph_is_running(docker_client, coverage_name,
+                                                               navitia_docker_compose_file_path,
+                                                               navitia_docker_compose_file_name)
+
+    worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
+    # After 20 minutes - test that both osm and gtfs conversions are done
+    success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 40, start_processing_time)
+
+    # If it didn't succeed, give it 30 more minutes
+    if not success:
+        success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30, start_processing_time)
+
+    # If it didn't succeed, give it 30 more minutes
+    if not success:
+        success = utils.validate_osm_gtfs_convertion_to_graph_is_completed(worker_con, 30, start_processing_time)
+
+    if not success:
+        _log.error("After 90 minutes - tasks aren't completed - connect to server for manual inspection")
+        raise Exception
 
     is_changes_applied = True
     # Validate that changes are applied
@@ -104,10 +104,10 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
         if not is_changes_applied:
             raise Exception
 
-    # # If it's up - delete the old gtfs and osm files - only from AWS machines
-    # if is_changes_applied and utils.is_aws_machine():
-    #     utils.delete_file_from_host(Path(os.getcwd()).parent / osm_file_path / osm_file_name)
-    #     utils.delete_file_from_host(Path(os.getcwd()).parent / gtfs_file_path / gtfs_file_name)
+    # If it's up - delete the old gtfs and osm files - only from AWS machines
+    if is_changes_applied and utils.is_aws_machine():
+        utils.delete_file_from_host(Path(os.getcwd()).parent / osm_file_path / osm_file_name)
+        utils.delete_file_from_host(Path(os.getcwd()).parent / gtfs_file_path / gtfs_file_name)
 
 
 # config variables to be moved to config-file downstrem
@@ -133,21 +133,21 @@ try:
         if utils.is_cov_exists(worker_con, default_coverage_name):
             default_cov_sop_date = utils.get_coverage_start_production_date(default_coverage_name)
 
-        # # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
-        # if utils.is_cov_exists(worker_con, coverage_name):
-        #     utils.backup_past_coverage(worker_con, coverage_name)
-        #     utils.delete_grpah_from_container(worker_con, coverage_name)
-        #
-        # # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
-        # if utils.is_cov_exists(worker_con, default_coverage_name):
-        #     utils.move_current_to_past(worker_con, default_coverage_name, coverage_name)
-    #
-    # if cfg.get_service_date == "on_demand":
-    #     utils.generate_ondemand_docker_config_file(navitia_docker_compose_file_path, navitia_docker_compose_file_name)
-    #
-    # # Generate the Transfers file required for Navitia and add to GTFS - only if the zip file doesn't already contain it
-    # if "transfers.txt" not in zipfile.ZipFile(Path(gtfs_file_path) / gtfs_zip_file_name).namelist():
-    #     utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path)
+        # Copy the existing secondary-cov.nav.lz4 to the host machine for backup and delete it from container
+        if utils.is_cov_exists(worker_con, coverage_name):
+            utils.backup_past_coverage(worker_con, coverage_name)
+            utils.delete_grpah_from_container(worker_con, coverage_name)
+
+        # Rename default.lz4 to secondary-cov.nav.lz4 (by that converting it to last month gtfs)
+        if utils.is_cov_exists(worker_con, default_coverage_name):
+            utils.move_current_to_past(worker_con, default_coverage_name, coverage_name)
+
+    if cfg.get_service_date == "on_demand":
+        utils.generate_ondemand_docker_config_file(navitia_docker_compose_file_path, navitia_docker_compose_file_name)
+
+    # Generate the Transfers file required for Navitia and add to GTFS - only if the zip file doesn't already contain it
+    if "transfers.txt" not in zipfile.ZipFile(Path(gtfs_file_path) / gtfs_zip_file_name).namelist():
+        utils.generate_gtfs_with_transfers(gtfs_zip_file_name, gtfs_file_path)
 
     process_new_data_to_current_coverage(docker_client, navitia_docker_compose_file_path,
                                          navitia_docker_compose_file_name, navitia_docker_compose_default_file_name,
