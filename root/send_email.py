@@ -58,7 +58,7 @@ def create_message_and_send(sender, to, subject,  message_text_plain, attached_f
     #Deleting key files
     os.remove(local_credentials_json.as_posix())
     os.remove(local_token_json.as_posix())
-    
+
 def create_message_without_attachment (sender, to, subject, message_text_html, message_text_plain):
     # Create message container
     message = MIMEMultipart('alternative') # needed for both plain & HTML (the MIME type is multipart/alternative)
