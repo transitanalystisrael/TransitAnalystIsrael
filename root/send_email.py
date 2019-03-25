@@ -28,7 +28,7 @@ def get_credentials():
     token_json = 'token.json'
     local_token_json = Path.cwd() / "assets" / "keys" / "token.json"
     keys_buckets.download_file(token_json, local_token_json.as_posix())
-    time.sleep(2)
+    דגכדגכ
     store = file.Storage(local_token_json.as_posix())
     creds = store.get()
     if not creds or creds.invalid:
