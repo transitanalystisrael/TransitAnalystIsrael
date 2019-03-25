@@ -15,17 +15,18 @@ from email.mime.text import MIMEText
 
 from apiclient import errors, discovery  #needed for gmail service
 import boto3
+from pathlib import Path
 
 def get_credentials():
     # get credentials from S3 bucket - this would only work on Transit Analyst EC2 that has a proper IAM role
     s3 = boto3.resource('s3')
     keys_buckets = s3.Bucket('transit-analyst-key-bucket')
     credentials_json = 'credentials.json'
-    local_credentials_json = '/assets/keys/credentials.json'
-    keys_buckets.download_file(credentials_json , local_credentials_json)
+    local_credentials_json = Path.cwd() / "assets" / "keys" / "credentials.json"
+    keys_buckets.download_file(credentials_json , local_credentials_json.as_posix())
     token_json = 'token.json'
-    local_token_json = 'token.json'
-    keys_buckets.download_file(token_json , local_token_json)
+    local_token_json = Path.cwd() / "assets" / "keys" / "token.json"
+    keys_buckets.download_file(token_json , local_token_json.as_posix())
 
     store = file.Storage(token_json)
     creds = store.get()
@@ -34,8 +35,8 @@ def get_credentials():
         creds = tools.run_flow(flow, store)
 
     #Deleting key files
-    os.remove(local_credentials_json)
-    os.remove(local_token_json)
+    os.remove(local_credentials_json.as_posix())
+    os.remove(local_token_json.as_posix())
 
     return creds
 
