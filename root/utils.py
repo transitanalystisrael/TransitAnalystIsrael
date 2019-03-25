@@ -202,9 +202,6 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
     start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_default_file_name,
                                        default_coverage_name, False)
 
-    if current_start_service_date!= "":
-        current_start_service_date = dt.strptime(current_start_service_date, "%Y%m%d")
-
     # if current_default_prod_date == "" or current_start_service_date < current_default_prod_date:
     if not check_prod_date_is_valid_using_heat_map(time_map_server_url, default_coverage_name,
                                                    current_start_service_date.strftime("%Y%m%d")):
