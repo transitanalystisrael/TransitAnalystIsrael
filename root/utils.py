@@ -256,7 +256,7 @@ def validate_graph_changes_applied(coverage_name):
         return False
 
     _log.info("%s coverage is now updated with new start-of-production date %s\n."
-              "Can be accessed via %s%s", coverage_name, current_start_service_date.strftime("%Y%m%d"), time_map_server_url,
+              "Can be accessed via %s%s", coverage_name, current_start_service_date, time_map_server_url,
               coverage_name)
     return True
 
