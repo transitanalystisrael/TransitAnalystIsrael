@@ -16,6 +16,7 @@ from email.mime.text import MIMEText
 from apiclient import errors, discovery  #needed for gmail service
 import boto3
 from pathlib import Path
+import time
 
 def get_credentials():
     # get credentials from S3 bucket - this would only work on Transit Analyst EC2 that has a proper IAM role
@@ -27,7 +28,7 @@ def get_credentials():
     token_json = 'token.json'
     local_token_json = Path.cwd() / "assets" / "keys" / "token.json"
     keys_buckets.download_file(token_json, local_token_json.as_posix())
-
+    time.sleep(2)
     store = file.Storage(local_token_json.as_posix())
     creds = store.get()
     if not creds or creds.invalid:
