@@ -111,10 +111,14 @@
     function displayEnglish() {
         window.open("indexe.html",'_blank');
     }
+
+
+
 </script>
 
 
 <div class="topnav">
+    <button id="period_button" type="button" onclick="displayOtherPeriod()">***</button>
     <button type="button" onclick="displayEnglish()">English</button>
     <button type="button" onclick="displayCreds()">תודות</button>
     <button type="button" onclick="contact()">צור קשר</button>
@@ -123,6 +127,23 @@
         <button type="button" onclick="displayHome()">מנתח תחבורה לישראל</button>
     </div>
 </div>
+
+<script>
+    // Change period button text according to the period displayed
+    if (window.location.href.includes("current")) {
+        document.getElementById("period_button").innerHTML = "מעבר לתקופה הקודמת";
+    } else {
+        document.getElementById("period_button").innerHTML = "מעבר לתקופה הנוכחית";
+    }
+
+    function displayOtherPeriod() {
+        if (window.location.href.includes("current")) {
+            window.open("https://s3.eu-central-1.amazonaws.com/transitanalystisrael-past/indexh.html",'_self')
+        } else {
+            window.open("https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/indexh.html",'_self')
+        }
+    }
+</script>
 
 <section>
   <nav>

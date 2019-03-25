@@ -113,6 +113,7 @@
 
 
 <div class="topnav english">
+    <button id="period_button" type="button" onclick="displayOtherPeriod()">***</button>
     <button type="button" onclick="displayHebrew()">עברית</button>
     <button type="button" onclick="contact()">Contact us</button>
     <button type="button" onclick="displayFaq()">FAQs</button>
@@ -121,6 +122,23 @@
         <button type="button" onclick="displayHome()">Transit Analyst Israel</button>
     </div>
 </div>
+
+<script>
+    // Change period button text according to the period displayed
+    if (window.location.href.includes("current")) {
+        document.getElementById("period_button").innerHTML = "Go to previous period";
+    } else {
+        document.getElementById("period_button").innerHTML = "Go to current period";
+    }
+
+    function displayOtherPeriod() {
+        if (window.location.href.includes("current")) {
+            window.open("https://s3.eu-central-1.amazonaws.com/transitanalystisrael-past/indexe.html", '_self')
+        } else {
+            window.open("https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/indexe.html",'_self')
+        }
+    }
+</script>
 
 <section>
   <nav>
