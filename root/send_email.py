@@ -23,7 +23,7 @@ def get_credentials():
     keys_buckets = s3.Bucket('transit-analyst-key-bucket')
     credentials_json = 'credentials.json'
     local_credentials_json = Path.cwd() / "assets" / "keys" / "credentials.json"
-    keys_buckets.download_file(credentials_json , local_credentials_json.as_posix())
+    keys_buckets.download_file(credentials_json, local_credentials_json.as_posix())
     token_json = 'token.json'
     local_token_json = Path.cwd() / "assets" / "keys" / "token.json"
     keys_buckets.download_file(token_json, local_token_json.as_posix())
