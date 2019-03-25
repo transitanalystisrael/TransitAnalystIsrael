@@ -27,16 +27,16 @@ def get_credentials():
     keys_buckets.download_file(credentials_json, local_credentials_json.as_posix())
     token_json = 'token.json'
     local_token_json = Path.cwd() / "assets" / "keys" / "token.json"
-    # keys_buckets.download_file(token_json, local_token_json.as_posix())
+    keys_buckets.download_file(token_json, local_token_json.as_posix())
     store = file.Storage(local_token_json.as_posix())
     creds = store.get()
     if not creds or creds.invalid:
         flow = client.flow_from_clientsecrets(local_credentials_json, 'https://www.googleapis.com/auth/gmail.send')
         creds = tools.run_flow(flow, store)
 
-    #Deleting key files
-    os.remove(local_credentials_json.as_posix())
-    os.remove(local_token_json.as_posix())
+    # #Deleting key files
+    # os.remove(local_credentials_json.as_posix())
+    # os.remove(local_token_json.as_posix())
 
     return creds
 
