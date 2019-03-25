@@ -52,7 +52,7 @@ ttm_server_on = 'aws_ec2'
 
 # common config
 # note - gtfsdate and serviceweekstartdate must be the same!!! (untill all scripts support different dates...)
-gtfsdate = '20190311'
+gtfsdate = '20190303'
 serviceweekstartdate = '20190311'
 autodatefile = 'auto_dates_to_process.json'
 gtfsdirbase = 'israel'

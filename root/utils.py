@@ -208,9 +208,8 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
         _log.error("The %s coverage seems not to be up-to-date following update attempts.", default_coverage_name)
         return False
     else:
-        current_default_prod_date = get_coverage_start_production_date(default_coverage_name)
         _log.info("%s coverage is up-to-date with production date %s", default_coverage_name,
-                  current_default_prod_date)
+                  current_start_service_date)
 
     # Check that the coverage_name (the previous one) is up-to-date by comparing sop dates
     stop_all_containers(docker_client)
@@ -233,7 +232,7 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
                    past_start_service_date.strftime("%Y%m%d"))
         return False
     _log.info("%s coverage is now updated with new start-of-production date %s. "
-              "Can be accessed via %s%s", coverage_name, past_start_service_date.strftime("%Y%m%d"), time_map_server_url,
+              "Can be accessed via %s%s", coverage_name, current_start_service_date.strftime("%Y%m%d"), time_map_server_url,
               coverage_name)
     return True
 
@@ -257,7 +256,7 @@ def validate_graph_changes_applied(coverage_name):
         return False
 
     _log.info("%s coverage is now updated with new start-of-production date %s\n."
-              "Can be accessed via %s%s", coverage_name, cov_sop_date, time_map_server_url,
+              "Can be accessed via %s%s", coverage_name, current_start_service_date, time_map_server_url,
               coverage_name)
     return True
 
