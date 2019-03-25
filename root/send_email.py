@@ -36,7 +36,7 @@ def get_credentials():
     #Deleting key files
     os.remove(local_credentials_json)
     os.remove(local_token_json)
-    
+
     return creds
 
 
