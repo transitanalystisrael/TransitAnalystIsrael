@@ -15,21 +15,23 @@ from email.mime.text import MIMEText
 
 from apiclient import errors, discovery  #needed for gmail service
 import boto3
+from pathlib import Path
+import time
 
-def get_credentials():
+def get_credentials(local_credentials_json, local_token_json):
     # get credentials from S3 bucket - this would only work on Transit Analyst EC2 that has a proper IAM role
     s3 = boto3.resource('s3')
     keys_buckets = s3.Bucket('transit-analyst-key-bucket')
     credentials_json = 'credentials.json'
-    keys_buckets.download_file(credentials_json , credentials_json )
+    keys_buckets.download_file(credentials_json, local_credentials_json.as_posix())
     token_json = 'token.json'
-    keys_buckets.download_file(token_json , token_json)
-
-    store = file.Storage(token_json)
+    keys_buckets.download_file(token_json, local_token_json.as_posix())
+    store = file.Storage(local_token_json.as_posix())
     creds = store.get()
     if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets(credentials_json, 'https://www.googleapis.com/auth/gmail.send')
+        flow = client.flow_from_clientsecrets(local_credentials_json, 'https://www.googleapis.com/auth/gmail.send')
         creds = tools.run_flow(flow, store)
+
     return creds
 
 
@@ -37,7 +39,9 @@ def get_credentials():
 
 ## Get creds, prepare message and send it
 def create_message_and_send(sender, to, subject,  message_text_plain, attached_file):
-    credentials = get_credentials()
+    local_credentials_json = Path.cwd() / "assets" / "keys" / "credentials.json"
+    local_token_json = Path.cwd() / "assets" / "keys" / "token.json"
+    credentials = get_credentials(local_credentials_json, local_token_json)
 
     # Create an httplib2.Http object to handle our HTTP requests, and authorize it using credentials.authorize()
     http = httplib2.Http()
@@ -50,6 +54,10 @@ def create_message_and_send(sender, to, subject,  message_text_plain, attached_f
     ## create messeage with attachment with attachment
     message_with_attachment = create_Message_with_attachment(sender, to, subject, message_text_plain, attached_file)
     send_Message_with_attachement(service, "me", message_with_attachment, message_text_plain,attached_file)
+
+    #Deleting key files
+    os.remove(local_credentials_json.as_posix())
+    os.remove(local_token_json.as_posix())
 
 def create_message_without_attachment (sender, to, subject, message_text_html, message_text_plain):
     # Create message container
