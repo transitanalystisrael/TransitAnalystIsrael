@@ -118,6 +118,9 @@
     <button type="button" onclick="contact()">Contact us</button>
     <button type="button" onclick="displayFaq()">FAQs</button>
     <button type="button" onclick="displayCreds()">Credits</button>
+    <div class="service-period-container">
+        <button id="service_period" type="button">***</button>
+    </div>
     <div class="main-button">
         <button type="button" onclick="displayHome()">Transit Analyst Israel</button>
     </div>
@@ -220,9 +223,7 @@
   </article>
 </section>
 
-<footer>
-  <p id="service_period">***</p>
-</footer>
+<footer></footer>
 
 <script src="docs/transitanalystisrael_config.js" ></script>
 <script src="docs/gtfs_start_date.js" ></script>
@@ -241,7 +242,11 @@
 	var startDay = new Date(gtfs_start_date.slice(0,4), gtfs_start_date.slice(4,6)-1, gtfs_start_date.slice(6)); // js months are 0-11
 	var endDay = new Date();
 	endDay.setTime(startDay.getTime() + 6*24*60*60*1000);
-	document.getElementById("service_period").innerHTML = 'Service Week Analyzed : '+startDay.toDateString()+' to '+endDay.toDateString();
+    startDayParts = startDay.toDateString().split(" ")
+    startDayString = startDayParts[2] + "/" + startDayParts[1] + "/" + startDayParts[3]
+    endDayParts = endDay.toDateString().split(" ")
+    endDayString = endDayParts[2] + "/" + endDayParts[1] + "/" + endDayParts[3]
+	document.getElementById("service_period").innerHTML = 'Service week analyzed: '+startDayString +' to '+endDayString;
 	</script>
 
 </body>

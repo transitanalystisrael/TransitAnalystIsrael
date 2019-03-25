@@ -35,6 +35,23 @@
   font-weight: bold;
   }
 
+.service-period-container {
+  font-size: 1.2em;
+  font-weight: bold;
+  cursor: default;
+}
+
+.service-period-container button#service_period {
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    text-decoration: none;
+    background-color: #72b317;;
+    font-size: 0.8em;
+    font-weight: normal;
+    cursor: default;
+
+}
 .topnav button:hover {
   /*background-color: #ddd;*/
   color: white;
