@@ -21,15 +21,22 @@ def get_credentials():
     s3 = boto3.resource('s3')
     keys_buckets = s3.Bucket('transit-analyst-key-bucket')
     credentials_json = 'credentials.json'
-    keys_buckets.download_file(credentials_json , credentials_json )
+    local_credentials_json = '/assets/keys/credentials.json'
+    keys_buckets.download_file(credentials_json , local_credentials_json)
     token_json = 'token.json'
-    keys_buckets.download_file(token_json , token_json)
+    local_token_json = 'token.json'
+    keys_buckets.download_file(token_json , local_token_json)
 
     store = file.Storage(token_json)
     creds = store.get()
     if not creds or creds.invalid:
         flow = client.flow_from_clientsecrets(credentials_json, 'https://www.googleapis.com/auth/gmail.send')
         creds = tools.run_flow(flow, store)
+
+    #Deleting key files
+    os.remove(local_credentials_json)
+    os.remove(local_token_json)
+    
     return creds
 
 
