@@ -10,8 +10,7 @@ Install required Software:
 * Gzip : http://gnuwin32.sourceforge.net/packages/gzip.htm , make sure to add the location of gzip.exe to the windows PATH variable
 * Python 3.7 (https://www.python.org/ftp/python/3.7.2/python-3.7.2.exe) , make sure to add the location of gzip.exe to the windows PATH variable
 
-
-Python 3 modules:
+Install Python 3 modules:
 ===================
 1. No need to pip install the following as they are already included in the default install of python3.7 : json zipfile tarfile re csv math 
 
@@ -31,10 +30,22 @@ mimetypes
 email
 apiclient
 boto3
-gdal (from https://github.com/OSGeo/gdal then use pytohn3 -m pip install <downlaoded file>)
-shapely (from https://github.com/Toblerity/Shapely then use pytohn3 -m pip install <downlaoded file>)
+gdal (from https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal then use python3 -m pip install <downlaoded file>)
+shapely (from https://github.com/Toblerity/Shapely , https://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely, then use python3 -m pip install <downlaoded file>)
+numpy
+geopy
 pypiwin32
-piwin32 
-pythoncom
-win32api
+
+
+Git Clone TransitAnalystIsrael
+==============================================================================================
+$ git clone https://github.com/shakedk/TransitAnalystIsrael.git
+
+Git Clone Navitia Server
+==============================================================================================
+$ git clone https://github.com/shakedk/navitia-docker-compose.git
+
+
+Setup access to TransitAnalystIsrael AWS S3 account
+==============================================================================================
 

@@ -9,7 +9,7 @@ On demand date on local pc no TTM
 
 =============================================================================================
 
-0. Set up a PC for local production without TTM - Transit Time Map. see instructions document "Set up a PC for local production without Transit Time Map"
+0. Set up a PC for local production without TTM - Transit Time Map. see instructions document "Local version setup.txt"
 	a. The starting dir structure under TransitAnalystIsrael (the name of this parent dir is not important and can be different) is explained below:
 		gtfs 					- GTFS zipped dir is placed in this dir, it will be unzipped by the script and the unzipped dir will be placed here
 		processed 				- this dir can start out empty or be missing altogether, it will hold all the processed data files produced by the python scripts
