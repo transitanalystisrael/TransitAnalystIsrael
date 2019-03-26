@@ -13,7 +13,7 @@ from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from apiclient import errors, discovery  #needed for gmail service
+from googleapiclient import errors, discovery  #needed for gmail service
 import boto3
 from pathlib import Path
 import time
