@@ -39,11 +39,11 @@ pypiwin32
 
 Git Clone TransitAnalystIsrael
 ==============================================================================================
-$ git clone https://github.com/shakedk/TransitAnalystIsrael.git
+$ git clone https://github.com/transitanalystisarel/TransitAnalystIsrael.git
 
 Git Clone Navitia Server
 ==============================================================================================
-$ git clone https://github.com/shakedk/navitia-docker-compose.git
+$ git clone https://github.com/transitanalystisarel/navitia-docker-compose.git
 
 
 Setup access to TransitAnalystIsrael AWS S3 account
