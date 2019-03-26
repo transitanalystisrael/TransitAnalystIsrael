@@ -202,7 +202,6 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
     start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_default_file_name,
                                        default_coverage_name, False)
 
-    # if current_default_prod_date == "" or current_start_service_date < current_default_prod_date:
     if not check_prod_date_is_valid_using_heat_map(time_map_server_url, default_coverage_name,
                                                    current_start_service_date.strftime("%Y%m%d")):
         _log.error("The %s coverage seems not to be up-to-date following update attempts.", default_coverage_name)
@@ -224,12 +223,10 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
                   "copy the generated default.nav.lz4 graph to secondary-cov.nav.lz4 - See docs.")
         return True
 
-    # if past_start_service_date > cov_sop_date:
     if not check_prod_date_is_valid_using_heat_map(time_map_server_url, coverage_name,
                                                    current_start_service_date.strftime("%Y%m%d")):
-        _log.error("The %s coverage seems not to be up-to-date following update attempts.\n%s production date is "                   
-                   "%s and should have been %s", coverage_name, coverage_name, past_start_service_date.strftime("%Y%m%d"),
-                   past_start_service_date.strftime("%Y%m%d"))
+        _log.error("The %s coverage seems not to be up-to-date following update attempts.\nA call for heat map data with"
+                   " %s date returned no results", coverage_name, current_start_service_date.strftime("%Y%m%d"))
         return False
     _log.info("%s coverage is now updated with new start-of-production date %s. "
               "Can be accessed via %s%s", coverage_name, current_start_service_date.strftime("%Y%m%d"), time_map_server_url,
@@ -251,8 +248,8 @@ def validate_graph_changes_applied(coverage_name):
     if cov_sop_date == "" or not check_prod_date_is_valid_using_heat_map(time_map_server_url, coverage_name,
                                                                      current_start_service_date):
         _log.error("The %s coverage seems not to be up-to-date following update attempts."
-                   "\n No production date or date isn't updated following data processing",
-                   coverage_name)
+                   "\n A call for heat map data with %s date returned no results",
+                   coverage_name, current_start_service_date)
         return False
 
     _log.info("%s coverage is now updated with new start-of-production date %s\n."
