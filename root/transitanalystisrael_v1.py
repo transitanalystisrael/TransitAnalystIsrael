@@ -14,6 +14,7 @@ update_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
 
 try:
     _log.info("Successsssssssss")
+    _log.info(os.getcwd())
     sdfsfsdf
     if cfg.get_service_date == 'auto':
         next_month_operation_date = process_date.get_auto_date_nextmonth()  # The date that the product should already be working
