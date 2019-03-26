@@ -35,18 +35,17 @@ c. Right-click on the new address -> Associate Address -> select the newly creat
 ===================
 The EC2 will upload items to your S3 buckets, take keys from the S3 bucket and also modify the AWS Lambda function that triggers the monthly update.
 In order to do that, we grant him permissions using proper IAM roles.
-a. Access the IAM roles page 
+a. Access the IAM roles page through the AWS console.
+b. Go to Roles -> "Create Role"
+c. Select "EC2" for the type of trusted entity -> "Next: Permissions"
+d. Assign the following permissions to allow access to all your S3 buckets and CloudWatch:
+   - AmazonS3FullAccess
+   - CloudWatchFullAccess
+   - AdministratorAccess
+e. Click "Next" until you can assign the role a proper name (e.g. "navitia_ec2_to_s3_cloudwatch") -> "Create Role"
 
-####################################################
-####################################################
-####################################################
-####################################################
-####################################################
-####################################################
-####################################################
-####################################################
 
-3. Acces via Putty for terminal operations
+5. Acces via Putty for terminal operations
 ==========================================
 a. Get Putty for Windows from: https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
 
