@@ -103,7 +103,13 @@ $ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-do
 	e. open a window in the TransitAnalystIsrael\website_current 
 	f. doubleclick on index.html 
 	
-	
+====================================================================================================================================
 
+12. Make sure your local pc is ready for the scheduled monthly auto update
+	a. optional - you can see the scheduled update in the windows "Task Scheduler" 
+		* search for scheduler and click on "Task Scheduler"
+		* click on "Task Schedular Library" folder on the left bar
+		* look under name for "Transit Analyst Israel Updater"
+	b. Make sure that the Navitia docker environment is up and running (you can do this by opening the TTM tool in website_current to see if it is working). if not then run 11. a. through d.
 
 

@@ -1,51 +1,59 @@
 Minimum Requirements:
 =====================
-- 16 GB of RAM )8 will be allocated for Docker)
+- 16GB of RAM (8GB will be allocated for Docker) smaller configurations are possible (even 8GB total and 4GB for docker), but will be very slow.
+- Win10 pro x64
 
 Install required Software:
 ==========================
 * Git with Git-bash (https://git-scm.com/downloads)
 * Docker for Windows (https://www.docker.com/products/docker-desktop)
+	- allocate 8GB for docker in the docker setup window
 * GDAL for widnows: https://trac.osgeo.org/gdal/wiki/OSGeo4W
 * Gzip : http://gnuwin32.sourceforge.net/packages/gzip.htm , make sure to add the location of gzip.exe to the windows PATH variable
 * Python 3.7 (https://www.python.org/ftp/python/3.7.2/python-3.7.2.exe) , make sure to add the location of gzip.exe to the windows PATH variable
 
 Install Python 3 modules:
 ===================
-1. No need to pip install the following as they are already included in the default install of python3.7 : json zipfile tarfile re csv math 
+* No need to pip install the following as they are already included in the default install of python3.7 : json zipfile tarfile re csv math 
 
-2. Install the following modules. 
+* Install the following modules. 
 Use the following command: python3 -m pip install <module name>
 To list all modules installed, you can use the python command: >>> help("modules")
-=====================================================================================
-logger
-docker
-progressbar2
-requests
-argparse
-httplib2
-oauth2client
-base64
-mimetypes
-email
-apiclient
-boto3
-gdal (from https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal then use python3 -m pip install <downlaoded file>)
-shapely (from https://github.com/Toblerity/Shapely , https://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely, then use python3 -m pip install <downlaoded file>)
-numpy
-geopy
-pypiwin32
-
+	logger
+	docker
+	progressbar2
+	requests
+	argparse
+	httplib2
+	oauth2client
+	base64
+	mimetypes
+	email
+	apiclient
+	boto3
+	gdal (from https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal then use python3 -m pip install <downlaoded file>)
+	shapely (from https://github.com/Toblerity/Shapely , https://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely, then use python3 -m pip install <downlaoded file>)
+	numpy
+	geopy
+	pypiwin32
 
 Git Clone TransitAnalystIsrael
 ==============================================================================================
-$ git clone https://github.com/transitanalystisarel/TransitAnalystIsrael.git
+* Create a dir for git to clone in e.g. C:\git
+* Open a window in the git dir and Right-click and select run "Git Bash Here" to open a terminal window.
+* type at the prompt "git clone https://github.com/transitanalystisrael/TransitAnalystIsrael.git" 
+$ git clone https://github.com/transitanalystisrael/TransitAnalystIsrael.git
 
 Git Clone Navitia Server
 ==============================================================================================
-$ git clone https://github.com/transitanalystisarel/navitia-docker-compose.git
+* Open a window in the git dir and Right-click and select run "Git Bash Here" to open a terminal window.
+* type at the prompt "git clone https://github.com/transitanalystisrael/navitia-docker-compose.git" 
+$ git clone https://github.com/transitanalystisrael/navitia-docker-compose.git
 
 
-Setup access to TransitAnalystIsrael AWS S3 account
+Setup access to TransitAnalystIsrael AWS S3 account (not needed for local pc only products)
 ==============================================================================================
+* open an AWS S3 account if you don't have one already
+* log into your existing AWS S3 account e.g. user - transitanalystisrael
+
 
