@@ -189,7 +189,6 @@ def validate_auto_graph_changes_applied(coverage_name, default_coverage_name, de
     :return: whether the graph changes were applied
     """
     current_start_service_date = dt.strptime(process_date.get_date_now(), "%Y%m%d")
-    past_start_service_date = dt.strptime(default_cov_prev_sop_date, "%Y%m%d")
 
     if cfg.ttm_server_on == "aws_ec2":
         time_map_server_url = cfg.time_map_server_aws_url
