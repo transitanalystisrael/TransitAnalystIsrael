@@ -56,7 +56,9 @@ C:\git\TransitAnalystIsrael\root>python3 transitanalystisrael_v1.py
 
 6. Wait about 4.5 hours for the scripts to run to completion
 
-7. Copy the newly created graph as secondary-cov to support current & past versions
+=================================================================================================================================
+
+7. If running this product (Monthly auto update on local pc) for the first time on this pc or running a date that is before the last date that was run in monthly auto on this pc, then : Copy the newly created graph as secondary-cov to support current & past versions. Else: skip directly to step 9. Run the TransitAnalystIsrael.
 	a. Open Power Shell
 	b. connect to the docker worker contrinaer:
 > docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
@@ -73,10 +75,11 @@ $ docker stop $(docker ps -a -q)
 	d. After stop is completed, type at the prompt 
 $ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up  --remove-orphans
 
+==================================================================================================================================
+
 9. Run the TransitAnalystIsrael
 	a. open a window in the TransitAnalystIsrael\website_current 
 	b. doubleclick on index.html
-	
 	
 ===================================================================================================================================
 
