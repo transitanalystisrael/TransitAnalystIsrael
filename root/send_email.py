@@ -40,7 +40,7 @@ def get_credentials(local_credentials_json, local_token_json):
 ## Get creds, prepare message and send it
 def create_message_and_send(sender, to, subject,  message_text_plain, attached_file):
     keys_path = Path.cwd() / "assets" / "keys"
-    if not os.listdir(keys_path.as_posix()):
+    if not os.isdir(keys_path.as_posix()):
         os.mkdir(keys_path.as_posix())
     local_credentials_json = keys_path / "credentials.json"
     local_token_json = keys_path / "token.json"
