@@ -44,6 +44,7 @@ d. Assign the following permissions to allow access to all your S3 buckets and C
    - AmazonS3FullAccess
    - CloudWatchFullAccess
    - AdministratorAccess
+
 e. Click "Next" until you can assign the role a proper name (e.g. "navitia_ec2_to_s3_cloudwatch") -> "Create Role"
 f. Go to the EC2 Instances page -> right click the EC2 instance -> "Attach/Replace IAM Role" -> select the newly created role -> click "Apply"
 
@@ -55,7 +56,7 @@ b. Follow the steps here to generate a .ppk file that will allow you to connect 
 
 c. The user should be in the host name filed, e.g. "ubuntu@18.185.174.211" where the IP is the public IP (elastic IP we assigned earlier) of the EC2 which can be obtained from the AWS EC2 console.
 
-4. Install required Software and get code:
+6. Install required Software and get code:
 ==========================================
 a. Git and Python3.6 is already installed.
 b. Install Docker for Ubuntu 18-04 (taken from: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04):
@@ -108,12 +109,12 @@ e. git Clone Transit Analyst Israel project:
 $ git clone https://github.com/transitanalystisarel/TransitAnalystIsrael/
 
 
-2. Assign an Elastic IP to the isntance:
+7. Assign an Elastic IP to the isntance:
 ========================================
 EC2 Instances recieve a new IP after each re-start. This can be avioded by attaching a static IP to the instance, in AWS it's called "Elastic IP".
 go to the elastic IP console, careate and attach it to the EC2 isnatnce as instructed by the online wiazrd: https://eu-central-1.console.aws.amazon.com/ec2/v2/home?region=eu-central-1#Addresses:sort=PublicIp
 
-3. Configure AWS Gateway API service to serve Secure content
+8. Configure AWS Gateway API service to serve Secure content
 ============================================================
 Navitia server on the instance serves HTTP only content via port 9191. Brwosers such as Chrome block this kind of data so we need to use AWS for serving secure content.
 
@@ -121,7 +122,7 @@ There are 2 options to that:
 3.1 - Importing existing API configruation from Transit Analyst Production environment
 3.2 - Configuring it manully through the console.
 
-3.1 - Cloning existing API configruation from Transit Analyst Production environment
+8.1 - Cloning existing API configruation from Transit Analyst Production environment
 ======================================================================================
 a. Access the API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
 b. Click "Create API"
@@ -130,7 +131,7 @@ h. Click "Actions" -> "Deploy API" -> "New stage" -> provide any stage name (e.g
 i. On the created stage page (if needed "Stages" -> Your staging) -> "Stage Varaibles" -> click "add Stage Varaible" ->
 Enter Name: "NavitiaServerIP" and Value: <elastic IP (or public IP if no elastic) of the Navitia server EC2>
 
-3.2 - Configuring it manully through the console
+8.2 - Configuring it manully through the console
 ================================================
 a. Access the API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
 b. Click "Create API"
@@ -150,7 +151,7 @@ e. Deploy the API
 	Click on "Get" -> Test the API to see you get a response from the docker using the elastic IP.
 	You should get Response code 200 and details about the coverage, such as regions, links, etc.
 
-4. Provide the Navitia server on the EC2 with the API gateway for integration on the client side (HTML & JS)
+9. Provide the Navitia server on the EC2 with the API gateway for integration on the client side (HTML & JS)
 ============================================================================================================
 a. Copy the Invoke URL from the "Stage" page in the AWS API Gateway console.
 b. Using putty connect to the EC2
@@ -164,5 +165,47 @@ d. Change the URL:
 - Change the value of time_map_server_aws_url to the value of the Invoke URL mentioned above (it should look the same as existing apart from the part after the http://)
 - Press Esc -> type :wq -> press Enter
 
+10. Configure the Lambda Function that triggets the monthly update
+=================================================================
+10.1 First, we need to create a proper IAM role that will allow the Lambda function to access the EC2 and perform actions:
+-------------------------------------------------------------------------------------------------------------------------
+a. Access the IAM Role console: https://console.aws.amazon.com/iam/home#/roles
+b. Click "Create Role" -> Select "Aws Service" -> Select "Lambda" -> Click "Next: Permissions"
+c. Assign the following policieis:
+	- AmazonEC2FullAccess
+	- AmazonS3FullAccess
+	- CloudWatchLogsFullAccess
+	- AmazonVPCFullAccess
+	- AWSLambdaVPCAccessExecutionRole
+	- CloudWatchFullAccess
+	
+d. Click "Next" until you can assign the role a proper name (e.g. "Transit-Analyst-Updater") -> "Create Role"
+	
+10.2 Create and configure the lambda function:
+---------------------------------------------
+a. Access the Lambda Function console: https://eu-central-1.console.aws.amazon.com/lambda/
+b. Click "Create Function"
+c. "Author from Scratch" -> Function name: "Transit Analyst Update" -> Runtime: Python 3.6 -> click "Choose or create an existing role" -> 
+   "Use an existing role" -> select the role you've just created -> Click "Create Function"
+d. Configure the trigger that will cause the lambda to be executed every month:
+d1. On the "Add Triggers" pane select "CloudWatch Events" -> click on the created "CloudWatch Events" box ("Configuration needed") -> Scroll down to the newly added box titled "Configure Triggers"
+d2. Click "Create new Rule" -> Provide name "GTFS-Monthly-Timer" -> Rule Type: schedule expression 
+     NOTE!!!: the name must be "GTFS-Monthly-Timer" because this is the name expected in Transit Analyst Code (/root -> set_next_month_invocation.py). you can change it, but then you have to change the code as well.
+d3. For the expression type: cron(30 22 DD MM ? YYYY) and replace DD MM and YYYY with daymonth and year respectivley, e.g. cron(30 22 31 04 ? 2019). 
+    The date here doesn't really matter because when Transit Analyst update runs it assignes the next update date to this rule by itself (using the IAM role we created for the EC2 earlier).
+d4. Click "Add"
 
-WRITE HERE ABOUT EDITING THE AUTO UPDATE PART!!!!!!!!!!!!!
+e. Upload the required code to be executed in the EC2 when the function is triggered:
+e1. Scroll up and click on <Function name> box
+e2. Scroll down to "Fucntion Code" -> Code entry type: "upload a .zip file". -> Runtime "Python 3.6"  -> Handler: "function.worker_handler"
+e3. Click uplaod and upload the python package found in TransitAnalystIsrael\AWS Lambda function\Monthly-GTFS-Update-package.zip (it's part of the source code, and can also be downloaded directly from github)
+
+f. Scroll to "Basic Settings" and change the memory requirements to 512MB
+e. Configure network - scroll to Network pane
+e1. Select the default VPC suggested by the console -> Select all subnets possible -> For Security group select the one you previously created when starting the EC2 setup: "ssh-and-http-from-anywhere".
+
+f. Scroll up and click "Save". The process might take 2-3 minutes while the 12.5 zip file is being uploaded.
+
+g. DO NOT CLICK TEST. This will trigger a monthly update!
+
+11. To start Transit analyst on AWS for the first time, go to "Instructions for Monthly auto update on AWS".txt
