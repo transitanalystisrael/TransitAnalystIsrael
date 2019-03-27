@@ -646,7 +646,7 @@ def send_log_to_email(subject, message):
     :param message:
     :return: Whether the e-mail was sent successfully
     """
-    # Change to root before trying to send logs 
+    # Change to root before trying to send logs
     root_path = Path.home() / "TransitAnalystIsrael" / "root"
     os.chdir(root_path.as_posix())
     logs_path = root_path / "logs"
