@@ -34,7 +34,8 @@ if cfg.get_service_date == 'auto' :
 	#
 	# remove website_past dir
 	#
-	shutil.rmtree(past_dir)
+	if os.path.isdir(past_dir):
+		shutil.rmtree(past_dir)
 	#
 	# rename website_current dir to website_past
 	#
