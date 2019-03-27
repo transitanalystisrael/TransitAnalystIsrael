@@ -1,0 +1,141 @@
+Instructions for "Monthly auto update on AWS"
+
+Monthly auto update on AWS and S3
+	get_service_date = 'auto'
+	python_processing = 'aws_ec2'
+	ttm_graph_processing = 'aws_ec2'
+	web_client_hosted_on = 'aws_s3'
+	ttm_server_on = 'aws_ec2'
+
+=============================================================================================
+
+0. Using Putty (see setup instructions for putty setup), connect to the EC2.
+	Change directory to Trasnit Analyst Israel project:
+	$ cd TransitAnalystIsrael
+	Make sure that the Project dir structure is as below, and create missing folders if needed using mkdir:   
+	a. The starting dir structure under TransitAnalystIsrael (name is given by git project, don't change it) is explained below:
+		gtfs 					- GTFS unzipped dir is placed in this dir
+		osm 					- Open Street Map file for Israel is downloaded to this dir for the TTM tool
+		processed 				- this dir can start out empty, it will hold all the processed data files produced by the python scripts
+		root					- this dir holds the python scripts that process the GTFS files about 50 files. 
+									See the flows presentation to see how they are used.
+		static_data				- this dir holds the 8 or so data files that do not change every month. They are copied into the processed dir before processing starts.
+		website_no_data			- this dir holds the client side html and js code for the tools, without the processed data. 
+									the files in this dir are copied into the dir website_current together with the processed data to create the tools
+		website_current			- this output dir will hold the tools and processed data to display for the current month
+		website_past			- this output dir will hold the tools and processed data to display for the past month
+
+		AWS Lambda function 	- used only in Monthly auto update on AWS 
+
+1. Update the config file - \root\transitanalystisrael_config.py 
+	a. If needed, remove "#" from the "Monthly auto update on AWS" to un-comment parameters to look as below:
+
+#Monthly auto update on AWS EC2 and S3
+get_service_date = 'auto'
+python_processing = 'aws_ec2'
+ttm_graph_processing = 'aws_ec2'
+web_client_hosted_on = 'aws_s3'
+ttm_server_on = 'aws_ec2'
+
+	b. make sure all the rest of the 6 product processing configurations are commented out - have "#"in the first char of the line.
+	c. Save the config file (Press Esc -> Type :wq -> Press Enter)
+
+2. Verify the dates for automatic dates are as you want them in the file \static_data\auto_dates_to_process.json
+   Notice that the dates represent the next production date in each month, the update itself will probably start after 10pm on the same date.
+
+   Save the json file if you performed any changes
+	
+3. Run the Navitia docker environment in the Putty 	
+	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g.:
+	   $ cd ~/navitia-docker-compose	
+	b. type at the terminal:
+		$ sudo docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up --remove-orphans
+
+	This might task some time.....
+		
+5. Run transitanalystisrael_v1.py with python3
+	a. Opena new Putty session (don't touch the existing one - you can close the window - the docker will continue running)
+	b. Change directory to Transit Analyst Israel project root folder:
+		$ cd TransitAnalystIsrael/root	
+	The following command will trigger the update process. 
+	Using 'nohup'  means that the program is running and you can safely close the Putty window without stopping the execution.
+	Right away the following line appears: "nohup: ignoring input and appending output to 'nohup.out'" - this is a good sign and nothing else should appear after.	
+	If you want to see the output on screen remove "nohup" from the command - but then closing the putty windows will STOP THE EXECUTION. so you have to make sure your local(!) machine
+	is up and running for the next 4-5 hours.
+
+	c. Type 'nohup python3 transitanalystisrael_v1.py'
+	
+	d. To view the status, open a new Putty session
+	   Navitigate to the logs directory:
+	   $ cd TransitAnalystIsrael/root/logs/
+	   Display the possible logs files:
+	   $ ls
+	   View the current log file:
+	   $ vim <log file name> (e.g. Transit Analyst27032019_1318.txt)
+	   Quit by Pressing Ecs -> typing q!
+	   
+	   You can recheck this log from time to time. If an error occurs you will see it in the log.
+	   Additional, when finishing succesfuly or unsucessfuly, the log will be sent to transitanalystisrael@gmail.com
+
+6. Wait about 4.5 hours for the scripts to run to completion
+
+=================================================================================================================================
+
+7. If running this product (Monthly auto update on AES) for the first time on this AWS or running a date that is before the last date that was run in monthly auto on this AWS, then: 
+    Copy the newly created graph as secondary-cov to support current & past versions. Else: skip directly to step 9. Run the TransitAnalystIsrael.
+	a. Open a  Putty session
+	b. connect to the docker worker contrinaer:
+		$ docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
+	c. Change directory to the graphs folder:
+		root@9bb282f314b6:/usr/src/app# cd /srv/ed/output
+	d. Copy the graph:
+		root@9bb282f314b6:/srv/ed/output# cp  default.nav.lz4 secondary-cov.nav.lz4
+	e. Exit the internal docker terminal:
+		root@9bb282f314b6:/srv/ed/output#  exit
+
+8. Stop and Re-start Navitia servers:	
+	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g.:
+	   $ cd ~/navitia-docker-compose
+	b. Stop the running navitia dockers:
+		$ docker stop $(docker ps -a -q)
+	d. Once done - run Navitia server with the secondary-cov: 
+		$ sudo docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up  --remove-orphans
+
+==================================================================================================================================
+
+9. To run the TransitAnalystIsrael web client, go to the URL generated for the S3 that stores it, such as: https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/indexh.html
+   The bucket is as you dfined in step 11 in the "How to deploy Transit Analyst Israel on AWS" and should be something like: 
+   https://s3.eu-central-1.amazonaws.com/<bucket-current-name>/indexh.html for current coverage and https://s3.eu-central-1.amazonaws.com/<bucket-past-name>/indexh.html for past coverage 
+
+	
+===================================================================================================================================
+
+10. When done, stop and quit
+	a. Using putty connect to the EC2	
+	b. stop the navitia docker containers by typing at the terminal:
+		$ docker stop $(docker ps -a -q)
+	c. close the browser window where transitanalistisrael is running (they are still accessible on the S3 at any time)
+	
+
+====================================================================================================================================
+
+11. To restart TransitAnalystIsrael for an existing auto date	
+	a. If you restart your EC2 machime, docker and coker-compose dameons are brought up automatically.
+	b. Using putty connect to the EC2	
+	c. Go to the folder where you cloned the Navitia-docker-compose repo e.g.:
+	   $ cd ~/navitia-docker-compose	
+	d. type at the terminal:
+		$ sudo docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up --remove-orphans
+	e. See step 9 to access the web files (you can also access from the S3 console)	
+	
+====================================================================================================================================
+
+12. Make sure your AWS is ready for the scheduled monthly auto update:
+	a. optional - you can see the scheduled update in the cloud watch console: https://eu-central-1.console.aws.amazon.com/cloudwatch/home?region=eu-central-1#rules:
+	   Click on the rule -> see the next trigger date is as expected in the static_files/auto_dates_to_process.json
+	   
+	b. Make sure that the Navitia docker environment on the EC2 is running, by using putty:
+	   $ docker ps
+	   This command should yield list of running containers. If it doesn't go to step 11 to make sure that the docker containers are running.
+
+
