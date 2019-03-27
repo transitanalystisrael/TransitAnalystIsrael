@@ -13,7 +13,6 @@ import process_date
 update_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
 
 try:
-    asdasdasd
     if cfg.get_service_date == 'auto':
         next_month_operation_date = process_date.get_auto_date_nextmonth()  # The date that the product should already be working
         next_month_operation_date = datetime.datetime.strptime(next_month_operation_date, '%Y%m%d')

@@ -5,9 +5,11 @@ Steps to Deploy Israel transit Analyst Alpha Version on AWS
 2. Transit Map requires a server to run the docker containers that run Navitia server.
 
 
-
 Trnaist Map Deployment - Steps:
-1. Launch EC2 instance - Ubuntu Server 18.04 LTS):
+===============================
+===============================
+
+1. Launch EC2 instance - Ubuntu Server 18.04 LTS:
 =================================================
 (We originally used this article as a basis for this setup: https://www.ybrikman.com/writing/2015/11/11/running-docker-aws-ground-up/)
 a. Instance Type: Select t3.large instance with 2 vCPUs and 8GB RAM.
@@ -43,7 +45,7 @@ d. Assign the following permissions to allow access to all your S3 buckets and C
    - CloudWatchFullAccess
    - AdministratorAccess
 e. Click "Next" until you can assign the role a proper name (e.g. "navitia_ec2_to_s3_cloudwatch") -> "Create Role"
-
+f. Go to the EC2 Instances page -> right click the EC2 instance -> "Attach/Replace IAM Role" -> select the newly created role -> click "Apply"
 
 5. Acces via Putty for terminal operations
 ==========================================
@@ -53,8 +55,8 @@ b. Follow the steps here to generate a .ppk file that will allow you to connect 
 
 c. The user should be in the host name filed, e.g. "ubuntu@18.185.174.211" where the IP is the public IP (elastic IP we assigned earlier) of the EC2 which can be obtained from the AWS EC2 console.
 
-4. Install required Software:
-=============================
+4. Install required Software and get code:
+==========================================
 a. Git and Python3.6 is already installed.
 b. Install Docker for Ubuntu 18-04 (taken from: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04):
 $ sudo apt install apt-transport-https ca-certificates curl software-properties-common
@@ -74,18 +76,7 @@ c. Install docker-compose (taken from https://docs.docker.com/compose/install/ -
 $ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 $ sudo chmod +x /usr/local/bin/docker-compose
 
-
-
-d. Pull Navitia docker project (adjusted to our needs) from: https://github.com/shakedk/navitia-docker-compose
-e. Install docker and docker-compose tools (or as detailed here: https://gist.github.com/benfogel/041e3c4b8b856cdcdfd8d9d5aa0a7f73):
-	$ sudo amazon-linux-extras install docker
-	$ sudo usermod -a -G docker ec2-user
-	$ sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-`uname -s`-`uname -m` | sudo tee /usr/local/bin/docker-compose > /dev/null
-	$ sudo chmod +x /usr/local/bin/docker-compose
-	$ sudo service docker start
-	$ sudo chkconfig docker on
-	
-	Configure the dokcer logs for rotation so they don't blow up:
+d. Configure the dokcer logs for rotation so they don't blow up:
 	$ cd /etc/docker
 	$ sudo touch daemon.json
 	$ sudo vim daemon.json
@@ -94,18 +85,30 @@ e. Install docker and docker-compose tools (or as detailed here: https://gist.gi
 		"log-driver": "json-file",
 		"log-opts": {"max-size": "10m", "max-file": "3"}
 	}
-	Quit with w and q
+	Quit by pressing Esc -> type :wq > press Enter
 	$sudo systemctl reload docker
 
-f. Copy the OSM and GTFS files to the worker container so the graph will be genreated:	
-	Open Bash terminal session where the .pem file is lcoated and use the following commands to copy the GTFS and OSM files to the EC2 instance
-	scp -i <pem-key-file-name>.pem israel-and-palestine-latest.osm.pbf ec2-user@<public-dns-of-ec2-instance, e.g. ec2-52-28-9-228.eu-central-1.compute.amazonaws.com>:/<destiantion directory>
-g. change dir to the git repo and run:
-	$docker-compose up
-After 40-60 minutes the graph will be generated and if you go to http://<elastic-ip>:9191/v1/coverage/default you should see info about Israel coverage
-h. Delete the OSM and GTFS files from the Linux host (they are automatically delete from the docker containers, so no worries about that) to save space
+e. Install GDAL for gdal command line operations (Accept all questions you're prompted with):
+$ sudo apt-get install libgdal-dev
+$ sudo apt install gdal-bin
 
-2. Assign an Elastic IP to teh isntance:
+f. Update pythong and install needed libraries  (Accept all questions you're prompted with):
+sudo apt-get install python3.6-dev
+sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
+sudo apt-get update
+sudo apt install python3-pip
+sudo apt-get install python3-gdal
+pip3 install docker logger shapely geopy progressbar2 requests argparse httplib2 oauth2client boto3 google-api-python-client google-auth google-auth-httplib2 apiclient
+
+d. git Clone Navitia docker project (adjusted to our needs):
+$ cd ~
+$ git clone https://github.com/transitanalystisrael/navitia-docker-compose
+
+e. git Clone Transit Analyst Israel project: 
+$ git clone https://github.com/transitanalystisarel/TransitAnalystIsrael/
+
+
+2. Assign an Elastic IP to the isntance:
 ========================================
 EC2 Instances recieve a new IP after each re-start. This can be avioded by attaching a static IP to the instance, in AWS it's called "Elastic IP".
 go to the elastic IP console, careate and attach it to the EC2 isnatnce as instructed by the online wiazrd: https://eu-central-1.console.aws.amazon.com/ec2/v2/home?region=eu-central-1#Addresses:sort=PublicIp
@@ -113,8 +116,24 @@ go to the elastic IP console, careate and attach it to the EC2 isnatnce as instr
 3. Configure AWS Gateway API service to serve Secure content
 ============================================================
 Navitia server on the instance serves HTTP only content via port 9191. Brwosers such as Chrome block this kind of data so we need to use AWS for serving secure content.
+
+There are 2 options to that:
+3.1 - Importing existing API configruation from Transit Analyst Production environment
+3.2 - Configuring it manully through the console.
+
+3.1 - Cloning existing API configruation from Transit Analyst Production environment
+======================================================================================
 a. Access the API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
-b. Create new API Get Request
+b. Click "Create API"
+c. Select "Rest" -> "clone from exiting API" -> Select "Clone from Time Map" -> provide name -> Click "Clone API"
+h. Click "Actions" -> "Deploy API" -> "New stage" -> provide any stage name (e.g. production) -> "Deploy".
+i. On the created stage page (if needed "Stages" -> Your staging) -> "Stage Varaibles" -> click "add Stage Varaible" ->
+Enter Name: "NavitiaServerIP" and Value: <elastic IP (or public IP if no elastic) of the Navitia server EC2>
+
+3.2 - Configuring it manully through the console
+================================================
+a. Access the API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
+b. Click "Create API"
 	Integration Type: HTTP
 	Endpoint URL: http://${stageVariables.NavitiaServerIP}:9191/v1/coverage/default 
 	content Handling: Passthrough
@@ -130,22 +149,20 @@ e. Deploy the API
 	Go back to "Resources" -> Actions -> Deploy API
 	Click on "Get" -> Test the API to see you get a response from the docker using the elastic IP.
 	You should get Response code 200 and details about the coverage, such as regions, links, etc.
-	
-4. Upload the Bundled JS and HTML file to S3
-============================================
-a. git clone the navitia-timemap project to your host (not EC2): https://github.com/shakedk/TransitAnalystIsrael/tree/master/navitia-timemap - follow the commands in the git repo for initial install
-b. Opem timeMap.js and change the server_url to work with the elastic ip
-c. run "npm run build" to generate the static files in the "build" folder
-d. upload the entire contents of the build folder to S3 and server and make them public.
-e. If you run access index.html via the S3 link, you should be able to see a heat map loaded.
 
-	
-	
+4. Provide the Navitia server on the EC2 with the API gateway for integration on the client side (HTML & JS)
+============================================================================================================
+a. Copy the Invoke URL from the "Stage" page in the AWS API Gateway console.
+b. Using putty connect to the EC2
+c. Go to the Transit Analyst config file and open for edit:
+$ cd TransitAnalystIsrael/root/
+$ vim transitanalystisrael_config.py
 
-	
+d. Change the URL:
+- Press I to go into edit mode
+- Using the down arrow button, scroll all the way down until you see: time_map_server_aws_url
+- Change the value of time_map_server_aws_url to the value of the Invoke URL mentioned above (it should look the same as existing apart from the part after the http://)
+- Press Esc -> type :wq -> press Enter
 
 
-
-
-Exploring the size of docker logs:
-docker ps -qa | xargs docker inspect --format='{{.LogPath}}' | xargs sudo du -hl
+WRITE HERE ABOUT EDITING THE AUTO UPDATE PART!!!!!!!!!!!!!
