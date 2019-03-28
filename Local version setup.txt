@@ -54,7 +54,15 @@ $ git clone https://github.com/transitanalystisrael/navitia-docker-compose.git
 
 Setup access to TransitAnalystIsrael AWS S3 account (not needed for local pc only products)
 ==============================================================================================
-* open an AWS S3 account if you don't have one already
+* open an AWS S3 account if you don't have one already 
 * log into your existing AWS S3 account e.g. user - transitanalystisrael
+* define a new user as described in https://realpython.com/python-boto3-aws-s3/#installation up to the download of the csv file
+* download and install the AWS CLI from https://aws.amazon.com/cli/
+* use the powershell to configue the AWS credentials with the command:
+> aws configure
+* when propted, enter the AWS Access Key ID and the AWS Secret Access Key from the csv file downloaded before
+* no need to fill in the region - it is hard coded.
+
+* 
 
 
