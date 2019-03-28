@@ -191,6 +191,7 @@ b. Click "Create Role" -> Select "Aws Service" -> Select "Lambda" -> Click "Next
 c. Assign the following policieis:
 	- AmazonEC2FullAccess
 	- AmazonS3FullAccess
+	- AdministratorAccess
 	- CloudWatchLogsFullAccess
 	- AmazonVPCFullAccess
 	- AWSLambdaVPCAccessExecutionRole
