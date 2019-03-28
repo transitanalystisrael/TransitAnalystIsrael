@@ -32,8 +32,12 @@
 	<style>
 		#map { width: 100%; height: 95%; }
 
-		.info { height: 500px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: rgba(255,255,255,0.95); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
-		.info h4 { margin: 0 0 5px; color: #777; }
+		.info { height: 500px; max-width: 300px; overflow: auto; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: rgba(255,255,255,0.95); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+		.info h5 { margin: 0 0 0 0; }
+		.info h3 { margin: 0 0 5px; color: #777; }
+		.info ul { padding-right: 20px; text-align: right}
+		.info li { max-width: 250px }
+		.freq-table tbody td { text-align: center;}
 
 
 		.legend { height: auto; max-width: 100px; text-align: center; line-height: 18px; color: #555; background: rgba(255,255,255,0.95); padding: 6px 8px; border-radius: 5px;}
@@ -42,6 +46,9 @@
 
 		.savefilecontrol { text-align: left; line-height: 18px; color: #555; background: rgba(255,255,255,0.95); padding: 6px 8px; border-radius: 5px;}
 		.savefilecontrol i { width: 18px; height: 18px; float: left; margin-right: 4px; opacity: 1.0; }
+		.route_short_name { cursor: pointer}
+
+
 	</style>
 
 	<link rel="stylesheet" href="leaflet-slider-master/dist/leaflet-slider.css"/>
@@ -140,25 +147,31 @@
 		this.update();
 		return this._div;
 	};
-		
+
 
 	info.update = function () {
 		this._div.innerHTML =
 			'<div class="freq-list">' +
 			'<h3>תדירות קווי אוטובוס בישראל</h3>' +
             '<h5>' + linesShownCount + ' קווים עם יותר מ-' + slidervalue + ' נסיעות' + '</h5>' +
-			'<table class="freq-table">' +
-            '    <thead>' +
-            '        <tr>' +
-            '            <th>מפעילה</th>' +
-            '            <th> מספר קו</th>' +
-            '            <th>תדירות יומית (לכיוון)</th>' +
-            '        </tr>' +
-            '    </thead>' +
-			'    <tbody>' +
-					displaystring +
-            '    </tbody>' +
-            '</table>' +
+		   '<ul class="instructions">' +
+            	'<li>העבירו את העכבר מעל קווי שירות במפה להדגשתם</li>' +
+            	'<li>לחצו על מספר קו בטבלה להדגשתו במפה</li>' +
+				'<li>לחצו על מיקום להצגת הקווים במיקום זה</li>' +
+				'<br>' +
+				'<table class="freq-table">' +
+				'    <thead>' +
+				'        <tr>' +
+				'            <th>מפעילה</th>' +
+				'            <th> מספר קו</th>' +
+				'            <th>תדירות יומית (לכיוון)</th>' +
+				'        </tr>' +
+				'    </thead>' +
+				'    <tbody>' +
+						displaystring +
+				'    </tbody>' +
+				'</table>' +
+			'</ul>' +
 			'</>'
 	};
 
@@ -422,7 +435,7 @@
             displaystring +=
 				'<tr>' +
                 '	<td>' + agencies[agency_id] + '</td>' +
-                '	<td onclick="clicklinefunction(event)">' + route_short_name + '</td>' +
+                '	<td class="route_short_name" onclick="clicklinefunction(event)">' + route_short_name + '</td>' +
                 '   <td>' + tpd + '</td>' +
             	'</tr>'
 
