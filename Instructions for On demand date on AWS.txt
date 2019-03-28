@@ -1,7 +1,7 @@
-Instructions for "Monthly auto update on AWS"
+Instructions for "On demand date on AWS"
 
-Monthly auto update on AWS and S3
-	get_service_date = 'auto'
+On demand date on AWS EC2 and S3
+	get_service_date = 'on_demand'
 	python_processing = 'aws_ec2'
 	ttm_graph_processing = 'aws_ec2'
 	web_client_hosted_on = 'aws_s3'
@@ -26,35 +26,46 @@ Monthly auto update on AWS and S3
 		website_past			- this output dir will hold the tools and processed data to display for the past month
 
 		AWS Lambda function 	- used only in Monthly auto update on AWS 
+		
+	b. note that the on-demand date output dir for the tools - website_yyyymmdd - does not exist prior to processing. It will be created by the scripts in the same parent dir.
 
-1. Update the config file - ~/TransitAnalystIsrael/root/transitanalystisrael_config.py
-	a. If needed, remove "#" from the "Monthly auto update on AWS" to un-comment parameters to look as below:
+1. Update the config file - ~/TransitAnalystIsrael/root/transitanalystisrael_config.py 
+	a. remove "#" from the "On demand date on AWS EC2 and S3" to un-comment parameters to look as below:
 
-#Monthly auto update on AWS EC2 and S3
-get_service_date = 'auto'
+#On demand date on AWS EC2 and S3
+get_service_date = 'on_demand'
 python_processing = 'aws_ec2'
 ttm_graph_processing = 'aws_ec2'
 web_client_hosted_on = 'aws_s3'
 ttm_server_on = 'aws_ec2'
 
 	b. make sure all the rest of the 6 product processing configurations are commented out - have "#"in the first char of the line.
-	c. Save the config file (Press Esc -> Type :wq -> Press Enter)
 
-2. Verify the dates for automatic dates are as you want them in the file \static_data\auto_dates_to_process.json
-   Notice that the dates represent the next production date in each month, the update itself will probably start after 10pm on the same date.
+	c. change "gtfsdate" and "serviceweekstartdate" to the requested on-demand date e.g. for 20190302 (YYYYMMDD)
 
-   Save the json file if you performed any changes
+gtfsdate = '20190302'
+serviceweekstartdate = '20190302'
+
+	d. save the config file
+
+2. Download or copy the GTFS zip file, rename and place in /gtfs/ directory
+	a. Locate GTFS files that corespond to a service start date that is equal to the on-demand date. Remeber that GTFS is uploaded to MOT servers (ftp://gtfs.mot.gov.il) at 10pm each day with a service start date of that same day. 
+	b. Download or copy the GTFS zip file (you can use the terminal command wget to download files directly into the EC2)
+	c. rename the GTFS zip file to be gtfsdirbase+gtfsdate+'.zip' (as in the config file) e.g. 'israel20190302.zip'
+	d. place the renamed GTFS zip file in the /gtfs/ directory e.g. ~/TransitAnalystIsrael/gtfs/israel20190302.zip
+
+3. Download or copy the Open Street Map - OSM file, and place in /osm/ directory
+	a. Locate the current or recent Israel OSM file or one that coresponds to the on-demand date. download from  http://download.geofabrik.de/asia/israel-and-palestine.html
+	b. Download or copy the OSM file - israel-and-palestine-latest.osm.pbf
+	c. place the file in the /osm/ directory e.g. ~/TransitAnalystIsrael/osm/israel-and-palestine-latest.osm.pbf
 	
-3. Run the Navitia docker environment in the Putty 	
+4. Run the Navitia docker environment
 	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g.:
 	   $ cd ~/navitia-docker-compose	
 	b. type at the terminal:
 		$ sudo docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up --remove-orphans
 
-	This might task some time.....
-		
-5. Run transitanalystisrael_v1.py with python3
-	a. Opena new Putty session (don't touch the existing one - you can close the window - the docker will continue running)
+a. Opena new Putty session (don't touch the existing one - you can close the window - the docker will continue running)
 	b. Change directory to Transit Analyst Israel project root folder:
 		$ cd TransitAnalystIsrael/root	
 	The following command will trigger the update process. 
@@ -79,34 +90,8 @@ ttm_server_on = 'aws_ec2'
 
 6. Wait about 4.5 hours for the scripts to run to completion
 
-=================================================================================================================================
-
-7. If running this product (Monthly auto update on AES) for the first time on this AWS or running a date that is before the last date that was run in monthly auto on this AWS, then: 
-    Copy the newly created graph as secondary-cov to support current & past versions. Else: skip directly to step 9. Run the TransitAnalystIsrael.
-	a. Open a  Putty session
-	b. connect to the docker worker contrinaer:
-		$ docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
-	c. Change directory to the graphs folder:
-		root@9bb282f314b6:/usr/src/app# cd /srv/ed/output
-	d. Copy the graph:
-		root@9bb282f314b6:/srv/ed/output# cp  default.nav.lz4 secondary-cov.nav.lz4
-	e. Exit the internal docker terminal:
-		root@9bb282f314b6:/srv/ed/output#  exit
-
-8. Stop and Re-start Navitia servers:	
-	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g.:
-	   $ cd ~/navitia-docker-compose
-	b. Stop the running navitia dockers:
-		$ docker stop $(docker ps -a -q)
-	d. Once done - run Navitia server with the secondary-cov: 
-		$ sudo docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up  --remove-orphans
-
-==================================================================================================================================
-
-9. To run the TransitAnalystIsrael web client, go to the URL generated for the S3 that stores it, such as: https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/indexh.html
-   The bucket is as you dfined in step 11 in the "How to deploy Transit Analyst Israel on AWS" and should be something like: 
-   https://s3.eu-central-1.amazonaws.com/<bucket-current-name>/indexh.html for current coverage and https://s3.eu-central-1.amazonaws.com/<bucket-past-name>/indexh.html for past coverage 
-
+9. To run the TransitAnalystIsrael web client, go to the URL generated for the S3 that stores it, such as: https://s3.eu-central-1.amazonaws.com/ondemand-YYYYMMDD/indexh.html where YYYYMMDD is the on demand date you set in the gtfsdate
+   
 	
 ===================================================================================================================================
 
@@ -125,17 +110,12 @@ ttm_server_on = 'aws_ec2'
 	c. Go to the folder where you cloned the Navitia-docker-compose repo e.g.:
 	   $ cd ~/navitia-docker-compose	
 	d. type at the terminal:
-		$ sudo docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up --remove-orphans
+		$ sudo docker-compose -f compose_files/docker-compose-ondemand-YYYYMMDD.yml -p navitia-docker-compose up --remove-orphans (where YYYYMMDD is the date you put for the gtfsdate)
 	e. See step 9 to access the web files (you can also access from the S3 console)	
 	
-====================================================================================================================================
+	
 
-12. Make sure your AWS is ready for the scheduled monthly auto update:
-	a. optional - you can see the scheduled update in the cloud watch console: https://eu-central-1.console.aws.amazon.com/cloudwatch/home?region=eu-central-1#rules:
-	   Click on the rule -> see the next trigger date is as expected in the static_files/auto_dates_to_process.json
-	   
-	b. Make sure that the Navitia docker environment on the EC2 is running, by using putty:
-	   $ docker ps
-	   This command should yield list of running containers. If it doesn't go to step 11 to make sure that the docker containers are running.
+
+
 
 

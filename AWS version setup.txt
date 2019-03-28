@@ -1,99 +1,288 @@
-Minimum Requirements:
-=====================
-- 16 GB of RAM *8 will be allocated for Docker)
-- 30 GB of storage
+(Note: if possible, you can replicate the existing Transit Analyst EC2 which will give you the same machine with all needed software installed. You will need to perform steps: 2,3, 4, 7-12)
 
-Install required Software:
-==========================
-* Docker for Windows / Linux
-* GDAL for AWS: https://gist.github.com/mojodna/2f596ca2fca48f08438e
-* Gzip
-* Python3 
+1. Launch EC2 instance:
+=======================
+(We originally used this article as a basis for this setup: https://www.ybrikman.com/writing/2015/11/11/running-docker-aws-ground-up/)
+a. Access the EC2 console: https://console.aws.amazon.com/console/home?nc2=h_ct&src=header-signin
+b. Click "Launch Instance" 
+c. Select "Ubuntu Server 18.04 LTS (HVM), SSD Volume Type" from the list (should be the 5th) or a newer version of ubuntu.
+d. Instance Type: Select t3.large instance with 2 vCPUs and 8GB RAM.
+e. Instance Details: leaeve as is and click "next"
+f. Add Storage: Enter 30GB
+g. add Tags: leaeve as is and click "next"
+h. Select a security group that has prots 9191 and 20 open. If doesn't exist, create a new one with the following rules:
+			 Type            Protocol  Port Range   Source    
+		i)   HTTP            TCP        80       0.0.0.0/0
+		ii)  HTTP            TCP        80       ::/0
+		iii) Custom TCP Rule TCP        9191     0.0.0.0/0
+		iv)  SSH             TCP        22       0.0.0.0/0
 
-python3 -m pip install logger docker progressbar2 json requests zipfile tarfile re argparse csv math httplib2 oauth2client base64 mimetypes email apiclient boto3 gdal python3-devel
-Start Docker Server with 2 covereges:
-=====================================
-
-1. Run Docker for Windows
-
-2. Go to the folder where you have the Navitia docker git project: ...\navitia-docker-compose
-
-3. run "Git Bash" and type: 
-$ git pull
-
-4. Once done Change directory to "\TransitAnalystIsrael\root\assets":
-$ cd "C:\Dev\TransitAnalystIsrael\root\assets" 
-and type:
-$ docker-compose up
-
-Don't close git bash!
+i. Launch - save the key in accessible location (best to store it in a private S3 bucket)
+j. In the EC2 console give the EC2 a name, e.g. "Transit Analyst machine"
+k. Wait until the Instance State is "running"
 
 
-5. Once you see all containers started, open Windows Power Shell (not cmd!) - the path is not improtant and type:
-docker ps
+2. Assign an Elastic IP (static IP)
+===================================
+Each time EC2 is re-started it is assigned with new Public IP. We will assign it a static IP called Elastic IP. As long as the instance is up and running, the use of the elastic IP isn't charged.
 
-a list of docker containers should appear, copy the name of the worker container from the NAMES column, e.g. "navitia-docker-compose_tyr_worker_1"
+a. Access the Elastic IP page via the EC2 console (under NETWORK & SECURITY)
+b. Click "Allocate New Address" -> VPC -> Confirm
+c. Right-click on the new address -> Associate Address -> select the newly created instance -> Select the sggested private IP -> allow re-association -> Click "Associate"
 
-6. Type the following command in the power shell in order to conenct to the worker container:
-docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
+3. Assign IAM roles
+===================
+The EC2 will upload items to your S3 buckets, take keys from the S3 bucket and also modify the AWS Lambda function that triggers the monthly update.
+In order to do that, we grant him permissions using proper IAM roles.
+a. Access the IAM roles page through the AWS console: https://console.aws.amazon.com/iam/
+b. Go to Roles -> "Create Role"
+c. Select "EC2" for the type of trusted entity -> "Next: Permissions"
+d. Assign the following permissions to allow access to all your S3 buckets and CloudWatch:
+   - AmazonS3FullAccess
+   - CloudWatchFullAccess
+   - AdministratorAccess
 
-7. Once in, type the following commands in order to have 2 coverages as a base setup:
-cd /srv/ed/output
-cp default.nav.lz4 secondary-cov.nav.lz4
-exit()
+e. Click "Next" until you can assign the role a proper name (e.g. "navitia_ec2_to_s3_cloudwatch") -> "Create Role"
+f. Go to the EC2 Instances page -> right click the EC2 instance -> "Attach/Replace IAM Role" -> select the newly created role -> click "Apply"
 
-8. Go back to Git Bash terminal with running log and press CTRL+C to stop the docker container.
-If, you closed the bash terminal, re-open it and type:
-$ docker stop $(docker ps -a -q)
+4. Acces via Putty for terminal operations
+==========================================
+a. Get Putty for Windows from: https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
 
-9. Start docker with 2 covereges by opening a Git Bash terminal at "...\TransitAnalystIsrael\root\assets" and running:
-$ docker-compose -f docker-compose.yml -f docker-israel-custom-instances.yml up
+b. Follow the steps here to generate a .ppk file that will allow you to connect to the EC2 instance using putty: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html
 
-10. Wait 2-3 minutes and then browse to "http://localhost:9191/v1/coverage/default" and "http://localhost:9191/v1/coverage/secondary-cov".
-    You should see "start_production_date:" field with an actual date (if you see "dead-socket" wait 1-2 min. more)
+c. The user should be in the host name filed, e.g. "ubuntu@18.185.174.211" where the IP is the public IP (elastic IP we assigned earlier) of the EC2 which can be obtained from the AWS EC2 console.
+
+5. Change the time zone of the Ec2 to be Israel Time
+====================================================
+a. Using the putty session, type:
+$ sudo dpkg-reconfigure tzdata
+b. Follow the instructions -> select Asia -> Jerusalem -> Confirm
+
+
+6. Install required Software and get code - Whenever prompted to accept installations, accept:
+==========================================
+a. Git and Python3.6 is already installed.
+b. Install Docker for Ubuntu 18-04 (taken from: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04 ):
+$ sudo apt install apt-transport-https ca-certificates curl software-properties-common
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+$ sudo apt update
+$ apt-cache policy docker-ce
+$ sudo apt install docker-ce
+
+To verify installation:
+$ sudo systemctl status docker
+
+Add priviliges for easy terminal work:
+$ sudo usermod -aG docker ${USER}
+
+c. Install docker-compose (taken from https://docs.docker.com/compose/install/ - linux tab):
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+$ sudo chmod +x /usr/local/bin/docker-compose
+
+d. Configure the dokcer logs for rotation so they don't blow up:
+	$ cd /etc/docker
+	$ sudo touch daemon.json
+	$ sudo vim daemon.json
+	Go into to edit mode by pressing I and add:
+		{
+			"log-driver": "json-file",
+			"log-opts": {"max-size": "10m", "max-file": "3"}
+		}
 	
-Dokcer Server is ready!
+	Quit by pressing Esc -> type :wq > press Enter
+	
+	$ sudo systemctl reload docker
 
-Make sure you have the following python3(!) modules installed:
-==============================================================
+e. Install GDAL for gdal command line operations (Accept all questions you're prompted with):
+$ sudo apt-get install libgdal-dev
+$ sudo apt install gdal-bin
 
-AWS EC2 Ubuntu should have proper IAM role to access the transit-analyst-key-bucket ("Navitia_EC2_to_S3") through instance settingsinthe EC2 console
-
-
-docker compose for linux: https://docs.docker.com/compose/install/ (go to linux tab)
-
-
-#Install Gdal for gdal command line operations:
-sudo apt-get install libgdal-dev
-sudo apt install gdal-bin
-
-#Update pythong and install gdal
+f. Update pythong and install needed libraries  (Accept all questions you're prompted with):
 sudo apt-get install python3.6-dev
 sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update
 sudo apt install python3-pip
 sudo apt-get install python3-gdal
-pip3 install docker 
-pip3 install zipfile
-pip3 install logger 
-pip3 install shapely
-pip3 install geopy
-pip3 install docker 
-pip3 install progressbar2 
-pip3 install requests 
-pip3 install argparse 
-pip3 install httplib2 
-pip3 install oauth2client 
-pip3 install boto3 
-pip3 install google-api-python-client
-pip3 install google-auth
-pip3 install google-auth-httplib2
-pip3 install apiclient
+pip3 install docker logger shapely geopy progressbar2 requests argparse httplib2 oauth2client boto3 google-api-python-client google-auth google-auth-httplib2 apiclient
+
+d. git Clone Navitia docker project (adjusted to our needs):
+$ cd ~ (IMPORTANT!!!!!!!!!!!!!!)
+$ git clone https://github.com/transitanalystisrael/navitia-docker-compose
+
+e. git Clone Transit Analyst Israel project: 
+$ git clone https://github.com/transitanalystisarel/TransitAnalystIsrael/
+
+7. Configure AWS Gateway API service to serve Secure content
+============================================================
+If you haven't jsut cloned the repositories (skipped step 6), make sure you have the latest code of both projects:
+a. using putty go to each project directory and perform git pull:
+   $ cd ~/navitia-docker-compose/
+   $ git pull
+   $ cd ~/TransitAnalystIsrael/
+   $ git pull
+
+Navitia server on the instance serves HTTP only content via port 9191. Brwosers such as Chrome block this kind of data so we need to use AWS for serving secure content.
+
+There are 2 options to that:
+7.1 - Importing existing API configruation from Transit Analyst Production environment
+7.2 - Configuring it manully through the console.
+
+7.1 - Cloning existing API configruation from Transit Analyst Production environment
+======================================================================================
+a. Access the API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
+b. Click "Create API"
+c. Select "Rest" -> "clone from exiting API" -> Select "Clone from Time Map" -> provide name -> Click "Clone API"
+h. Click "Actions" -> "Deploy API" -> "New stage" -> provide any stage name (e.g. production) -> "Deploy".
+i. On the created stage page (if needed "Stages" -> Your staging) -> "Stage Varaibles" -> click "add Stage Varaible" ->
+Enter Name: "NavitiaServerIP" and Value: <elastic IP (or public IP if no elastic) of the Navitia server EC2>
+
+	
+7.2 - Configuring it manully through the console
+================================================
+a. Access the API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
+b. Click "Create API"
+	Select "Rest" -> "new API" -> provide name -> Click "Create API"	
+c. Click "Actions" -> "Create Method" -> Select "Get"
+	Integration Type: HTTP
+	HTTP Method: Get
+	Endpoint URL: http://${stageVariables.NavitiaServerIP}:9191/v1/coverage/default 	
+	content Handling: Passthrough
+	Click "Save"
+d. Click "Actions" -> "Create Resource" so you can pass the parameters (https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html):
+	Check the "proxy resource" checkbox and the details will be filled automatically (Name: proxy ; Path: /{proxy+}
+	Check the "Enable API Gateway CORS" checkbox so if the request comes from another domain (and it will) the server will allow it
+	Click "Create"
+e. Click on "/{proxy}" -> Under "Any" click "Set up now"
+   Select "HTTP Proxy"
+   Endpoint URL: http://${stageVariables.NavitiaServerIP}:9191/v1/coverage/{proxy}
+   content Handling: Passthrough
+   Click "Save"
+f. Enable Gzip servering - this will compress all responses from AWS and save data trasnfer costs (browsers know to deal with this automatically):
+	Go to settings under the API name in the left pane -> check the "Content Encoding enabled" checkbox -> Enter 100000 Bytes for "Minimum body size required for compression"
+	Save Changes
+g. Deploy the API
+	Click on the API name on the left pane
+	Click "Actions" -> "Deploy API" -> create new Staging named "Navitia-Time-Map" -> Deploy
+	Click "Stages" -> Select the newly created staging -> Go to Stage Varaiables -> Create new varaible "NavitiaServerIP" with the elastic IP of the EC2 instance -> Click the V icon		
 
 
-clone gits
+8. Provide the Navitia server on the EC2 with the API gateway for integration on the client side (HTML & JS)
+============================================================================================================
+a. Copy the Invoke URL from the "Stage" page in the AWS API Gateway console.
+b. Using putty connect to the EC2
+c. Go to the Transit Analyst config file and open for edit:
+$ cd TransitAnalystIsrael/root/
+$ vim transitanalystisrael_config.py
 
-Bring up the docker compose:
-$sudo docker-compose up
+d. Change the URL:
+- Press I to go into edit mode
+- Using the down arrow button, scroll all the way down until you see: time_map_server_aws_url
+- Change the value of time_map_server_aws_url to the value of the Invoke URL mentioned above (it should look the same as existing apart from the part after the http://)
+- Press Esc -> type :wq -> press Enter
+
+9. Configure the Lambda Function that triggets the monthly update
+=================================================================
+9.1 First, we need to create a proper IAM role that will allow the Lambda function to access the EC2 and perform actions:
+-------------------------------------------------------------------------------------------------------------------------
+a. Access the IAM Role console: https://console.aws.amazon.com/iam/home#/roles
+b. Click "Create Role" -> Select "Aws Service" -> Select "Lambda" -> Click "Next: Permissions"
+c. Assign the following policieis:
+	- AmazonEC2FullAccess
+	- AmazonS3FullAccess
+	- AdministratorAccess
+	- CloudWatchLogsFullAccess
+	- AmazonVPCFullAccess
+	- AWSLambdaVPCAccessExecutionRole
+	- CloudWatchFullAccess
+	
+d. Click "Next" until you can assign the role a proper name (e.g. "Transit-Analyst-Updater") -> "Create Role"
+	
+9.2 Create and configure the lambda function:
+---------------------------------------------
+a. Access the Lambda Function console: https://eu-central-1.console.aws.amazon.com/lambda/
+b. Click "Create Function"
+c. "Author from Scratch" -> Function name: "Transit Analyst Update" -> Runtime: Python 3.6 -> click "Choose or create an existing role" -> 
+   "Use an existing role" -> select the role you've just created -> Click "Create Function"
+d. Configure the trigger that will cause the lambda to be executed every month:
+d1. On the "Add Triggers" pane select "CloudWatch Events" -> click on the created "CloudWatch Events" box ("Configuration needed") -> Scroll down to the newly added box titled "Configure Triggers"
+d2. Click "Create new Rule" -> Provide name "GTFS-Monthly-Timer" -> Rule Type: schedule expression 
+     NOTE!!!: the name must be "GTFS-Monthly-Timer" because this is the name expected in Transit Analyst Code (/root -> set_next_month_invocation.py). you can change it, but then you have to change the code as well.
+d3. For the expression type: cron(30 22 DD MM ? YYYY) and replace DD MM and YYYY with daymonth and year respectivley, e.g. cron(30 22 31 04 ? 2019). 
+    The date here doesn't really matter because when Transit Analyst update runs it assignes the next update date to this rule by itself (using the IAM role we created for the EC2 earlier).
+d4. Click "Add"
+
+e. Upload the required code to be executed in the EC2 when the function is triggered:
+e1. Scroll up and click on <Function name> box
+e2. Scroll down to "Fucntion Code" -> Code entry type: "upload a .zip file". -> Runtime "Python 3.6"  -> Handler: "function.worker_handler"
+e3. Click uplaod and upload the python package found in TransitAnalystIsrael\AWS Lambda function\Monthly-GTFS-Update-package.zip (it's part of the source code, and can also be downloaded directly from github)
+
+f. Scroll to "Basic Settings" and change the memory requirements to 512MB
+e. Configure network - scroll to Network pane
+e1. Select the default VPC suggested by the console -> Select all subnets possible -> For Security group select the one you previously created when starting the EC2 setup: "ssh-and-http-from-anywhere".
+
+f. Scroll up and click "Save". The process might take 2-3 minutes while the 12.5 zip file is being uploaded.
+
+10. DO NOT CLICK TEST - If you click on test, this will trigger an update. If you wish to test that the lambda function is ready do as follows:
+===============================================================================================================================================
+a. Using putty access the EC2
+b. Using the following commands, modify transitanalysisrael_v1.py to generate an error that will be reflected in the Lambda console:
+$ cd TransitAnalystIsrael/root/
+$ vim transitanalysisrael_v1
+Press Insert -> Just under the "try:" at the top of the file type "asddasdad" -> Press Esc -> type :wq -> press Enter
+
+c. Go to the Lambda console and click Test.
+d. After 10-20 seconds the execution should be finished with the console painted in green to show that the execution succeeded. 
+e. Look at the logs displayed on the console and you sohuld see that the python file was executed, but generated an error such as:
+   "transitanalystisrael_v1.py", line 16, in <module>\n', '    asddasdad\n', "NameError: name 'asddasdad' is not defined\n"]
+f. go back to the putty window, and type the following command to restore transitanalysisrael_v1.py to its previous state:
+$ git checkout transitanalysisrael_v1.py
 
 
+11. Create S3 buckets to server to hose the web files:
+======================================================
+When working with an EC2, the web content is served from S3 buckets. During theupdate process, the processed files are uplaoded to the buckets.
+WARNING: The bucket names universally unique and the Transit Analyst Israel come with the following names: transitanalystisrael-current, transitanalystisrael-past, transitanalystisrael-backup.
+         If you run the code as-is with the transitanalystisrael@gmail.com account, this will override the current production env.
+	
+11.1. Creating new buckets for an EC2 instance that shouldn't be transitanalystisrael@gmail.com prod env.:
+-------------------------------------------------------------------------------------------------------
+a. Access the S3 Console: https://s3.console.aws.amazon.com/s3/
+b. Click "Create Bucket" -> Enter name <some-prefix>-current -> Select region (should be the same as the EC2)
+c. Skip the "Configure Options"
+d. In the "Set Permissions" screen uncheck the following options:
+   - "Block new public bucket policies (Recommended)"
+   - "Block public and cross-account access if bucket has public policies (Recommended)"
+   So in total you have the 2 top checked boxes and 2 unchecked boxes at the bottom
+   Click "Next" -> "Create Bucket"
+ e. Access the created bucket -> "Properties" tab -> Click "Static website hosting" -> select "Use this bucket to host a website" -> Index document: "index.html" -> click "save"
+ f. Go to the "permissions" tab -> "bucket policy" -> enter the following code and enter the bucket name in the brackets:
+	{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::<bucket-name>/*"
+        }
+	]
+	}
+	Click "Save"
+ g. Repeat steps b-f for a bucket called <some-prefix>-past and <some-prefix>-backup (during the creation there's an option to copy settings from existing bucket)
+
+11.2 Updating Transit Analyst Israel with the new buckets:
+==========================================================
+a. Using putty connect to the EC2
+b. Go to the Upload to S3 code and change the names of the buckets:
+	$ cd ~/TransitAnalystIsrael/root/
+	$ vim upload2aws_s3.py
+	Type the following command one by one with pressing Enter in-between your bucket names (DO NOT COPY-PASTE):
+	Type : -> Paste: %s/transitanalystisrael-current/<bucket-name-current>/g - > Enter
+	Type : -> Paste: %s/transitanalystisrael-past/<bucket-name-past>/g - > Enter
+	Type : -> Paste: %s/transitanalystisrael-backup/<bucket-name-backup>/g - > Enter
+	Type :wq
+
+12. To start Transit analyst on AWS for the first time, go to "Instructions for Monthly auto update on AWS".txt

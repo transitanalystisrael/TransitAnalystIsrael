@@ -38,7 +38,7 @@ ttm_server_on = 'local_pc'
 
 	b. make sure all the rest of the 6 product processing configurations are commented out - have "#"in the first char of the line.
 
-	c. change "gtfsdate" and "serviceweekstartdate" to the requested on-demand date e.g. for 20190302 
+	c. change "gtfsdate" and "serviceweekstartdate" to the requested on-demand date e.g. for 20190302 (YYYYMMDD)
 
 gtfsdate = '20190302'
 serviceweekstartdate = '20190302'
