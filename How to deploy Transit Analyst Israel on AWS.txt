@@ -179,7 +179,7 @@ $ vim transitanalystisrael_config.py
 d. Change the URL:
 - Press I to go into edit mode
 - Using the down arrow button, scroll all the way down until you see: time_map_server_aws_url
-- Change the value of time_map_server_aws_url to the value of the Invoke URL mentioned above (it should look the same as existing apart from the part after the http://)########################################################################################################################
+- Change the value of time_map_server_aws_url to the value of the Invoke URL mentioned above (it should look the same as existing apart from the part after the http://)
 - Press Esc -> type :wq -> press Enter
 
 9. Configure the Lambda Function that triggets the monthly update
