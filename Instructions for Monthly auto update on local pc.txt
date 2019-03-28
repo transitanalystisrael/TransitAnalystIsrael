@@ -73,7 +73,7 @@ root@9bb282f314b6:/srv/ed/output# cp  default.nav.lz4 secondary-cov.nav.lz4
 	c. stop the navitia docker containers by typing at the prompt:
 $ docker stop $(docker ps -a -q)
 	d. After stop is completed, type at the prompt 
-$ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up  --remove-orphans
+$ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up --remove-orphans
 
 ==================================================================================================================================
 
@@ -98,8 +98,8 @@ $ docker stop $(docker ps -a -q)
 	a. Run the Docker Desktop for Windows application and wait for it to come up.
 	b. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
 	c. Right-click and select run "Git Bash Here" to open a terminal window.
-	d. type at the prompt "docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up" 
-$ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up
+	d. type at the prompt "docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up --remove-orphans" 
+$ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up --remove-orphans
 	e. open a window in the TransitAnalystIsrael\website_current 
 	f. doubleclick on index.html 
 	
