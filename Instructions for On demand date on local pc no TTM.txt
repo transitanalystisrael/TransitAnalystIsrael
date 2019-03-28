@@ -53,8 +53,8 @@ serviceweekstartdate = '20190302'
 3. Run transitanalystisrael_v1.py with python3
 	a. open a window in the pythonpath (as in the config file) e.g. C:\git\TransitAnalystIsrael\root
 	b. type "cmd" in the bar on top to open a cmd terminal
-	c. at the prompt type 'python3 transitanalystisrael_v1' e.g. 
-C:\git\TransitAnalystIsrael\root>python3 transitanalystisrael_v1
+	c. at the prompt type 'python3 transitanalystisrael_v1.py' e.g. 
+C:\git\TransitAnalystIsrael\root>python3 transitanalystisrael_v1.py
 
 4. Wait about 2.5 hours for the scripts to run to completion
 
