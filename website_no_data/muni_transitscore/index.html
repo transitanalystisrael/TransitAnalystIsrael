@@ -143,7 +143,8 @@
         '</ul>';
         if (props){
             muniName = (props ? props.muni_name_h : '');
-            this._div.innerHTML += '<p>' + muniName + '</p>';
+			muniTransitScore = (props ? ' ' + Math.round(props.transitscore) : '')
+            this._div.innerHTML += '<p>' + muniName +  muniTransitScore + '</p>';
         }
 	};
 
