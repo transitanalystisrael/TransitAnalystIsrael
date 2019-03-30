@@ -7,9 +7,9 @@ Minimum Requirements:
 
 2. You should already have TransitAnalystIsrael and navitia-docker-compose git repositories. Using Git-bash, git clone the git reprsitory of Navitia Frontend timemap. This is the project for developing the time map frontend: https://github.com/transitanalystisrael/Navitia-Timemap-Frontend.git
 
-2. Install SourceTree (https://www.sourcetreeapp.com/) and add the git folders of the three projects to SourceTree so you can develop. Each project's main branch is "master" - check it out first then branch out a new branch for development.
+3. Install SourceTree (https://www.sourcetreeapp.com/) and add the git folders of the three projects to SourceTree so you can develop. Each project's main branch is "master" - check it out first then branch out a new branch for development.
 
-3.1 TranitAnalystIsrael Development
+4.1 TranitAnalystIsrael Development
 ===================================
 TranitAnalystIsrael is comprised of python code for data processing and HTML/JS code for frontend client.
 
@@ -24,9 +24,9 @@ The web tools code is found under website_no_data, where each tool has its own i
 
 The only exception is the Time map code.
 
-3.2 TimeMap Development
+4.2 TimeMap Development
 =======================
-The time map data is served by Navitia Dockers (see 3.3). The client is HTML + JS developed with webpack framework.
+The time map data is served by Navitia Dockers (see 4.3). The client is HTML + JS developed with webpack framework.
 1. Download and install Node.js (https://nodejs.org/en/download/)
 2. Bring up Navitia Docker server:
 	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
@@ -39,25 +39,21 @@ The time map data is served by Navitia Dockers (see 3.3). The client is HTML + J
 5. The main file for edit is "index.ejs" which is like the index.html.
    The main JS file is app/timeMap.js
    The main CSS file is assets/styles/_custom.scss
-6. As long as "npm run dev" us runninh, each change you make will trigger a refresh on localhost:8080 right away.
+6. As long as "npm run dev" is running, each change you make will trigger a refresh on localhost:8080 right away.
 7. When you're done editing the code, you need to build it so you can copy the output files back to TranitAnalystIsrael:
-a. Go to the Git bash -> press ctrl+c -> Type: npm run build.
-b. Once done, a "dist" folder is created under Navitia-timemap-Frontend.
-c. Copy all the folders and files expect the ones that end with .map (those help development and are not required for prodction):
-- assets
-- node_modules
-- bundle.dc819f7b4b10f0abddcf.js (the code changes every time)
-- index.html
-- vendor.a91f00ab8da7685898bc.js (the code changes every time)
+7a. Go to the Git bash -> press ctrl+c -> Type: npm run build.
+7b. Once done, a "dist" folder is created under Navitia-timemap-Frontend.
+7c. Copy all the folders and files except the ones that end with .map (those help development and are not required for prodction):
+	- assets
+	- node_modules
+	- bundle.dc819f7b4b10f0abddcf.js (the code changes every time)
+	- index.html
+	- vendor.a91f00ab8da7685898bc.js (the code changes every time)
+7d. Paste these files under C:\Dev\TransitAnalystIsrael\website_no_data. When you paste them, keep in mind that the bundle.XXXXXXX.js always changes, so remove the old one.
+7e. If you don't want to re-run TransitAnalystIsrael procesess all over again, assuming you only made changes to the Navitia-time-map frontend, you can paste the files and folders directly in C:\Dev\TransitAnalystIsrael\website_current
 
-d. Paste these files under C:\Dev\TransitAnalystIsrael\website_no_data. When you paste them, keep in mind that the bundle.XXXXXXX.js always changes, so remove the old one.
-
-e. If you don't want to re-run TransitAnalystIsrael procesess all voer again, assuming you only made changes to the Navitia-time-map frontend, you can paste the files and folders directly in C:\Dev\TransitAnalystIsrael\website_current
-
-3.3 Navitia-Docker-Compose development
+4.3 Navitia-Docker-Compose development
 ======================================
-During the development of TransitAnalystIsrael v1.0 we haven't made any changes to the source code of Navitia-docker-compose. The only changes performed are for the docker-compose files for brinign up custom coverages (secondary-cov, onedemand, etc.). 
+During the development of TransitAnalystIsrael v1.0 we haven't made any changes to the source code of Navitia-docker-compose. The only changes performed are for the docker-compose files for bringing up custom coverages (secondary-cov, on-demand, etc.). 
 The .yml files are under C:\Dev\navitia-docker-compose\custom_files
 
-
- 

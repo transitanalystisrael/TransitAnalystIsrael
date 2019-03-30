@@ -10,7 +10,7 @@ d. Instance Type: Select t3.large instance with 2 vCPUs and 8GB RAM.
 e. Instance Details: leaeve as is and click "next"
 f. Add Storage: Enter 30GB
 g. add Tags: leaeve as is and click "next"
-h. Select a security group that has prots 9191 and 20 open. If doesn't exist, create a new one with the following rules:
+h. Select a security group that has ports 9191 and 20 open. If doesn't exist, create a new one with the following rules:
 			 Type            Protocol  Port Range   Source    
 		i)   HTTP            TCP        80       0.0.0.0/0
 		ii)  HTTP            TCP        80       ::/0
@@ -20,7 +20,6 @@ h. Select a security group that has prots 9191 and 20 open. If doesn't exist, cr
 i. Launch - save the key in accessible location (best to store it in a private S3 bucket)
 j. In the EC2 console give the EC2 a name, e.g. "Transit Analyst machine"
 k. Wait until the Instance State is "running"
-
 
 2. Assign an Elastic IP (static IP)
 ===================================
@@ -51,14 +50,13 @@ a. Get Putty for Windows from: https://www.chiark.greenend.org.uk/~sgtatham/putt
 
 b. Follow the steps here to generate a .ppk file that will allow you to connect to the EC2 instance using putty: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html
 
-c. The user should be in the host name filed, e.g. "ubuntu@18.185.174.211" where the IP is the public IP (elastic IP we assigned earlier) of the EC2 which can be obtained from the AWS EC2 console.
+c. The user should be in the host name filled, e.g. "ubuntu@18.185.174.211" where the IP is the public IP (elastic IP we assigned earlier) of the EC2 which can be obtained from the AWS EC2 console.???
 
-5. Change the time zone of the Ec2 to be Israel Time
+5. Change the time zone of the EC2 to be Israel Time
 ====================================================
 a. Using the putty session, type:
 $ sudo dpkg-reconfigure tzdata
 b. Follow the instructions -> select Asia -> Jerusalem -> Confirm
-
 
 6. Install required Software and get code - Whenever prompted to accept installations, accept:
 ==========================================
@@ -75,17 +73,17 @@ To verify installation:
 $ sudo systemctl status docker
 
 Add priviliges for easy terminal work:
-$ sudo usermod -aG docker ${USER}
+$ sudo usermod -aG docker ${USER} ???
 
 c. Install docker-compose (taken from https://docs.docker.com/compose/install/ - linux tab):
-$ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose ???
 $ sudo chmod +x /usr/local/bin/docker-compose
 
 d. Configure the dokcer logs for rotation so they don't blow up:
 	$ cd /etc/docker
 	$ sudo touch daemon.json
 	$ sudo vim daemon.json
-	Go into to edit mode by pressing I and add:
+	Go into to edit mode by pressing I and add: ???
 		{
 			"log-driver": "json-file",
 			"log-opts": {"max-size": "10m", "max-file": "3"}
@@ -99,7 +97,7 @@ e. Install GDAL for gdal command line operations (Accept all questions you're pr
 $ sudo apt-get install libgdal-dev
 $ sudo apt install gdal-bin
 
-f. Update pythong and install needed libraries  (Accept all questions you're prompted with):
+f. Update python and install needed libraries  (Accept all questions you're prompted with): ???
 sudo apt-get install python3.6-dev
 sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update
@@ -108,7 +106,7 @@ sudo apt-get install python3-gdal
 pip3 install docker logger shapely geopy progressbar2 requests argparse httplib2 oauth2client boto3 google-api-python-client google-auth google-auth-httplib2 apiclient
 
 d. git Clone Navitia docker project (adjusted to our needs):
-$ cd ~ (IMPORTANT!!!!!!!!!!!!!!)
+$ cd ~ (IMPORTANT!!!!!!!!!!!!!!) ???
 $ git clone https://github.com/transitanalystisrael/navitia-docker-compose
 
 e. git Clone Transit Analyst Israel project: 
@@ -116,12 +114,12 @@ $ git clone https://github.com/transitanalystisarel/TransitAnalystIsrael/
 
 7. Configure AWS Gateway API service to serve Secure content
 ============================================================
-If you haven't jsut cloned the repositories (skipped step 6), make sure you have the latest code of both projects:
+If you haven't just cloned the repositories (skipped step 6), make sure you have the latest code of both projects:
 a. using putty go to each project directory and perform git pull:
-   $ cd ~/navitia-docker-compose/
-   $ git pull
-   $ cd ~/TransitAnalystIsrael/
-   $ git pull
+$ cd ~/navitia-docker-compose/
+$ git pull
+$ cd ~/TransitAnalystIsrael/
+$ git pull
 
 Navitia server on the instance serves HTTP only content via port 9191. Brwosers such as Chrome block this kind of data so we need to use AWS for serving secure content.
 
@@ -131,7 +129,7 @@ There are 2 options to that:
 
 7.1 - Cloning existing API configruation from Transit Analyst Production environment
 ======================================================================================
-a. Access the API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
+a. Access the AWS API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
 b. Click "Create API"
 c. Select "Rest" -> "clone from exiting API" -> Select "Clone from Time Map" -> provide name -> Click "Clone API"
 h. Click "Actions" -> "Deploy API" -> "New stage" -> provide any stage name (e.g. production) -> "Deploy".
@@ -141,7 +139,7 @@ Enter Name: "NavitiaServerIP" and Value: <elastic IP (or public IP if no elastic
 	
 7.2 - Configuring it manully through the console
 ================================================
-a. Access the API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
+a. Access the AWS API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
 b. Click "Create API"
 	Select "Rest" -> "new API" -> provide name -> Click "Create API"	
 c. Click "Actions" -> "Create Method" -> Select "Get"
@@ -165,8 +163,7 @@ f. Enable Gzip servering - this will compress all responses from AWS and save da
 g. Deploy the API
 	Click on the API name on the left pane
 	Click "Actions" -> "Deploy API" -> create new Staging named "Navitia-Time-Map" -> Deploy
-	Click "Stages" -> Select the newly created staging -> Go to Stage Varaiables -> Create new varaible "NavitiaServerIP" with the elastic IP of the EC2 instance -> Click the V icon		
-
+	Click "Stages" -> Select the newly created staging -> Go to Stage Varaiables -> Create new varaible "NavitiaServerIP" with the elastic IP of the EC2 instance -> Click the V icon
 
 8. Provide the Navitia server on the EC2 with the API gateway for integration on the client side (HTML & JS)
 ============================================================================================================
@@ -182,7 +179,7 @@ d. Change the URL:
 - Change the value of time_map_server_aws_url to the value of the Invoke URL mentioned above (it should look the same as existing apart from the part after the http://)
 - Press Esc -> type :wq -> press Enter
 
-9. Configure the Lambda Function that triggets the monthly update
+9. Configure the Lambda Function that triggets the monthly update ???
 =================================================================
 9.1 First, we need to create a proper IAM role that will allow the Lambda function to access the EC2 and perform actions:
 -------------------------------------------------------------------------------------------------------------------------
@@ -209,14 +206,14 @@ d. Configure the trigger that will cause the lambda to be executed every month:
 d1. On the "Add Triggers" pane select "CloudWatch Events" -> click on the created "CloudWatch Events" box ("Configuration needed") -> Scroll down to the newly added box titled "Configure Triggers"
 d2. Click "Create new Rule" -> Provide name "GTFS-Monthly-Timer" -> Rule Type: schedule expression 
      NOTE!!!: the name must be "GTFS-Monthly-Timer" because this is the name expected in Transit Analyst Code (/root -> set_next_month_invocation.py). you can change it, but then you have to change the code as well.
-d3. For the expression type: cron(30 22 DD MM ? YYYY) and replace DD MM and YYYY with daymonth and year respectivley, e.g. cron(30 22 31 04 ? 2019). 
+d3. For the expression type: cron(30 22 DD MM ? YYYY) and replace DD MM and YYYY with daymonth and year respectivley, e.g. cron(30 22 31 04 ? 2019). ???
     The date here doesn't really matter because when Transit Analyst update runs it assignes the next update date to this rule by itself (using the IAM role we created for the EC2 earlier).
 d4. Click "Add"
 
 e. Upload the required code to be executed in the EC2 when the function is triggered:
 e1. Scroll up and click on <Function name> box
 e2. Scroll down to "Fucntion Code" -> Code entry type: "upload a .zip file". -> Runtime "Python 3.6"  -> Handler: "function.worker_handler"
-e3. Click uplaod and upload the python package found in TransitAnalystIsrael\AWS Lambda function\Monthly-GTFS-Update-package.zip (it's part of the source code, and can also be downloaded directly from github)
+e3. Click upload and upload the python package found in TransitAnalystIsrael\AWS Lambda function\Monthly-GTFS-Update-package.zip (it's part of the source code, and can also be downloaded directly from github)
 
 f. Scroll to "Basic Settings" and change the memory requirements to 512MB
 e. Configure network - scroll to Network pane
@@ -239,17 +236,16 @@ e. Look at the logs displayed on the console and you sohuld see that the python 
 f. go back to the putty window, and type the following command to restore transitanalysisrael_v1.py to its previous state:
 $ git checkout transitanalysisrael_v1.py
 
-
-11. Create S3 buckets to server to hose the web files:
+11. Create S3 buckets to server to hose the web files: ??? ???
 ======================================================
-When working with an EC2, the web content is served from S3 buckets. During theupdate process, the processed files are uplaoded to the buckets.
-WARNING: The bucket names universally unique and the Transit Analyst Israel come with the following names: transitanalystisrael-current, transitanalystisrael-past, transitanalystisrael-backup.
+When working with an EC2, the web content is served from S3 buckets. During the update process, the processed files are uplaoded to the buckets.
+WARNING: The bucket names are universally unique and the Transit Analyst Israel comes with the following names: transitanalystisrael-current, transitanalystisrael-past, transitanalystisrael-backup.
          If you run the code as-is with the transitanalystisrael@gmail.com account, this will override the current production env.
 	
 11.1. Creating new buckets for an EC2 instance that shouldn't be transitanalystisrael@gmail.com prod env.:
 -------------------------------------------------------------------------------------------------------
 a. Access the S3 Console: https://s3.console.aws.amazon.com/s3/
-b. Click "Create Bucket" -> Enter name <some-prefix>-current -> Select region (should be the same as the EC2)
+b. Click "Create Bucket" -> Enter name <some-prefix>-current -> Select region (should be the same as the EC2) ???
 c. Skip the "Configure Options"
 d. In the "Set Permissions" screen uncheck the following options:
    - "Block new public bucket policies (Recommended)"
@@ -278,11 +274,11 @@ d. In the "Set Permissions" screen uncheck the following options:
 a. Using putty connect to the EC2
 b. Go to the Upload to S3 code and change the names of the buckets:
 	$ cd ~/TransitAnalystIsrael/root/
-	$ vim upload2aws_s3.py
-	Type the following command one by one with pressing Enter in-between your bucket names (DO NOT COPY-PASTE):
+	$ vim upload2aws_s3.py ???
+	Type the following commands one by one with pressing Enter in-between your bucket names (DO NOT COPY-PASTE):
 	Type : -> Paste: %s/transitanalystisrael-current/<bucket-name-current>/g - > Enter
 	Type : -> Paste: %s/transitanalystisrael-past/<bucket-name-past>/g - > Enter
 	Type : -> Paste: %s/transitanalystisrael-backup/<bucket-name-backup>/g - > Enter
 	Type :wq
 
-12. To start Transit analyst on AWS for the first time, go to "Instructions for Monthly auto update on AWS".txt
+12. To start Transit analyst on AWS for the first time, go to "Instructions for Monthly auto update on AWS".txt ???

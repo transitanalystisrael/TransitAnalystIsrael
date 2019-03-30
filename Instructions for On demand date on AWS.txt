@@ -11,7 +11,7 @@ On demand date on AWS EC2 and S3
 
 0. Using Putty (see setup instructions for putty setup in "AWS version setup.txt"), connect to the EC2.
 	Change directory to Trasnit Analyst Israel project:
-	$ cd TransitAnalystIsrael
+$ cd TransitAnalystIsrael
 	Make sure that the Project dir structure is as below, and create missing folders if needed using mkdir:   
 	a. The starting dir structure under TransitAnalystIsrael (name is given by git project, don't change it) is explained below:
 		gtfs 					- GTFS unzipped dir is placed in this dir
@@ -22,9 +22,9 @@ On demand date on AWS EC2 and S3
 		static_data				- this dir holds the 8 or so data files that do not change every month. They are copied into the processed dir before processing starts.
 		website_no_data			- this dir holds the client side html and js code for the tools, without the processed data. 
 									the files in this dir are copied into the dir website_current together with the processed data to create the tools
-		website_current			- this output dir will hold the tools and processed data to display for the current month
-		website_past			- this output dir will hold the tools and processed data to display for the past month
 
+		website_current			- used only in Monthly auto update on AWS, this output dir will hold the tools and processed data to display for the current month
+		website_past			- used only in Monthly auto update on AWS, this output dir will hold the tools and processed data to display for the past month
 		AWS Lambda function 	- used only in Monthly auto update on AWS 
 		
 	b. note that the on-demand date output dir for the tools - website_yyyymmdd - does not exist prior to processing. It will be created by the scripts in the same parent dir.
@@ -50,7 +50,7 @@ serviceweekstartdate = '20190302'
 
 2. Download or copy the GTFS zip file, rename and place in /gtfs/ directory
 	a. Locate GTFS files that corespond to a service start date that is equal to the on-demand date. Remeber that GTFS is uploaded to MOT servers (ftp://gtfs.mot.gov.il) at 10pm each day with a service start date of that same day. 
-	b. Download or copy the GTFS zip file (you can use the terminal command wget to download files directly into the EC2)
+	b. Download or copy the GTFS zip file (you can use the terminal command wget to download files directly into the EC2) ???
 	c. rename the GTFS zip file to be gtfsdirbase+gtfsdate+'.zip' (as in the config file) e.g. 'israel20190302.zip'
 	d. place the renamed GTFS zip file in the /gtfs/ directory e.g. ~/TransitAnalystIsrael/gtfs/israel20190302.zip
 
@@ -61,13 +61,13 @@ serviceweekstartdate = '20190302'
 	
 4. Run the Navitia docker environment
 	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g.:
-	   $ cd ~/navitia-docker-compose	
+$ cd ~/navitia-docker-compose	
 	b. type at the terminal:
-		$ sudo docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up --remove-orphans
+$ sudo docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up --remove-orphans
 
-a. Opena new Putty session (don't touch the existing one - you can close the window - the docker will continue running)
+a. Open a new Putty session (don't touch the existing one - you can close the window - the docker will continue running)
 	b. Change directory to Transit Analyst Israel project root folder:
-		$ cd TransitAnalystIsrael/root	
+$ cd TransitAnalystIsrael/root	
 	The following command will trigger the update process. 
 	Using 'nohup'  means that the program is running and you can safely close the Putty window without stopping the execution.
 	Right away the following line appears: "nohup: ignoring input and appending output to 'nohup.out'" - this is a good sign and nothing else should appear after.	
@@ -75,45 +75,46 @@ a. Opena new Putty session (don't touch the existing one - you can close the win
 	is up and running for the next 4-5 hours.
 
 	c. Type 'nohup python3 transitanalystisrael_v1.py'
+$ nohup python3 transitanalystisrael_v1.py
 	
 	d. To view the status, open a new Putty session
-	   Navitigate to the logs directory:
-	   $ cd TransitAnalystIsrael/root/logs/
-	   Display the possible logs files:
-	   $ ls
-	   View the current log file:
-	   $ vim <log file name> (e.g. Transit Analyst27032019_1318.txt)
-	   Quit by Pressing Ecs -> typing q!
+		Navitigate to the logs directory:
+$ cd TransitAnalystIsrael/root/logs/
+		Display the possible logs files:
+$ ls
+		View the current log file:
+		$ vim <log file name> (e.g. Transit Analyst27032019_1318.txt)
+$ vim Transit Analyst27032019_1318.txt
+		Quit by Pressing Ecs -> typing q!
+$ q!
 	   
-	   You can recheck this log from time to time. If an error occurs you will see it in the log.
-	   Additional, when finishing succesfuly or unsucessfuly, the log will be sent to transitanalystisrael@gmail.com
+		You can recheck this log from time to time. If an error occurs you will see it in the log.
+		Additional, when finishing succesfuly or unsucessfuly, the log will be sent to transitanalystisrael@gmail.com
 
 6. Wait about 4.5 hours for the scripts to run to completion
 
-9. To run the TransitAnalystIsrael web client, go to the URL generated for the S3 that stores it, such as: https://s3.eu-central-1.amazonaws.com/ondemand-YYYYMMDD/indexh.html where YYYYMMDD is the on demand date you set in the gtfsdate
-   
-	
+9. To run the TransitAnalystIsrael web client, go to the URL generated for the S3 that stores it, such as: https://s3.eu-central-1.amazonaws.com/ondemand-YYYYMMDD/indexh.html where YYYYMMDD is the on demand date you set in the gtfsdate (you can also access from the S3 console)
+
 ===================================================================================================================================
 
-10. When done, stop and quit
-	a. Using putty connect to the EC2	
+10. When done, stop and quit ???
+	a. Using putty connect to the EC2
 	b. stop the navitia docker containers by typing at the terminal:
-		$ docker stop $(docker ps -a -q)
+$ docker stop $(docker ps -a -q)
 	c. close the browser window where transitanalistisrael is running (they are still accessible on the S3 at any time)
-	
 
 ====================================================================================================================================
 
 11. To restart TransitAnalystIsrael for an existing auto date	
-	a. If you restart your EC2 machime, docker and coker-compose dameons are brought up automatically.
+	a. Restart your EC2 machime, docker and docker-compose dameons are brought up automatically.
 	b. Using putty connect to the EC2	
 	c. Go to the folder where you cloned the Navitia-docker-compose repo e.g.:
-	   $ cd ~/navitia-docker-compose	
+$ cd ~/navitia-docker-compose	
 	d. type at the terminal:
-		$ sudo docker-compose -f compose_files/docker-compose-ondemand-YYYYMMDD.yml -p navitia-docker-compose up --remove-orphans (where YYYYMMDD is the date you put for the gtfsdate)
+$ sudo docker-compose -f compose_files/docker-compose-ondemand-YYYYMMDD.yml -p navitia-docker-compose up --remove-orphans (where YYYYMMDD is the date you put for the gtfsdate)
 	e. See step 9 to access the web files (you can also access from the S3 console)	
 	
-	
+
 
 
 
