@@ -57,3 +57,6 @@ The time map data is served by Navitia Dockers (see 4.3). The client is HTML + J
 During the development of TransitAnalystIsrael v1.0 we haven't made any changes to the source code of Navitia-docker-compose. The only changes performed are for the docker-compose files for bringing up custom coverages (secondary-cov, on-demand, etc.). 
 The .yml files are under C:\Dev\navitia-docker-compose\custom_files
 
+4.4 Update Navitia to a newer version
+======================================
+If you want to rebase our navitia-docker-compose with the original repo then follow the instructions in - https://stackoverflow.com/questions/7244321/how-do-i-update-a-github-forked-repository
