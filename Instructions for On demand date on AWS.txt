@@ -97,16 +97,18 @@ $ q!
 
 ===================================================================================================================================
 
-10. When done, stop and quit ???
+10. When done, stop and quit
 	a. Using putty connect to the EC2
 	b. stop the navitia docker containers by typing at the terminal:
 $ docker stop $(docker ps -a -q)
-	c. close the browser window where transitanalistisrael is running (they are still accessible on the S3 at any time)
+	c. Connect to the AWS console (http://console.aws.amazon.com/ec2), right-click on the running instance -> Instance State -> Stop
+	d. close the browser window where transitanalistisrael is running (they are still accessible on the S3 at any time)
 
 ====================================================================================================================================
 
 11. To restart TransitAnalystIsrael for an existing auto date	
-	a. Restart your EC2 machime, docker and docker-compose dameons are brought up automatically.
+	a.Connect to the AWS console (http://console.aws.amazon.com/ec2), right-click on the stopped instance -> Instance State -> Start. 
+	   docker and docker-compose dameons are brought up automatically.
 	b. Using putty connect to the EC2	
 	c. Go to the folder where you cloned the Navitia-docker-compose repo e.g.:
 $ cd ~/navitia-docker-compose	
