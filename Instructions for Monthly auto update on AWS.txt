@@ -112,7 +112,7 @@ $ sudo docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navit
 
 ===================================================================================================================================
 
-10. When done, stop and quit ???
+10. When done, stop and quit 
 	a. Using putty connect to the EC2
 	b. stop the navitia docker containers by typing at the terminal:
 $ docker stop $(docker ps -a -q)

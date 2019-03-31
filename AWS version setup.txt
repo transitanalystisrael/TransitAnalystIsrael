@@ -50,7 +50,7 @@ a. Get Putty for Windows from: https://www.chiark.greenend.org.uk/~sgtatham/putt
 
 b. Follow the steps here to generate a .ppk file that will allow you to connect to the EC2 instance using putty: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html
 
-c. The user should be in the host name filled, e.g. "ubuntu@18.185.174.211" where the IP is the public IP (elastic IP we assigned earlier) of the EC2 which can be obtained from the AWS EC2 console.???
+c. The user-name should be part of the host name field, for AWS EC2 Ubuntu Server the nuser-name is "ubuntu" - "<user-name>@<IPaddress>" e.g. "ubuntu@18.185.174.211" where the IP is the public IP (elastic IP we assigned earlier) of the EC2 which can be obtained from the AWS EC2 console.
 
 5. Change the time zone of the EC2 to be Israel Time
 ====================================================
@@ -73,40 +73,41 @@ To verify installation:
 $ sudo systemctl status docker
 
 Add priviliges for easy terminal work:
-$ sudo usermod -aG docker ${USER} ???
+$ sudo usermod -aG docker ${USER} 
 
 c. Install docker-compose (taken from https://docs.docker.com/compose/install/ - linux tab):
-$ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose ???
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose 
 $ sudo chmod +x /usr/local/bin/docker-compose
 
 d. Configure the dokcer logs for rotation so they don't blow up:
-	$ cd /etc/docker
-	$ sudo touch daemon.json
-	$ sudo vim daemon.json
-	Go into to edit mode by pressing I and add: ???
-		{
-			"log-driver": "json-file",
-			"log-opts": {"max-size": "10m", "max-file": "3"}
-		}
+$ cd /etc/docker
+$ sudo touch daemon.json
+$ sudo vim daemon.json
+	Go into edit mode by pressing I and add to the end of the file the following: 
+{
+	"log-driver": "json-file",
+	"log-opts": {"max-size": "10m", "max-file": "3"}
+}
 	
 	Quit by pressing Esc -> type :wq > press Enter
-	
-	$ sudo systemctl reload docker
+
+	Initialize the docker with the command:
+$ sudo systemctl reload docker
 
 e. Install GDAL for gdal command line operations (Accept all questions you're prompted with):
 $ sudo apt-get install libgdal-dev
 $ sudo apt install gdal-bin
 
-f. Update python and install needed libraries  (Accept all questions you're prompted with): ???
-sudo apt-get install python3.6-dev
-sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
-sudo apt-get update
-sudo apt install python3-pip
-sudo apt-get install python3-gdal
-pip3 install docker logger shapely geopy progressbar2 requests argparse httplib2 oauth2client boto3 google-api-python-client google-auth google-auth-httplib2 apiclient
+f. Update python and install needed libraries  (Accept all questions you're prompted with): 
+$ sudo apt-get install python3.6-dev
+$ sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
+$ sudo apt-get update
+$ sudo apt install python3-pip
+$ sudo apt-get install python3-gdal
+$ pip3 install docker logger shapely geopy progressbar2 requests argparse httplib2 oauth2client boto3 google-api-python-client google-auth google-auth-httplib2 apiclient
 
-d. git Clone Navitia docker project (adjusted to our needs):
-$ cd ~ (IMPORTANT!!!!!!!!!!!!!!) ???
+d. git Clone Navitia docker project (adjusted to our needs)(IMPORTANT to clone to the user root folder "~" !!!!!!!!!!!!!!):
+$ cd ~ 
 $ git clone https://github.com/transitanalystisrael/navitia-docker-compose
 
 e. git Clone Transit Analyst Israel project: 
@@ -179,8 +180,8 @@ d. Change the URL:
 - Change the value of time_map_server_aws_url to the value of the Invoke URL mentioned above (it should look the same as existing apart from the part after the http://)
 - Press Esc -> type :wq -> press Enter
 
-9. Configure the Lambda Function that triggets the monthly update ???
-=================================================================
+9. Configure the Lambda Function that triggets the monthly update (only used in monthly auto update, not needed (will not be used) for on-demand date.
+======================================================================================================================================================
 9.1 First, we need to create a proper IAM role that will allow the Lambda function to access the EC2 and perform actions:
 -------------------------------------------------------------------------------------------------------------------------
 a. Access the IAM Role console: https://console.aws.amazon.com/iam/home#/roles
@@ -206,8 +207,9 @@ d. Configure the trigger that will cause the lambda to be executed every month:
 d1. On the "Add Triggers" pane select "CloudWatch Events" -> click on the created "CloudWatch Events" box ("Configuration needed") -> Scroll down to the newly added box titled "Configure Triggers"
 d2. Click "Create new Rule" -> Provide name "GTFS-Monthly-Timer" -> Rule Type: schedule expression 
      NOTE!!!: the name must be "GTFS-Monthly-Timer" because this is the name expected in Transit Analyst Code (/root -> set_next_month_invocation.py). you can change it, but then you have to change the code as well.
-d3. For the expression type: cron(30 22 DD MM ? YYYY) and replace DD MM and YYYY with daymonth and year respectivley, e.g. cron(30 22 31 04 ? 2019). ???
-    The date here doesn't really matter because when Transit Analyst update runs it assignes the next update date to this rule by itself (using the IAM role we created for the EC2 earlier).
+d3. For the expression type: "cron(30 22 01 01 ? 2030)". 
+	This includes a day, month and year that will be replaced when you first run Monthly Auto on AWS.
+	When Transit Analyst monthly update runs it assignes the next update date to this rule by itself (using the IAM role we created for the EC2 earlier).
 d4. Click "Add"
 
 e. Upload the required code to be executed in the EC2 when the function is triggered:
@@ -236,16 +238,18 @@ e. Look at the logs displayed on the console and you sohuld see that the python 
 f. go back to the putty window, and type the following command to restore transitanalysisrael_v1.py to its previous state:
 $ git checkout transitanalysisrael_v1.py
 
-11. Create S3 buckets to server to hose the web files: ??? ???
-======================================================
-When working with an EC2, the web content is served from S3 buckets. During the update process, the processed files are uplaoded to the buckets.
+11. Create S3 buckets to host the web files for monthly auto update:
+======================================================================
+When working with an EC2, the web content is served from S3 buckets. 
+For Monthly Auto Update - During the update process, the processed files are uplaoded to the buckets.
 WARNING: The bucket names are universally unique and the Transit Analyst Israel comes with the following names: transitanalystisrael-current, transitanalystisrael-past, transitanalystisrael-backup.
-         If you run the code as-is with the transitanalystisrael@gmail.com account, this will override the current production env.
+If you run the monthly auto update code as-is with the transitanalystisrael@gmail.com account, this will override the current production env.
+If running only On-Demand dates then the bucket used ("transitanalystisrael-yyyymmdd")is generated by the code and does not need to be created at setup.
 	
 11.1. Creating new buckets for an EC2 instance that shouldn't be transitanalystisrael@gmail.com prod env.:
 -------------------------------------------------------------------------------------------------------
 a. Access the S3 Console: https://s3.console.aws.amazon.com/s3/
-b. Click "Create Bucket" -> Enter name <some-prefix>-current -> Select region (should be the same as the EC2) ???
+b. Click "Create Bucket" -> Enter name <some-prefix>-current e.g. "blablablablablabla-current" -> Select region (should be the same as the EC2) 
 c. Skip the "Configure Options"
 d. In the "Set Permissions" screen uncheck the following options:
    - "Block new public bucket policies (Recommended)"
@@ -274,11 +278,12 @@ d. In the "Set Permissions" screen uncheck the following options:
 a. Using putty connect to the EC2
 b. Go to the Upload to S3 code and change the names of the buckets:
 	$ cd ~/TransitAnalystIsrael/root/
-	$ vim upload2aws_s3.py ???
-	Type the following commands one by one with pressing Enter in-between your bucket names (DO NOT COPY-PASTE):
-	Type : -> Paste: %s/transitanalystisrael-current/<bucket-name-current>/g - > Enter
-	Type : -> Paste: %s/transitanalystisrael-past/<bucket-name-past>/g - > Enter
-	Type : -> Paste: %s/transitanalystisrael-backup/<bucket-name-backup>/g - > Enter
-	Type :wq
+	$ vim upload2aws_s3.py 
+	Type the following commands one by one with your bucket names replacing <some-prefix>-current, <some-prefix>-past and <some-prefix>-backup (DO NOT COPY-PASTE):
+: 
+:%s/transitanalystisrael-current/<some-prefix>-current/g
+:%s/transitanalystisrael-past/<some-prefix>-past/g 
+:%s/transitanalystisrael-backup/<some-prefix>-backup/g
+:wq
 
-12. To start Transit analyst on AWS for the first time, go to "Instructions for Monthly auto update on AWS".txt ???
+12. To start Transit analyst on AWS for the first time, go to "Instructions for Monthly auto update on AWS".txt or "Instructions for On demand date on AWS".txt"

@@ -48,41 +48,39 @@ serviceweekstartdate = '20190302'
 
 	d. save the config file
 
-2. Downloading or copying the GTFS zip file to the AWS: ???
+2. Downloading or copying the GTFS zip file to the AWS (two options 2.1 and 2.2): 
 2.1 Downloading from  HTTP/FTP website: 
-	a. Locate GTFS files that corespond to a service start date that is equal to the on-demand date. Remeber that GTFS is uploaded to MOT servers (ftp://gtfs.mot.gov.il) at 10pm each day with a service start date of that same day. URL for example: https://transitfeeds.com/p/ministry-of-transport-and-road-safety/820/latest/download
+	a. Locate GTFS files that corespond to a service start date that is equal to the on-demand date. Remeber that GTFS is uploaded to MOT servers (ftp://gtfs.mot.gov.il) at 10pm each day with a service start date of that same day. Alternitivly, for GTFS files from past dates download from the  transitfeeds website (now part of OpenMobilityData) - https://transitfeeds.com/p/ministry-of-transport-and-road-safety/820 - download URL for example for 06 March 2019: https://transitfeeds.com/p/ministry-of-transport-and-road-safety/820/20190306
     b. Connect to the EC2 using putty
 	c. Change directory to the GTFS folder:
 $ cd TransitAnalystIsrael/gtfs/
 	d. Download the file - url is provided as example:
-$ wget https://transitfeeds.com/p/ministry-of-transport-and-road-safety/820/latest/download
-	e. Rename the downlaoded file named "download" be gtfsdirbase+gtfsdate+'.zip' (as in the config file) e.g. 'israel20190302.zip':
-$ mv download israel20190302.zip
+$ wget https://transitfeeds.com/p/ministry-of-transport-and-road-safety/820/20190306
+	e. Rename the downlaoded file named "download" to be gtfsdirbase+gtfsdate+'.zip' (as in the config file) e.g. 'israel20190306.zip':
+$ mv download israel20190306.zip
 	
 2.2 Copying from a gtfs file from your local host. File name for example gtfs.zip:
-	In order to copy the file from your machine to the EC2, you need the .pem key that allows you to access the EC2. 
+	In order to copy the file from your machine to the EC2, you need the .pem key that allows you to access the EC2 (you got the .pem key when you created the EC2 instance - probably in the s3 key bucket). 
 	a. Place both the gtfs file and the key in the same folder.
 	b. Right-click in the widnows explorer -> Open "Git Bash" here
-	c. The copy command requried the following infromation:
+	c. The copy command requries the following infromation:
 	   i. the name of the .pem file <pem-file>.pem, e.g. key.pem
 	   ii. name of the gtfs file <gtfs-file>.zip, e.g. gtfs.zip
 	   iii. user name that you use to connect to the EC2 with putty <user-name>, e.g. ubuntu
-	   iv. public DNS of the EC2 instace that can be found at the AWS console (http://console.aws.amazon.com/ec2) -> in the EC2 instances list -> column "Public DNS (IPv4)"), <public-dns>, e.g. ec2-3-122-15-201.eu-central-1.compute.amazonaws.com
-	d. Type the command:
-$ scp -i <pem-file>.pem <gtfs-file>.zip <user-name>@<public-dns>:/home/ubuntu/TransitAnalystIsrael/gtfs/ e.g.
-$ scp -i key.pem israel20190303.zip ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu
-	e. Rename the downlaoded file named "download" be gtfsdirbase+gtfsdate+'.zip' (as in the config file) e.g. 'israel20190302.zip':
-$ mv <gtfs-file>.zip israel20190302.zip
+	   iv. public DNS of the EC2 instace that can be found at the AWS EC2 console (http://console.aws.amazon.com/ec2) -> in the EC2 instances list -> column "Public DNS (IPv4)"), <public-dns>, e.g. ec2-3-122-15-201.eu-central-1.compute.amazonaws.com
+	d. Type the command: "scp -i <pem-file>.pem <gtfs-file>.zip <user-name>@<public-dns>:/home/ubuntu/TransitAnalystIsrael/gtfs/" e.g.
+$ scp -i key.pem israel20190303.zip ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/TransitAnalystIsrael/gtfs/
+	e. Rename the copied file e.g. "gtfs.zip" be gtfsdirbase+gtfsdate+'.zip' (as in the config file) e.g. 'israel20190306.zip':
+$ mv gtfs.zip israel20190306.zip
 
-
-3. Download or copy the Open Street Map - OSM file:
+3. Download the Open Street Map - OSM file:
 	a. Locate the current or recent Israel OSM file or one that coresponds to the on-demand date. The latest can be downloaded from  http://download.geofabrik.de/asia/israel-and-palestine.html
     b. Connect to the EC2 using putty
 	c. Change directory to the osm folder:
 $ cd TransitAnalystIsrael/osm/
 	d. Download the file - url is provided as example:
-$ wget http://download.geofabrik.de/asia/israel-and-palestine.html
-	e. Rename the downlaoded file named "download" be 'israel-and-palestine-latest.osm.pbf'
+$ wget https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf
+	e. Rename the downlaoded file named "download" to be 'israel-and-palestine-latest.osm.pbf'
 $ mv download israel-and-palestine-latest.osm.pbf
 
 
