@@ -16,8 +16,17 @@
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
+	<meta property="og:image" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/docs/images/tool5.jpg" />
+	<meta property="og:type" content= "website" />
+	<meta property="og:title" content= "נסיעות תחבורה ציבורית ליום בישוב" />
+	<meta property="og:description" content= "Transit Analyst Israel" />
+	<meta property="og:url" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/muni_tpd_per_line/index.html"/>
+	<meta property="og:image:width" content="432" />
+	<meta property="og:image:height" content="409" />
+
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 
     <link rel="stylesheet" href="../dist/leaflet.css" />
     <script src="../dist/leaflet.js" ></script>
@@ -185,9 +194,9 @@
         };
 		this._div.innerHTML = '<h3>מדד תחבורה ציבורית לישוב<br>ותדירות יומית של כל הקווים בישוב</h3>'
 			+ '<ul class="instructions">' +
-              '<li>העבירו את העכבר מעל לישוב להצגת נתוניו</li>' +
-              '<li>לחצו על הישוב על מנת לקבע את הבחירה</li>' +
-			  table_data_string+
+              '<li>העבירו את העכבר מעל לישוב להצגת שמו</li>' +
+              '<li>לחצו על כל נקודה במפה להצגת מדד עוצמת התח"צ</li>' +
+			+  table_data_string+
 			  '</ul>';
 
 		function dispFunction(linetpd){

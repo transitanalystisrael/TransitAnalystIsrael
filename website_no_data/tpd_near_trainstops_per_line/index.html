@@ -16,8 +16,14 @@
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
+	<meta property="og:image" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/docs/images/tool9.jpg" />
+	<meta property="og:type" content= "website" />
+	<meta property="og:title" content= "נגישות בתחבורה ציבורית לתחנות רכבת" />
+	<meta property="og:description" content= "Transit Analyst Israel" />
+	<meta property="og:url" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/tpd_near_trainstops_per_line/index.html"/>
+	<meta property="og:image:width" content="435" />
+	<meta property="og:image:height" content="441" />
 
     <link rel="stylesheet" href="../dist/leaflet.css" />
     <script src="../dist/leaflet.js" ></script>
@@ -479,13 +485,13 @@
 				var html =
                     '<div class="freq-list popup-list">' +
 					'<h3>נסיעות בסמוך לנקודת עניין</h3>' +
-                    '<h4>תדירות יומית בתחנות באיזור: ' + totaltpd.toString() + '</h4>' +
+                    '<h4>תדירות יומית (לשני כיוונים): ' + totaltpd.toString() + '</h4>' +
                     '<table class="freq-table">' +
                     '    <thead>' +
                     '        <tr>' +
                     '            <th>מפעילה</th>' +
                     '            <th>מספר קו</th>' +
-                    '            <th>נסיעות ליום</th>' +
+                    '            <th>נסיעות ליום (לכיוון)</th>' +
                     '        </tr>' +
                     '    </thead>' +
                     '    <tbody>' +
