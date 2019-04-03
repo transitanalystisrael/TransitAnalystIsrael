@@ -1,0 +1,275 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-130620396-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-130620396-1');
+    </script>
+
+        <meta charset="utf-8" />
+        <title>מנתח תחבורה לישראל</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
+        <meta property="og:image" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/docs/images/all_tools.png" />
+        <meta property="og:type" content= "website" />
+        <meta property="og:title" content= "מנתח תחבורה לישראל" />
+        <meta property="og:description" content= "Transit Analyst Israel" />
+        <meta property="og:url" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/embed_cards/index.html"/>
+        <meta property="og:image:width" content="430" />
+        <meta property="og:image:height" content="264" />
+
+
+        <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        a:link {
+            text-decoration: none;
+        }
+
+        /* Style the header */
+        header {
+            background-color: #666;
+            width: 100%;
+            height: 5%;
+            padding: 0px;
+            text-align: left;
+            font-size: 24px;
+            color: white;
+        }
+
+        /* Create two columns/boxes that floats next to each other */
+        nav {
+            float: right;
+            width: 172px;
+            height: 19%; /*height: 160px; /* only for demonstration, should be removed */
+            background: #ccc;
+            padding: 6px;
+        }
+
+        /* Style the list inside the menu */
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        article {
+            float: right;
+            text-align: right;
+            direction: rtl;
+            padding: 6px;
+            width: 600px;
+            background-color: #f1f1f1;
+            height: 19%; /*height: 160px; /* only for demonstration, should be removed */
+        }
+
+        /* Clear floats after the columns */
+        section:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        /* Style the footer */
+        footer {
+            background-color: #777;
+            padding: 10px;
+            text-align: center;
+            color: white;
+        }
+
+        /* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
+        @media (max-width: 1600px) {
+            nav, article {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        .embed-cards-container {
+            display: grid;
+            grid-template-columns: auto auto auto;;
+        }
+
+        .embed-card {
+            border: 1px solid lightgrey;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-rows: 9fr 1fr;
+
+        }
+
+
+        .embed-button {
+            color: #f2f2f2;
+            text-align: center;
+            vertical-align: middle;
+            text-decoration: none;
+            background-color: #45a31f;
+        }
+        .embed-button:hover {
+             color: black;
+         }
+
+        </style>
+        <link rel="stylesheet" href="../css/topnav.css"/>
+    </head>
+
+    <body>
+
+
+
+    <script>
+        function displayHome() {
+            window.location.href="../index.html";
+        }
+
+        function displayFaq() {
+            window.open("../docs/faqsh.html",'_blank');
+        }
+
+        function contact() {
+            window.location.href="mailto:transitanalystisrael@gmail.com?Subject=Contact%20from%20website";
+        }
+
+        function displayCreds() {
+            window.open("../docs/credits.html",'_blank');
+        }
+
+    </script>
+    <script src="../dist/platform.js" charset="UTF-8"></script>
+
+    <div class="topnav">
+        <button type="button" onclick="displayCreds()">תודות</button>
+        <button type="button" onclick="contact()">צור קשר</button>
+        <button type="button" onclick="displayFaq()">שאלות נפוצות</button>
+        <div class="main-button">
+            <button type="button" onclick="displayHome()">מנתח תחבורה לישראל</button>
+        </div>
+    </div>
+    <script>
+
+        function copyEmbedCode(page_path) {
+            var url = 'https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/'+page_path
+            var embeding_text =
+        '<div style=\"width: 400px; height: 350px;\">' +
+            '<a class=\"embedly-card\" data-card-controls=\"0\" ' +
+                    'href="'+ url + '\">' +
+            '</a>' +
+                    '<script async src=\"//cdn.embedly.com/widgets/platform.js\" charset=\"UTF-8\"><\/script>' +
+        '<\div>'
+
+        //code to allow text copy
+        const el = document.createElement('textarea');
+        el.value = embeding_text;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        }
+    </script>
+
+    <!--Cards were generated by https://embed.ly/ that parses the og tags added to each of the pages' head section, e.g. og:title, og:icon, og:image (thumbnail) etc.-->
+
+    <div class="embed-cards-container">
+        <!--Main page Hebrew-->
+            <div class="embed-card" style="width: 400px; height: 400px;">
+                <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/indexh.html">מנתח תחבורה לישראל</a>
+                <button class="embed-button" type="button" onclick="copyEmbedCode('indexh.html')">העתקת קוד הטמעה</button>
+            </div>
+
+
+        <!--Main page English-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/indexe.html">Transit Analyst Israel</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('indexe.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Transit Score-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/transitscore/index.html">מדד עוצמת תחבורה ציבורית לפי מיקום</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('transitscore/index.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Muni Transit Score-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/muni_transitscore/index.html">מדד עוצמת תחבורה ציבורית בישוב</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('muni_transitscore/index.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Muni_fairshare score-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/muni_fairsharescore/index.html">מנתח תחבורה לישראל - מדד השקעה בתחבורה ציבורית בישוב</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('muni_fairsharescore/index.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Charts PT score-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/muni_score_lists_and_charts/indexts.html">דירוג תחבורה ציבורית בין ישובים - מדד תחבורה ציבורית</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('muni_score_lists_and_charts/indexts.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Charts FS score-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/muni_score_lists_and_charts/indexfss.html">דירוג תחבורה ציבורית בין ישובים - מדד חלוקה הוגנת</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('muni_score_lists_and_charts/indexfss.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Charts BD score-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/muni_score_lists_and_charts/indexbds.html">דירוג תחבורה ציבורית בין ישובים - מדד צפיפות בנויה</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('muni_score_lists_and_charts/indexbds.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Muni lines-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/muni_tpd_per_line/index.html">נסיעות תחבורה ציבורית ליום בישוב</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('muni_tpd_per_line/index.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Freq lines-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/line_freq/index.html">מנתח תחבורה לישראל - קווי תחבורה ציבורית תדירים</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('line_freq/index.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Freq on Street-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/lines_on_street/index.html">מנתח תחבורה לישראל - תדירות יומית ברחוב נבחר</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('lines_on_street/index.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Freq lines at stops-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/tpd_at_stops_per_line/index.html">נגישות לשירותי תחבורה ציבורית בתחנות</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('tpd_at_stops_per_line/index.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Freq lines near train stops-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/tpd_near_trainstops_per_line/index.html">נגישות בתחבורה ציבורית לתחנות רכבת</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('tpd_near_trainstops_per_line/index.html')">העתקת קוד הטמעה</button>
+        </div>
+
+        <!--//Time map-->
+        <div class="embed-card" style="width: 400px; height: 400px;">
+            <a class="embedly-card" data-card-controls="0" href="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/transit_time_map/index.html">מנתח תחבורה לישראל - מפת ניידות בישראל</a>
+            <button class="embed-button" type="button" onclick="copyEmbedCode('transit_time_map/index.html')">העתקת קוד הטמעה</button>
+        </div>
+
+    </div>
+    <footer></footer>
+    </body>
+
+    </html>

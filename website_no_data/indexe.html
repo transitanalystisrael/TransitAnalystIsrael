@@ -13,8 +13,15 @@
 
 	<meta charset="utf-8" />
 	<title>Transit Analyst Israel</title>
-	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="./docs/images/favicon.ico" />
+    <meta property="og:image" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/docs/images/all_tools_e.png" />
+    <meta property="og:type" content= "website" />
+    <meta property="og:title" content= "Transit Analyst Israel" />
+    <meta property="og:description" content= "Transit Analyst Israel" />
+    <meta property="og:url" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/indexe.html"/>
+    <meta property="og:image:width" content="430" />
+    <meta property="og:image:height" content="265" />
 	<style>
 	* {
 		box-sizing: border-box;
@@ -109,6 +116,10 @@
     function displayHebrew() {
         window.open("indexh.html",'_blank');
     }
+
+    function displayEmbed() {
+        window.open("embed_cards/index.html",'_blank');
+    }
 </script>
 
 
@@ -116,6 +127,7 @@
     <button id="period_button" type="button" onclick="displayOtherPeriod()">***</button>
     <button type="button" onclick="displayHebrew()">עברית</button>
     <button type="button" onclick="contact()">Contact us</button>
+    <button type="button" onclick="displayEmbed()">!Embed me</button>
     <button type="button" onclick="displayFaq()">FAQs</button>
     <button type="button" onclick="displayCreds()">Credits</button>
     <div class="service-period-container">
