@@ -111,5 +111,7 @@ $ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-do
 		* click on "Task Schedular Library" folder on the left bar
 		* look under name for "Transit Analyst Israel Updater"
 	b. Make sure that the Navitia docker environment is up and running (you can do this by opening the TTM tool in website_current to see if it is working). if not then run 11. a. through d.
+	c. It's better to restart the docker desktop daemon in order to reutilize the reserved memory. We've noticed that over long periods of time, running terminal commands for dokcer, e.g. "docker stop" is blocked by Windows due to memory issues. So to restart the daemon, right-click the Docker icon (whale) in your task bar -> restart. 
+	d. Follow step 11 to restart the docker navitia conatiners.
 
 
