@@ -3,7 +3,7 @@ import process_date
 from datetime import datetime as dt
 import utils
 import datetime
-
+import pytz
 from pathlib import Path
 import sys
 
@@ -100,8 +100,10 @@ def set_next_invocation_date(main_script_name):
         # Get the ColudWatch Events clients
         client = boto3.client('events',region_name='eu-central-1')
 
-        # Set to run in the next day only once at 22:30
-        scheduleExpression = next_month_operation_date.strftime("cron(30 22 %d %m ? %Y)") #cron(30 12 11 03 ? 2019)
+        # Set to run in the next day only once at 22:30 - first convert to UTC because of AWS CloudWatch settings
+        next_month_operation_date = next_month_operation_date + datetime.timedelta(hours=22) + datetime.timedelta(minutes=30)
+        next_month_operation_date = next_month_operation_date.astimezone(pytz.utc)
+        scheduleExpression = next_month_operation_date.strftime("cron(%M %H %d %m ? %Y)") #cron(30 12 11 03 ? 2019) in UTC time
         response = client.put_rule(
             Name="GTFS-Monthly-Timer",
             ScheduleExpression=scheduleExpression,

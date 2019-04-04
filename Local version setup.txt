@@ -37,6 +37,7 @@ To list all modules installed, you can use the python command: >>> help("modules
 	geopy
 	pypiwin32
 	win10toast
+	pytz
 
 Git Clone TransitAnalystIsrael
 ==============================================================================================

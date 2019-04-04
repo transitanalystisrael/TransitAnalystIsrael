@@ -104,7 +104,7 @@ $ sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
 $ sudo apt-get update
 $ sudo apt install python3-pip
 $ sudo apt-get install python3-gdal
-$ pip3 install docker logger shapely geopy progressbar2 requests argparse httplib2 oauth2client boto3 google-api-python-client google-auth google-auth-httplib2 apiclient
+$ pip3 install docker logger shapely geopy progressbar2 requests argparse httplib2 oauth2client boto3 google-api-python-client google-auth google-auth-httplib2 apiclient pytz
 
 d. git Clone Navitia docker project (adjusted to our needs)(IMPORTANT to clone to the user root folder "~" !!!!!!!!!!!!!!):
 $ cd ~ 
