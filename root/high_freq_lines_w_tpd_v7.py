@@ -629,7 +629,10 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 			used_route_id_set.add(route_id)
 			for route_id2, [agency_id2,route_short_name2,route_long_name2,route_desc2,route_type2, tripset2, tpdlist2, totaltpdperroute2, stopset2, direction_id2] in routes_dict.items():
 				common_stop_set = stopset & stopset2
-				percent_common_stops = 100*len(common_stop_set)/max(len(stopset),len(stopset2))
+				if len(common_stop_set) > 0 : # needed for div by zero error case - stopsets are empty
+					percent_common_stops = 100*len(common_stop_set)/max(len(stopset),len(stopset2))
+				else :
+					percent_common_stops = 0
 				same_stops = len(common_stop_set) == len(stopset) and len(stopset) == len(stopset2)
 				same_or_similar = route_desc[:7] == route_desc2[:7] and route_short_name == route_short_name2 and agency_id == agency_id2 and direction_id == direction_id2 and len(common_stop_set) > 0
 				
