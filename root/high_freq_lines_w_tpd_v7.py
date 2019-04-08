@@ -633,6 +633,10 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 					percent_common_stops = 100*len(common_stop_set)/max(len(stopset),len(stopset2))
 				else :
 					percent_common_stops = 0
+				if max(len(stopset),len(stopset2)) == 0 :
+					print('route_id,agency_id,route_short_name')
+					print(route_id,agency_id,route_short_name)
+					print(route_id2,agency_id2,route_short_name2)
 				same_stops = len(common_stop_set) == len(stopset) and len(stopset) == len(stopset2)
 				same_or_similar = route_desc[:7] == route_desc2[:7] and route_short_name == route_short_name2 and agency_id == agency_id2 and direction_id == direction_id2 and len(common_stop_set) > 0
 				
