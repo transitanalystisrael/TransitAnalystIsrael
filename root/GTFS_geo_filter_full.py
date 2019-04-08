@@ -16,6 +16,7 @@
 # begin main ------------------------------------
 import time;
 import GTFS_geo_filter_util
+import gtfs_config
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 
 """
@@ -32,13 +33,6 @@ geo_filter = [
 """
 def main(gtfspathin, gtfspathout, geo_filter):
     #
-    MAX_STOPS_COUNT = 50000
-    MAX_STOP_TIMES_COUNT = 25000000
-    MAX_TRIPS_COUNT = 900000
-    MAX_SHAPES_COUNT = 10000000
-    MAX_ROUTES_COUNT = 15000
-    MAX_AGENCY_COUNT = 100
-    MAX_CALENDAR_COUNT = 250000
     #
     keep_stop_set = set([]) # set of 'stop_id'
     keep_trip_set = set([]) # set of  'trip_id'
