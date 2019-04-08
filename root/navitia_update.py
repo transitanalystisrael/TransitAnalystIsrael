@@ -125,6 +125,8 @@ try:
         utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path,
                                                  navitia_docker_compose_default_file_name,
                                                  default_coverage_name)
+        containers = docker_client.containers.list(filters={"name": "worker"})
+        
     # Get the worker container
     worker_con = containers[0]
 
