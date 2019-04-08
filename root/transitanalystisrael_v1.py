@@ -25,6 +25,9 @@ try:
         _log.info("Download OSM & GTFS")
         import gtfs_osm_download
 
+    # Stop docker running to release memory for processing
+    utils.stop_all_containers(utils.get_docker_service_client())
+    
     # unzip gtfs file
     import gtfs_unzip
 

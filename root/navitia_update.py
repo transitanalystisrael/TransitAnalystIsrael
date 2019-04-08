@@ -121,8 +121,10 @@ try:
 
     containers = docker_client.containers.list(filters={"name": "worker"})
     if len(containers) == 0:
-        _log.error("Navitia docker is down, run 'docker-compose up' in the navitia-docker-compose repo folder")
-        raise Exception
+        _log.error("Navitia docker containers are down, bringing them up with default coverage for processing")
+        utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path,
+                                                 navitia_docker_compose_default_file_name,
+                                                 default_coverage_name)
     # Get the worker container
     worker_con = containers[0]
 
