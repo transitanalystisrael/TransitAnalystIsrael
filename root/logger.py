@@ -45,4 +45,4 @@ class Logger(object):
         return logger
 
 _log = Logger()
-_log = _log.get_logger("Transit Analyst")
+_log = _log.get_logger("Transit_Analyst")
