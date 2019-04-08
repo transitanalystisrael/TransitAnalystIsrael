@@ -26,7 +26,10 @@ try:
         import gtfs_osm_download
 
     # Stop docker running to release memory for processing
-    utils.stop_all_containers(utils.get_docker_service_client())
+    docker_client = utils.get_docker_service_client()
+    containers = docker_client.containers.list(filters={"name": "worker"})
+    if len(containers) > 0:
+        utils.stop_all_containers(utils.get_docker_service_client())
     
     # unzip gtfs file
     import gtfs_unzip
