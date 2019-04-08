@@ -4,7 +4,7 @@
 import transitanalystisrael_config as cfg
 import datetime
 import utils
-
+import traceback
 from logger import _log
 import set_next_month_invocation
 import os
@@ -92,7 +92,9 @@ try:
 except Exception as e:
     if utils.is_aws_machine():
         _log.exception("Done with errors - see Exception stacktrace")
+        _log.exception(traceback.print_exc())
         utils.send_log_to_email("Transit Analyst Monthly Update " + update_time, "Update Failed - see logs")
     else:
         _log.exception("Done with errors - see Exception stacktrace")
+        _log.exception(traceback.print_exc())
 
