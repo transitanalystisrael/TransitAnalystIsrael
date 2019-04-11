@@ -7,6 +7,7 @@
 # most of the patches are now only placeholders... need to add...
 # need to rerun after patch to see that nothing was broken by fix... this is not done yet
 #
+import gtfs_config
 import time
 import csv
 from pathlib import Path
@@ -30,6 +31,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	gtfspath = gtfspathin
 	
 	# >>> load routes file
+	routes_count = 0
 	txtfilein = 'routes.txt'
 	routes_dict = {}
 	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
@@ -38,11 +40,13 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		#print(header)
 		for row in reader:
 			#print row
+			routes_count +=1
 			routes_dict[row[0]] = [row[1]] # 'route_id' : ['agency_id']
 	#print routes_dict[:4]
 	print('routes_dict loaded. routes count ', len(routes_dict))
 	
 	# >>> load trips file
+	trips_count = 0
 	txtfilein = 'trips.txt'
 	trips_dict = {}
 	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
@@ -51,11 +55,13 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		#print(header)
 		for row in reader:
 			#print row
+			trips_count +=1
 			trips_dict[row[2]] = [row[0],row[1],row[5]] # 'trip_id' : ['route_id','service_id','shape_id']
 	#print trips_dict[:4]
 	print('trips_dict loaded. trips count ', len(trips_dict))
 	
 	# >>> load stop_times file
+	stop_times_count = 0
 	txtfilein = 'stop_times.txt'
 	stop_times_trips_set = set([])
 	stop_times_stops_set = set([])
@@ -65,12 +71,14 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		#print(header)
 		for row in reader:
 			#print row
+			stop_times_count +=1
 			stop_times_trips_set.add(row[0]) # trip_id
 			stop_times_stops_set.add(row[3]) # stop_id
 	print('stop_times_trips loaded. trips count ', len(stop_times_trips_set))
 	print('stop_times_stops loaded. stops count ', len(stop_times_stops_set))
 	
 	# >>> load stops file
+	stops_count = 0
 	txtfilein = 'stops.txt'
 	stops_dict = {}
 	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
@@ -79,11 +87,13 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		#print(header)
 		for row in reader:
 			#print row
+			stops_count +=1
 			stops_dict[row[0]] = [row[2], row[3], row[4], row[5]] # 'stop_id' : ['stop_name', 'stop_desc', 'stop_lat', 'stop_lon']
 	#print stops_dict[row[0]] # last one
 	print('stops_dict loaded. stop count ', len(stops_dict))
 	
 	# >>> load agency file
+	agency_count = 0
 	txtfilein = 'agency.txt'
 	agency_dict = {}
 	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
@@ -92,11 +102,13 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		#print(header)
 		for row in reader:
 			#print row
+			agency_count +=1
 			agency_dict[row[0]] = [row[1]] # 'agency_id' : ['agency_name']
 	#print agency_dict[row[0]] # last one
 	print('agency_dict loaded. agency count ', len(agency_dict))
 	
 	# >>> load shapes file. Actually loads only one point per shape!!! used only as a set of shape_ids
+	shapes_count = 0
 	txtfilein = 'shapes.txt'
 	shapes_dict = {}
 	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
@@ -105,11 +117,13 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		#print(header)
 		for row in reader:
 			#print row
+			shapes_count +=1
 			shapes_dict[row[0]] = [row[1], row[2]] # 'shape_id' : ['shape_pt_lat','shape_pt_lon']
 	#print shapes_dict[row[0]] # last one
 	print('shapes_dict loaded. shape count ', len(shapes_dict))
 	
 	# >>> load calendar file
+	calendar_count = 0
 	txtfilein = 'calendar.txt'
 	calendar_dict = {}
 	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
@@ -118,12 +132,44 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		#print(header)
 		for row in reader:
 			#print row
+			calendar_count +=1
 			calendar_dict[row[0]] = [row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]] # ['service_id' : [ 'sunday','monday','tuesday','wednesday','thursday','friday','saturday','start_date','end_date']
 	#print calendar_dict[row[0]] # last one
 	print('calendar_dict loaded. calendar count ', len(calendar_dict))
 	
 	
 	# >>> process loaded files
+	
+	# check MAX limits on file line count
+	
+	if stops_count > gtfs_config.MAX_STOPS_COUNT :
+		print('need to abort')
+		_log.error('MAX GTFS line count exceeded')
+		raise Exception 
+	if stop_times_count > gtfs_config.MAX_STOP_TIMES_COUNT :
+		print('need to abort')
+		_log.error('MAX GTFS line count exceeded')
+		raise Exception
+	if trips_count > gtfs_config.MAX_TRIPS_COUNT :
+		print('need to abort')
+		_log.error('MAX GTFS line count exceeded')
+		raise Exception
+	if shapes_count > gtfs_config.MAX_SHAPES_COUNT :
+		print('need to abort')
+		_log.error('MAX GTFS line count exceeded')
+		raise Exception
+	if routes_count > gtfs_config.MAX_ROUTES_COUNT :
+		print('need to abort')
+		_log.error('MAX GTFS line count exceeded')
+		raise Exception
+	if agency_count > gtfs_config.MAX_AGENCY_COUNT :
+		print('need to abort')
+		_log.error('MAX GTFS line count exceeded')
+		raise Exception
+	if calendar_count > gtfs_config.MAX_CALENDAR_COUNT :
+		print('need to abort')
+		_log.error('MAX GTFS line count exceeded')
+		raise Exception
 	
 	# >>> process calendar - check that GTFS start date in calendar.txt is as expected - gtfsdate
 	service_ok_count = 0
