@@ -9,7 +9,7 @@ Monthly auto update on AWS and S3
 
 =============================================================================================
 
-0. Using Putty (see setup instructions for putty setup in "AWS version setup.txt"), connect to the EC2.
+0. Using Putty (see setup instructions for putty setup in "AWS version setup for processing and production.txt"), connect to the EC2.
 	Change directory to Trasnit Analyst Israel project:
 	$ cd TransitAnalystIsrael
 	Make sure that the Project dir structure is as below, and create missing folders if needed using mkdir:   
