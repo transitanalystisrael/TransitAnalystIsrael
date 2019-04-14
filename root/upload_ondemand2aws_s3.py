@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# upload current to AWS S3 cloud
+# upload ondemand to AWS S3 cloud
+# the ondemand date bucket is created in S3 before the local dir is copied to the bucket
 #
 import transitanalystisrael_config as cfg
 import shutil
@@ -27,7 +28,6 @@ def print_objects(bucket_name):
 	for obj in bucket2.objects.all():
 		print(obj.key)
 
-#copy_to_bucket(cfg.bucket_prefix+'past', cfg.bucket_prefix+'backup', 'index.html')
 def copy_to_bucket(bucket_from_name, bucket_to_name, file_name):
 	copy_source = {
 		'Bucket': bucket_from_name,
@@ -35,7 +35,6 @@ def copy_to_bucket(bucket_from_name, bucket_to_name, file_name):
 	}
 	s3.Object(bucket_to_name, file_name).copy(copy_source)
 
-#copy_bucket(cfg.bucket_prefix+'past', cfg.bucket_prefix+'backup')
 def copy_bucket(bucket_from_name, bucket_to_name):
 	print('--------copy_bucket------------')
 	print(bucket_from_name, bucket_to_name)
@@ -112,12 +111,12 @@ def upload_localdir_w_gzip_to_bucket(localdir_from, bucket_to_name):
 
 #-------------------------------------------------------------------------
 
-print('********** upload current to AWS S3 cloud *************')
-current_localdir = cwd.parent / cfg.websitelocalcurrentpath
-print('current_localdir : ',current_localdir)
+print('********** upload ondemand to AWS S3 cloud *************')
+ondemand_localdir = cwd.parent / cfg.websitelocalondemandpath.replace('yyyymmdd', cfg.gtfsdate)
+print('ondemand_localdir : ',ondemand_localdir)
 
-os.chdir(current_localdir)
-print(os.listdir(current_localdir))
+os.chdir(ondemand_localdir)
+print(os.listdir(ondemand_localdir))
 
 # Create an S3 resource
 s3 = boto3.resource('s3')
@@ -129,22 +128,38 @@ for bucket in s3.buckets.all():
 #		print(key.key)
 
 #
-# Create an Amazon S3 Bucket - not needed - buckets are pre-created
+# Create an Amazon S3 Bucket 
 #
-#s3.create_bucket(Bucket=cfg.bucket_prefix+'current', CreateBucketConfiguration={'LocationConstraint': 'eu-central-1'})
+on_demand_bucket = cfg.bucket_prefix+cfg.gtfsdate
+s3.create_bucket(Bucket=on_demand_bucket, CreateBucketConfiguration={'LocationConstraint': 'eu-central-1'})
+
+# Create the configuration for the website
+website_configuration = {'ErrorDocument': {'Key': 'error.html'}, 'IndexDocument': {'Suffix': 'index.html'},}
+# Set the new policy on the selected bucket
+s3c.put_bucket_website(Bucket=on_demand_bucket, WebsiteConfiguration=website_configuration)
+
+# Create the bucket policy
+bucket_policy = {
+	'Version': '2012-10-17',
+	'Statement': [{
+		'Sid': 'PublicReadGetObject',
+		'Effect': 'Allow',
+		'Principal': '*',
+		'Action': ['s3:GetObject'],
+		'Resource': "arn:aws:s3:::%s/*" % on_demand_bucket
+	}]
+}
+# Convert the policy to a JSON string
+bucket_policy = json.dumps(bucket_policy)
+# Set the new policy on the given bucket
+s3c.put_bucket_policy(Bucket=on_demand_bucket, Policy=bucket_policy)
 
 #
-# erase content of current
+# copy content of local to ondemand
 #
-print_objects(cfg.bucket_prefix+'current')
-delete_all_objects(cfg.bucket_prefix+'current')
-
-#
-# copy content of local to current
-#
-#upload_localdir_w_gzip_to_bucket(for_testing_upload_localdir, cfg.bucket_prefix+'current') # for testing
-upload_localdir_w_gzip_to_bucket(current_localdir, cfg.bucket_prefix+'current')
-print_objects(cfg.bucket_prefix+'current')
+#upload_localdir_w_gzip_to_bucket(for_testing_upload_localdir, cfg.bucket_prefix+cfg.gtfsdate) # for testing
+upload_localdir_w_gzip_to_bucket(ondemand_localdir, cfg.bucket_prefix+cfg.gtfsdate)
+print_objects(cfg.bucket_prefix+cfg.gtfsdate)
 
 print('------------------------------------------------------------')
 # Call S3 to list current buckets

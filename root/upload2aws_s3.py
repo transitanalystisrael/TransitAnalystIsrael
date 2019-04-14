@@ -27,7 +27,7 @@ def print_objects(bucket_name):
 	for obj in bucket2.objects.all():
 		print(obj.key)
 
-#copy_to_bucket('transitanalystisrael-past', 'transitanalystisrael-backup', 'index.html')
+#copy_to_bucket(cfg.bucket_prefix+'past', cfg.bucket_prefix+'backup', 'index.html')
 def copy_to_bucket(bucket_from_name, bucket_to_name, file_name):
 	copy_source = {
 		'Bucket': bucket_from_name,
@@ -35,7 +35,7 @@ def copy_to_bucket(bucket_from_name, bucket_to_name, file_name):
 	}
 	s3.Object(bucket_to_name, file_name).copy(copy_source)
 
-#copy_bucket('transitanalystisrael-past', 'transitanalystisrael-backup')
+#copy_bucket(cfg.bucket_prefix+'past', cfg.bucket_prefix+'backup')
 def copy_bucket(bucket_from_name, bucket_to_name):
 	print('--------copy_bucket------------')
 	print(bucket_from_name, bucket_to_name)
@@ -135,46 +135,46 @@ if cfg.get_service_date == 'auto' :
 	#
 	# Create an Amazon S3 Bucket - not needed - buckets are pre-created
 	#
-	#s3.create_bucket(Bucket='transitanalystisrael-current', CreateBucketConfiguration={'LocationConstraint': 'eu-central-1'})
+	#s3.create_bucket(Bucket=cfg.bucket_prefix+'current', CreateBucketConfiguration={'LocationConstraint': 'eu-central-1'})
 
 	#
 	# erase content of backup 
 	#
-	print_objects('transitanalystisrael-backup')
-	delete_all_objects('transitanalystisrael-backup')
+	print_objects(cfg.bucket_prefix+'backup')
+	delete_all_objects(cfg.bucket_prefix+'backup')
 
 	#
 	# copy content of past to backup
 	#
-	print_objects('transitanalystisrael-past')
-	copy_bucket('transitanalystisrael-past', 'transitanalystisrael-backup')
-	print_objects('transitanalystisrael-backup')
+	print_objects(cfg.bucket_prefix+'past')
+	copy_bucket(cfg.bucket_prefix+'past', cfg.bucket_prefix+'backup')
+	print_objects(cfg.bucket_prefix+'backup')
 
 	#
 	# erase content of past
 	#
-	print_objects('transitanalystisrael-past')
-	delete_all_objects('transitanalystisrael-past')
+	print_objects(cfg.bucket_prefix+'past')
+	delete_all_objects(cfg.bucket_prefix+'past')
 
 	#
 	# copy content of current to past
 	#
-	print_objects('transitanalystisrael-current')
-	copy_bucket('transitanalystisrael-current', 'transitanalystisrael-past')
-	print_objects('transitanalystisrael-past')
+	print_objects(cfg.bucket_prefix+'current')
+	copy_bucket(cfg.bucket_prefix+'current', cfg.bucket_prefix+'past')
+	print_objects(cfg.bucket_prefix+'past')
 
 	#
 	# erase content of current
 	#
-	print_objects('transitanalystisrael-current')
-	delete_all_objects('transitanalystisrael-current')
+	print_objects(cfg.bucket_prefix+'current')
+	delete_all_objects(cfg.bucket_prefix+'current')
 
 	#
 	# copy content of local to current
 	#
-	#upload_localdir_w_gzip_to_bucket(for_testing_upload_localdir, 'transitanalystisrael-current') # for testing
-	upload_localdir_w_gzip_to_bucket(current_localdir, 'transitanalystisrael-current')
-	print_objects('transitanalystisrael-current')
+	#upload_localdir_w_gzip_to_bucket(for_testing_upload_localdir, cfg.bucket_prefix+'current') # for testing
+	upload_localdir_w_gzip_to_bucket(current_localdir, cfg.bucket_prefix+'current')
+	print_objects(cfg.bucket_prefix+'current')
 
 	print('------------------------------------------------------------')
 	# Call S3 to list current buckets
@@ -191,7 +191,7 @@ if cfg.get_service_date == 'auto' :
 	#download
 	config_file_full_path = temp_localdir / 'transitanalystisrael_config.js'
 	config_file_full_path = config_file_full_path.as_posix()
-	s3.Bucket('transitanalystisrael-past').download_file('docs/transitanalystisrael_config.js', config_file_full_path)
+	s3.Bucket(cfg.bucket_prefix+'past').download_file('docs/transitanalystisrael_config.js', config_file_full_path)
 	#edit
 	jsfile = 'transitanalystisrael_config.js'
 	tempjsfile = 'temp_config.js'
@@ -224,7 +224,7 @@ if cfg.get_service_date == 'auto' :
 	os.remove(out_dir / tempjsfile)
 	#upload
 	with open(out_dir / jsfile, 'rb') as data:
-		s3.Bucket('transitanalystisrael-past').put_object(Key='docs/transitanalystisrael_config.js', Body=data, ContentType='application/javascript')
+		s3.Bucket(cfg.bucket_prefix+'past').put_object(Key='docs/transitanalystisrael_config.js', Body=data, ContentType='application/javascript')
 		print('uploaded : ', out_dir / jsfile)
 #---------------------------------------------------------------------------------------
 else : # cfg.get_service_date == 'on_demand'
@@ -250,7 +250,7 @@ else : # cfg.get_service_date == 'on_demand'
 	#
 	# Create an Amazon S3 Bucket - needed for on demand. for auto - buckets are pre-created
 	#
-	on_demand_bucket = 'transitanalystisrael-'+cfg.gtfsdate
+	on_demand_bucket = cfg.bucket_prefix+cfg.gtfsdate
 	s3.create_bucket(Bucket=on_demand_bucket, CreateBucketConfiguration={'LocationConstraint': 'eu-central-1'})
 	
 	# Create the configuration for the website
@@ -277,7 +277,7 @@ else : # cfg.get_service_date == 'on_demand'
 	#
 	# copy content of local to on_demand bucket
 	#
-	#upload_localdir_w_gzip_to_bucket(for_testing_upload_localdir, 'transitanalystisrael-current') # for testing
+	#upload_localdir_w_gzip_to_bucket(for_testing_upload_localdir, cfg.bucket_prefix+'current') # for testing
 	upload_localdir_w_gzip_to_bucket(on_demand_localdir, on_demand_bucket)
 	print_objects(on_demand_bucket)
 

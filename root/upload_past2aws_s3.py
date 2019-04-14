@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# upload current to AWS S3 cloud
+# upload past to AWS S3 cloud
 #
 import transitanalystisrael_config as cfg
 import shutil
@@ -112,12 +112,12 @@ def upload_localdir_w_gzip_to_bucket(localdir_from, bucket_to_name):
 
 #-------------------------------------------------------------------------
 
-print('********** upload current to AWS S3 cloud *************')
-current_localdir = cwd.parent / cfg.websitelocalcurrentpath
-print('current_localdir : ',current_localdir)
+print('********** upload past to AWS S3 cloud *************')
+past_localdir = cwd.parent / cfg.websitelocalpastpath
+print('past_localdir : ',past_localdir)
 
-os.chdir(current_localdir)
-print(os.listdir(current_localdir))
+os.chdir(past_localdir)
+print(os.listdir(past_localdir))
 
 # Create an S3 resource
 s3 = boto3.resource('s3')
@@ -131,20 +131,20 @@ for bucket in s3.buckets.all():
 #
 # Create an Amazon S3 Bucket - not needed - buckets are pre-created
 #
-#s3.create_bucket(Bucket=cfg.bucket_prefix+'current', CreateBucketConfiguration={'LocationConstraint': 'eu-central-1'})
+#s3.create_bucket(Bucket=cfg.bucket_prefix+'past', CreateBucketConfiguration={'LocationConstraint': 'eu-central-1'})
 
 #
-# erase content of current
+# erase content of past
 #
-print_objects(cfg.bucket_prefix+'current')
-delete_all_objects(cfg.bucket_prefix+'current')
+print_objects(cfg.bucket_prefix+'past')
+delete_all_objects(cfg.bucket_prefix+'past')
 
 #
-# copy content of local to current
+# copy content of local to past
 #
-#upload_localdir_w_gzip_to_bucket(for_testing_upload_localdir, cfg.bucket_prefix+'current') # for testing
-upload_localdir_w_gzip_to_bucket(current_localdir, cfg.bucket_prefix+'current')
-print_objects(cfg.bucket_prefix+'current')
+#upload_localdir_w_gzip_to_bucket(for_testing_upload_localdir, cfg.bucket_prefix+'past') # for testing
+upload_localdir_w_gzip_to_bucket(past_localdir, cfg.bucket_prefix+'past')
+print_objects(cfg.bucket_prefix+'past')
 
 print('------------------------------------------------------------')
 # Call S3 to list current buckets
