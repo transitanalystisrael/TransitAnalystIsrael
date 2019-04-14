@@ -1,0 +1,152 @@
+(Note: if possible, you can replicate the existing Transit Analyst EC2 which will give you the same machine with all needed software installed. You will need to perform steps: 2,3, 4, 7-12)
+
+1. Launch EC2 instance:
+=======================
+(We originally used this article as a basis for this setup: https://www.ybrikman.com/writing/2015/11/11/running-docker-aws-ground-up/)
+a. Access the EC2 console: https://console.aws.amazon.com/console/home?nc2=h_ct&src=header-signin
+b. Click "Launch Instance" 
+c. Select "Ubuntu Server 18.04 LTS (HVM), SSD Volume Type" from the list (should be the 5th) or a newer version of ubuntu.
+d. Instance Type: Select t3.large instance with 2 vCPUs and 8GB RAM.
+e. Instance Details: leaeve as is and click "next"
+f. Add Storage: Enter 30GB
+g. add Tags: leaeve as is and click "next"
+h. Select a security group that has ports 9191 and 20 open. If doesn't exist, create a new one with the following rules:
+			 Type            Protocol  Port Range   Source    
+		i)   HTTP            TCP        80       0.0.0.0/0
+		ii)  HTTP            TCP        80       ::/0
+		iii) Custom TCP Rule TCP        9191     0.0.0.0/0
+		iv)  SSH             TCP        22       0.0.0.0/0
+
+i. Launch - save the key in accessible location (best to store it in a private S3 bucket)
+j. In the EC2 console give the EC2 a name, e.g. "Transit Analyst machine"
+k. Wait until the Instance State is "running"
+
+2. Assign an Elastic IP (static IP)
+===================================
+Each time EC2 is re-started it is assigned with new Public IP. We will assign it a static IP called Elastic IP. As long as the instance is up and running, the use of the elastic IP isn't charged.
+
+a. Access the Elastic IP page via the EC2 console (under NETWORK & SECURITY)
+b. Click "Allocate New Address" -> VPC -> Confirm
+c. Right-click on the new address -> Associate Address -> select the newly created instance -> Select the sggested private IP -> allow re-association -> Click "Associate"
+
+3. not used
+===================
+
+4. Acces via Putty for terminal operations
+==========================================
+a. Get Putty for Windows from: https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+
+b. Follow the steps here to generate a .ppk file that will allow you to connect to the EC2 instance using putty: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html
+
+c. The user-name should be part of the host name field, for AWS EC2 Ubuntu Server the nuser-name is "ubuntu" - "<user-name>@<IPaddress>" e.g. "ubuntu@18.185.174.211" where the IP is the public IP (elastic IP we assigned earlier) of the EC2 which can be obtained from the AWS EC2 console.
+
+5. Change the time zone of the EC2 to be Israel Time
+====================================================
+a. Using the putty session, type:
+$ sudo dpkg-reconfigure tzdata
+b. Follow the instructions -> select Asia -> Jerusalem -> Confirm
+
+6. Install required Software and get code - Whenever prompted to accept installations, accept:
+==========================================
+a. Git is already installed.
+b. Install Docker for Ubuntu 18-04 (taken from: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04 ):
+$ sudo apt install apt-transport-https ca-certificates curl software-properties-common
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+$ sudo apt update
+$ apt-cache policy docker-ce
+$ sudo apt install docker-ce
+
+To verify installation:
+$ sudo systemctl status docker
+
+Add priviliges for easy terminal work:
+$ sudo usermod -aG docker ${USER} 
+
+c. Install docker-compose (taken from https://docs.docker.com/compose/install/ - linux tab):
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose 
+$ sudo chmod +x /usr/local/bin/docker-compose
+
+d. Configure the dokcer logs for rotation so they don't blow up:
+$ cd /etc/docker
+$ sudo touch daemon.json
+$ sudo vim daemon.json
+	Go into edit mode by pressing I and add to the end of the file the following: 
+{
+	"log-driver": "json-file",
+	"log-opts": {"max-size": "10m", "max-file": "3"}
+}
+	
+	Quit by pressing Esc -> type :wq > press Enter
+
+	Initialize the docker with the command:
+$ sudo systemctl reload docker
+
+e. not needed
+
+f. not needed
+
+g. git Clone Navitia docker project (adjusted to our needs)(IMPORTANT to clone to the user root folder "~" !!!!!!!!!!!!!!):
+$ cd ~ 
+$ git clone https://github.com/transitanalystisrael/navitia-docker-compose
+
+7. Configure AWS Gateway API service to serve Secure content
+============================================================
+If you haven't just cloned the repositories (skipped step 6), make sure you have the latest code of the projects:
+a. using putty go to each project directory and perform git pull:
+$ cd ~/navitia-docker-compose/
+$ git pull
+
+Navitia server on the instance serves HTTP only content via port 9191. Brwosers such as Chrome block this kind of data so we need to use AWS for serving secure content.
+
+There are 2 options to that:
+7.1 - Importing existing API configruation from Transit Analyst Production environment
+7.2 - Configuring it manully through the console.
+
+7.1 - Cloning existing API configruation from Transit Analyst Production environment
+======================================================================================
+a. Access the AWS API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
+b. Click "Create API"
+c. Select "Rest" -> "clone from exiting API" -> Select "Clone from Time Map" -> provide name -> Click "Clone API"
+h. Click "Actions" -> "Deploy API" -> "New stage" -> provide any stage name (e.g. production) -> "Deploy".
+i. On the created stage page (if needed "Stages" -> Your staging) -> "Stage Varaibles" -> click "add Stage Varaible" ->
+Enter Name: "NavitiaServerIP" and Value: <elastic IP (or public IP if no elastic) of the Navitia server EC2>
+
+	
+7.2 - Configuring it manully through the console
+================================================
+a. Access the AWS API Console: https://eu-central-1.console.aws.amazon.com/apigateway/
+b. Click "Create API"
+	Select "Rest" -> "new API" -> provide name -> Click "Create API"	
+c. Click "Actions" -> "Create Method" -> Select "Get"
+	Integration Type: HTTP
+	HTTP Method: Get
+	Endpoint URL: http://${stageVariables.NavitiaServerIP}:9191/v1/coverage/default 	
+	content Handling: Passthrough
+	Click "Save"
+d. Click "Actions" -> "Create Resource" so you can pass the parameters (https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html):
+	Check the "proxy resource" checkbox and the details will be filled automatically (Name: proxy ; Path: /{proxy+}
+	Check the "Enable API Gateway CORS" checkbox so if the request comes from another domain (and it will) the server will allow it
+	Click "Create"
+e. Click on "/{proxy}" -> Under "Any" click "Set up now"
+   Select "HTTP Proxy"
+   Endpoint URL: http://${stageVariables.NavitiaServerIP}:9191/v1/coverage/{proxy}
+   content Handling: Passthrough
+   Click "Save"
+f. Enable Gzip servering - this will compress all responses from AWS and save data trasnfer costs (browsers know to deal with this automatically):
+	Go to settings under the API name in the left pane -> check the "Content Encoding enabled" checkbox -> Enter 100000 Bytes for "Minimum body size required for compression"
+	Save Changes
+g. Deploy the API
+	Click on the API name on the left pane
+	Click "Actions" -> "Deploy API" -> create new Staging named "Navitia-Time-Map" -> Deploy
+	Click "Stages" -> Select the newly created staging -> Go to Stage Varaiables -> Create new varaible "NavitiaServerIP" with the elastic IP of the EC2 instance -> Click the V icon
+
+8. not needed
+
+9. not needed
+
+10. not needed
+
+11. not needed
+
+12. To start Transit analyst on AWS for the first time, go to "Instructions to clone current and past and on-demand from local pc to AWS production"

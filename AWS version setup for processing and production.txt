@@ -6,7 +6,7 @@
 a. Access the EC2 console: https://console.aws.amazon.com/console/home?nc2=h_ct&src=header-signin
 b. Click "Launch Instance" 
 c. Select "Ubuntu Server 18.04 LTS (HVM), SSD Volume Type" from the list (should be the 5th) or a newer version of ubuntu.
-d. Instance Type: Select t3.large instance with 2 vCPUs and 8GB RAM.
+d. Instance Type: Select t3.xlarge instance with 4 vCPUs and 16GB RAM.
 e. Instance Details: leaeve as is and click "next"
 f. Add Storage: Enter 30GB
 g. add Tags: leaeve as is and click "next"
@@ -106,11 +106,11 @@ $ sudo apt install python3-pip
 $ sudo apt-get install python3-gdal
 $ pip3 install docker logger shapely geopy progressbar2 requests argparse httplib2 oauth2client boto3 google-api-python-client google-auth google-auth-httplib2 apiclient pytz
 
-d. git Clone Navitia docker project (adjusted to our needs)(IMPORTANT to clone to the user root folder "~" !!!!!!!!!!!!!!):
+g. git Clone Navitia docker project (adjusted to our needs)(IMPORTANT to clone to the user root folder "~" !!!!!!!!!!!!!!):
 $ cd ~ 
 $ git clone https://github.com/transitanalystisrael/navitia-docker-compose
 
-e. git Clone Transit Analyst Israel project: 
+h. git Clone Transit Analyst Israel project: 
 $ git clone https://github.com/transitanalystisarel/TransitAnalystIsrael/
 
 7. Configure AWS Gateway API service to serve Secure content
