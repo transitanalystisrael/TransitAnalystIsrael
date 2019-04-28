@@ -276,14 +276,11 @@ d. In the "Set Permissions" screen uncheck the following options:
 11.2 Updating Transit Analyst Israel with the new buckets:
 ==========================================================
 a. Using putty connect to the EC2
-b. Go to the Upload to S3 code and change the names of the buckets:
+b. Type rhe following command:
 	$ cd ~/TransitAnalystIsrael/root/
-	$ vim upload2aws_s3.py 
-	Type the following commands one by one with your bucket names replacing <some-prefix>-current, <some-prefix>-past and <some-prefix>-backup (DO NOT COPY-PASTE):
-: 
-:%s/transitanalystisrael-current/<some-prefix>-current/g
-:%s/transitanalystisrael-past/<some-prefix>-past/g 
-:%s/transitanalystisrael-backup/<some-prefix>-backup/g
-:wq
+	- Press I to go into edit mode
+	- Using the down arrow button, scroll all the way down until you see: bucket_prefix
+	- Change the value of bucket_prefix to <some-prefix>
+	- Press Esc -> type :wq -> press Enter
 
 12. To start Transit analyst on AWS for the first time, go to "Instructions for Monthly auto update on AWS".txt or "Instructions for On demand date on AWS".txt"
