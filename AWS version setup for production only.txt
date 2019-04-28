@@ -29,20 +29,8 @@ a. Access the Elastic IP page via the EC2 console (under NETWORK & SECURITY)
 b. Click "Allocate New Address" -> VPC -> Confirm
 c. Right-click on the new address -> Associate Address -> select the newly created instance -> Select the sggested private IP -> allow re-association -> Click "Associate"
 
-3. Assign IAM roles
+3. not used
 ===================
-The EC2 will upload items to your S3 buckets, take keys from the S3 bucket and also modify the AWS Lambda function that triggers the monthly update.
-In order to do that, we grant him permissions using proper IAM roles.
-a. Access the IAM roles page through the AWS console: https://console.aws.amazon.com/iam/
-b. Go to Roles -> "Create Role"
-c. Select "EC2" for the type of trusted entity -> "Next: Permissions"
-d. Assign the following permissions to allow access to all your S3 buckets and CloudWatch:
-   - AmazonS3FullAccess
-   - CloudWatchFullAccess
-   - AdministratorAccess
-
-e. Click "Next" until you can assign the role a proper name (e.g. "navitia_ec2_to_s3_cloudwatch") -> "Create Role"
-f. Go to the EC2 Instances page -> right click the EC2 instance -> "Attach/Replace IAM Role" -> select the newly created role -> click "Apply"
 
 4. Acces via Putty for terminal operations
 ==========================================
@@ -60,7 +48,7 @@ b. Follow the instructions -> select Asia -> Jerusalem -> Confirm
 
 6. Install required Software and get code - Whenever prompted to accept installations, accept:
 ==========================================
-a. Git and Python3.6 is already installed.
+a. Git is already installed.
 b. Install Docker for Ubuntu 18-04 (taken from: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04 ):
 $ sudo apt install apt-transport-https ca-certificates curl software-properties-common
 $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -94,32 +82,19 @@ $ sudo vim daemon.json
 	Initialize the docker with the command:
 $ sudo systemctl reload docker
 
-e. Install GDAL for gdal command line operations (Accept all questions you're prompted with):
-$ sudo apt-get install libgdal-dev
-$ sudo apt install gdal-bin
+e. not needed
 
-f. Update python and install needed libraries  (Accept all questions you're prompted with): 
-$ sudo apt-get install python3.6-dev
-$ sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
-$ sudo apt-get update
-$ sudo apt install python3-pip
-$ sudo apt-get install python3-gdal
-$ pip3 install docker logger shapely geopy progressbar2 requests argparse httplib2 oauth2client boto3 google-api-python-client google-auth google-auth-httplib2 apiclient pytz
+f. not needed
 
-d. git Clone Navitia docker project (adjusted to our needs)(IMPORTANT to clone to the user root folder "~" !!!!!!!!!!!!!!):
+g. git Clone Navitia docker project (adjusted to our needs)(IMPORTANT to clone to the user root folder "~" !!!!!!!!!!!!!!):
 $ cd ~ 
 $ git clone https://github.com/transitanalystisrael/navitia-docker-compose
 
-e. git Clone Transit Analyst Israel project: 
-$ git clone https://github.com/transitanalystisarel/TransitAnalystIsrael/
-
 7. Configure AWS Gateway API service to serve Secure content
 ============================================================
-If you haven't just cloned the repositories (skipped step 6), make sure you have the latest code of both projects:
+If you haven't just cloned the repositories (skipped step 6), make sure you have the latest code of the projects:
 a. using putty go to each project directory and perform git pull:
 $ cd ~/navitia-docker-compose/
-$ git pull
-$ cd ~/TransitAnalystIsrael/
 $ git pull
 
 Navitia server on the instance serves HTTP only content via port 9191. Brwosers such as Chrome block this kind of data so we need to use AWS for serving secure content.
@@ -166,77 +141,12 @@ g. Deploy the API
 	Click "Actions" -> "Deploy API" -> create new Staging named "Navitia-Time-Map" -> Deploy
 	Click "Stages" -> Select the newly created staging -> Go to Stage Varaiables -> Create new varaible "NavitiaServerIP" with the elastic IP of the EC2 instance -> Click the V icon
 
-8. Provide the Navitia server on the EC2 with the API gateway for integration on the client side (HTML & JS)
-============================================================================================================
-a. Copy the Invoke URL from the "Stage" page in the AWS API Gateway console.
-b. Using putty connect to the EC2
-c. Go to the Transit Analyst config file and open for edit:
-$ cd TransitAnalystIsrael/root/
-$ vim transitanalystisrael_config.py
+8. not needed
 
-d. Change the URL:
-- Press I to go into edit mode
-- Using the down arrow button, scroll all the way down until you see: time_map_server_aws_url
-- Change the value of time_map_server_aws_url to the value of the Invoke URL mentioned above (it should look the same as existing apart from the part after the http://)
-- Press Esc -> type :wq -> press Enter
+9. not needed
 
-9. Configure the Lambda Function that triggets the monthly update (only used in monthly auto update, not needed (will not be used) for on-demand date.
-======================================================================================================================================================
-9.1 First, we need to create a proper IAM role that will allow the Lambda function to access the EC2 and perform actions:
--------------------------------------------------------------------------------------------------------------------------
-a. Access the IAM Role console: https://console.aws.amazon.com/iam/home#/roles
-b. Click "Create Role" -> Select "Aws Service" -> Select "Lambda" -> Click "Next: Permissions"
-c. Assign the following policieis:
-	- AmazonEC2FullAccess
-	- AmazonS3FullAccess
-	- AdministratorAccess
-	- CloudWatchLogsFullAccess
-	- AmazonVPCFullAccess
-	- AWSLambdaVPCAccessExecutionRole
-	- CloudWatchFullAccess
-	
-d. Click "Next" until you can assign the role a proper name (e.g. "Transit-Analyst-Updater") -> "Create Role"
-	
-9.2 Create and configure the lambda function:
----------------------------------------------
-a. Access the Lambda Function console: https://eu-central-1.console.aws.amazon.com/lambda/
-b. Click "Create Function"
-c. "Author from Scratch" -> Function name: "Transit Analyst Update" -> Runtime: Python 3.6 -> click "Choose or create an existing role" -> 
-   "Use an existing role" -> select the role you've just created -> Click "Create Function"
-d. Configure the trigger that will cause the lambda to be executed every month:
-d1. On the "Add Triggers" pane select "CloudWatch Events" -> click on the created "CloudWatch Events" box ("Configuration needed") -> Scroll down to the newly added box titled "Configure Triggers"
-d2. Click "Create new Rule" -> Provide name "GTFS-Monthly-Timer" -> Rule Type: schedule expression 
-     NOTE!!!: the name must be "GTFS-Monthly-Timer" because this is the name expected in Transit Analyst Code (/root -> set_next_month_invocation.py). you can change it, but then you have to change the code as well.
-d3. For the expression type: "cron(30 22 01 01 ? 2030)". 
-	This includes a day, month and year that will be replaced when you first run Monthly Auto on AWS.
-	When Transit Analyst monthly update runs it assignes the next update date to this rule by itself (using the IAM role we created for the EC2 earlier).
-d4. Click "Add"
+10. not needed
 
-e. Upload the required code to be executed in the EC2 when the function is triggered:
-e1. Scroll up and click on <Function name> box
-e2. Scroll down to "Fucntion Code" -> Code entry type: "upload a .zip file". -> Runtime "Python 3.6"  -> Handler: "function.worker_handler"
-e3. Click upload and upload the python package found in TransitAnalystIsrael\AWS Lambda function\Monthly-GTFS-Update-package.zip (it's part of the source code, and can also be downloaded directly from github)
-
-f. Scroll to "Basic Settings" and change the memory requirements to 512MB
-e. Configure network - scroll to Network pane
-e1. Select the default VPC suggested by the console -> Select all subnets possible -> For Security group select the one you previously created when starting the EC2 setup: "ssh-and-http-from-anywhere".
-
-f. Scroll up and click "Save". The process might take 2-3 minutes while the 12.5 zip file is being uploaded.
-
-10. DO NOT CLICK TEST - If you click on test, this will trigger an update. If you wish to test that the lambda function is ready do as follows:
-===============================================================================================================================================
-a. Using putty access the EC2
-b. Using the following commands, modify transitanalysisrael_v1.py to generate an error that will be reflected in the Lambda console:
-$ cd TransitAnalystIsrael/root/
-$ vim transitanalysisrael_v1
-Press Insert -> Just under the "try:" at the top of the file type "asddasdad" -> Press Esc -> type :wq -> press Enter
-
-c. Go to the Lambda console and click Test.
-d. After 10-20 seconds the execution should be finished with the console painted in green to show that the execution succeeded. 
-e. Look at the logs displayed on the console and you sohuld see that the python file was executed, but generated an error such as:
-   "transitanalystisrael_v1.py", line 16, in <module>\n', '    asddasdad\n', "NameError: name 'asddasdad' is not defined\n"]
-f. go back to the putty window, and type the following command to restore transitanalysisrael_v1.py to its previous state:
-$ git checkout transitanalysisrael_v1.py
 
 11. Create S3 buckets to host the web files for monthly auto update:
 ======================================================================
@@ -273,14 +183,15 @@ d. In the "Set Permissions" screen uncheck the following options:
 	Click "Save"
  g. Repeat steps b-f for a bucket called <some-prefix>-past and <some-prefix>-backup (during the creation there's an option to copy settings from existing bucket)
 
-11.2 Updating Transit Analyst Israel with the new buckets:
-==========================================================
-a. Using putty connect to the EC2
-b. Type rhe following command:
-	$ cd ~/TransitAnalystIsrael/root/
-	- Press I to go into edit mode
-	- Using the down arrow button, scroll all the way down until you see: bucket_prefix
-	- Change the value of bucket_prefix to <some-prefix>
-	- Press Esc -> type :wq -> press Enter
+12. Updating Transit Analyst Israel files on the local PC files that will be used for processing:
+=================================================================================================
+a. Go to TransitAnalystIsrael/root/
+b. Open transitisrael_config.py
+c. Updating the new bucket names: change  "bucket_prefix" parameter with <some-prefix> if needed.
+d. The static HTML files that will be uplaoded to S3 should be aware of the correct API Getway UTL of the EC2 machine.
+   d.1. Go to https://eu-central-1.console.aws.amazon.com/apigateway/
+   d.2. Click on the API Gateway you defined earlier -> Click "Stages" -> Click on the staging name -> Copy the invoke URL
+e. In the transitisrael_config.py file, change "time_map_server_aws_url" if needed. 
+f. Save and exit.
 
-12. To start Transit analyst on AWS for the first time, go to "Instructions for Monthly auto update on AWS".txt or "Instructions for On demand date on AWS".txt"
+12. To start Transit analyst on AWS for the first time, go to "Instructions to clone current and past and on-demand from local pc to AWS production"

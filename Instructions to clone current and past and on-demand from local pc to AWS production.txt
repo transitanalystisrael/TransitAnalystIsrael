@@ -1,0 +1,138 @@
+Instructions for "AWS Production EC2 and S3 cloned from local PC (no processing)"
+================================================================================
+
+This manual is intended for transferring the outputs of the update process on a local PC to cloud-based services AWS EC2 and S3.
+It is assumed that the following guides where completed:
+a. "AWS version setup for production only.txt" (or "AWS version setup for processing and production.txt")
+b. "Local version setup for processing and production.txt"
+c. "Instructions for Monthly auto update on local pc.txt" or 
+   "Instructions for On demand date on local pc no TTM.txt" or
+   "Instructions for On demand date on local pc.txt"
+   
+1. Upload the HTML and static data files to S3
+==============================================
+
+1.1 - Monthly update files
+1.2 - On-demand files
+
+1.1 - Monthly update files
+--------------------------
+
+You should have 3 buckets available to host on the S3 service:
+<some-prefix>-current, e.g. transitanalystisrael-current
+<some-prefix>-past, e.g. transitanalystisrael-past
+<some-prefix>-backup, e.g. transitanalystisrael-backup
+
+a. Updating or Valdiating Transit Analyst Israel files are up-to-date with the bucket names:
+   - Open TransitAnalystIsrael/root bucket_prefix transitisrael_config.py
+   - Update the "bucket_prefix" parameter with <some-prefix> if needed.
+
+
+b. Updating or Valdiating Transit Analyst Israel files are up-to-date with the EC2 API Gateway URL
+The static HTML files should have the correct API Getway URL that points to the AWS EC2 before uplaoded to the S3.
+a. Go to https://eu-central-1.console.aws.amazon.com/apigateway/
+b.1. Click on the API Gateway you defined earlier -> Click "Stages" -> Click on the staging name -> Copy the invoke URL
+b.2. Make sure that that parameter time_map_server_aws_url value is the same as the copied invoke URL in the following location on your local PC:
+	 - TransitAnalystIsrael/root/transitisrael_config.py
+	 - TransitAnalystIsrael/website_current/transitisrael_config.js
+	 - TransitAnalystIsrael/website_past/transitisrael_config.js
+
+c. Performing the upload
+Now you will upload the curent website files to S3. The website_current files on S3 will be copied to website_past and website_past files will be copied to website_backup.
+c.1. Go to TransitAnalystIsrael/root and run upload2aws_s3.py
+c.2. Once finished, the current period files shoule be available https://s3.console.aws.amazon.com/s3/buckets/<<some-prefix>-current>/
+                  the past period files shoule be available https://s3.console.aws.amazon.com/s3/buckets/<<some-prefix>-past>/
+
+
+1.2 - On-demand files
+---------------------
+A bucket will be created to host the files on the S3 service with a unique name as appears in the config file.
+a.  Open TransitAnalystIsrael/root bucket_prefix transitisrael_config.py
+	The name is the combination of the following parameters
+	bucket_prefix+gtfsdate e.g. transitanalystisrael_040319
+
+b. Performing the upload
+b.1. Go to TransitAnalystIsrael/root and run upload_ondemand2aws_s3.py
+b.2. Once finished, the files should be available at https://s3.console.aws.amazon.com/s3/buckets/<bucket_prefix+gtfsdate>/
+
+
+2. Upload generated Navitia graph to AWS EC2
+============================================
+a. Make sure that one of the Navitia docker containers is running by performing step 4 in "Instructions for On demand date on local pc.txt"
+1.1 - Monthly update graph
+--------------------------
+a. Transfer the generted Navitia graph from the docker containe to your local pc:
+a.1. Open Windows power shell and run the following command to copy the graph to <some-dest-folder> on your local machine e.g. "C:\":
+$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/default.nav.lz4 <some-dest-folder>
+a.2. Copying the graph to your AWS EC2 machine:
+	In order to copy the file from your machine to the EC2, you need the .pem key that allows you to access the EC2 (you got the .pem key when you created the EC2 instance - probably in the s3 key bucket). 
+	a. Place both the graph and the key in the same folder.
+	b. Right-click in the widnows explorer -> Open "Git Bash" here
+	c. The copy command requries the following infromation:
+	   i. the name of the .pem file <pem-file>.pem, e.g. key.pem
+	   ii. name of the grpah file: default.nav.lz4
+	   iii. user name that you use to connect to the EC2 with putty <user-name>, e.g. ubuntu
+	   iv. public DNS of the EC2 instace that can be found at the AWS EC2 console (http://console.aws.amazon.com/ec2) -> in the EC2 instances list -> column "Public DNS (IPv4)"), <public-dns>, e.g. ec2-3-122-15-201.eu-central-1.compute.amazonaws.com
+	d. Type the command: "scp -i <pem-file>.pem default.nav.lz4 <user-name>@<public-dns>:/home/ubuntu/" e.g.
+$ scp -i key.pem default.nav.lz4 ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/
+
+a.3. Delete the default.nav.lz4 file from your local PC to save storage (it's still avialible inside the docker container)
+
+b. Copy the graph into the docker container on the EC2 machine:
+b.1. Using putty, connect to the EC2 machine and performthe following commands to move the current graph to be the past graph.     
+	 - connect to the docker worker container:
+$ docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
+	 - Change directory to the graphs folder:
+root@9bb282f314b6:/usr/src/app# cd /srv/ed/output
+	 - Copy the graph:
+root@9bb282f314b6:/srv/ed/output# cp  default.nav.lz4 secondary-cov.nav.lz4
+	-  Exit the internal docker terminal:
+root@9bb282f314b6:/srv/ed/output#  exit
+
+b.2. Copy the new current graph into the docker container:
+$ docker cp default.nav.lz4 navitia-docker-compose_tyr_worker_1:/srv/ed/output/
+
+c. Stop and Re-start Navitia servers:	
+	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g.:
+$ cd ~/navitia-docker-compose
+	b. Stop the running navitia dockers:
+$ docker stop $(docker ps -a -q)
+	d. Once done - run Navitia server with the secondary-cov: 
+$ sudo docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up  --remove-orphans
+
+
+Once docker is up, you can close the putty terminal and navigiate to the website_current index.html file on the S3 to validate that everything works.
+
+1.2 - On-demand graph
+---------------------
+When the on-demand process is finished a graph is created named ondemand-YYYYMMDD.nav.lz4 is generted, e.g. ondeamnd-20190304.nav.lz4 whith will be given as example (where YYYYMMDD is the date you put for the gtfsdate). 
+a. Transfer the generted Navitia graph from the docker containe to your local pc:
+a.1. Open Windows power shell and run the following command to copy the graph to <some-dest-folder> on your local machine e.g. "C:\":
+$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/ondeamnd-20190304.nav.lz4 <some-dest-folder>
+a.2. Copying the graph to your AWS EC2 machine:
+	In order to copy the file from your machine to the EC2, you need the .pem key that allows you to access the EC2 (you got the .pem key when you created the EC2 instance - probably in the s3 key bucket). 
+	a. Place both the graph and the key in the same folder.
+	b. Right-click in the widnows explorer -> Open "Git Bash" here
+	c. The copy command requries the following infromation:
+	   i. the name of the .pem file <pem-file>.pem, e.g. key.pem
+	   ii. name of the grpah file: ondeamnd-20190304.nav.lz4
+	   iii. user name that you use to connect to the EC2 with putty <user-name>, e.g. ubuntu
+	   iv. public DNS of the EC2 instace that can be found at the AWS EC2 console (http://console.aws.amazon.com/ec2) -> in the EC2 instances list -> column "Public DNS (IPv4)"), <public-dns>, e.g. ec2-3-122-15-201.eu-central-1.compute.amazonaws.com
+	d. Type the command: "scp -i <pem-file>.pem ondeamnd-20190304.nav.lz4 <user-name>@<public-dns>:/home/ubuntu/" e.g.
+$ scp -i key.pem ondeamnd-20190304.nav.lz4 ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/
+
+a.3. Delete the ondeamnd-20190304.nav.lz4 file from your local PC to save storage (it's still avialible inside the docker container)
+
+b. Copy the new on-dmeand graph into the docker container:
+$ docker cp ondeamnd-20190304 navitia-docker-compose_tyr_worker_1:/srv/ed/output/
+
+c. Stop and Re-start Navitia servers:	
+	a. Go to the folder where you cloned the Navitia-docker-compose repo e.g.:
+$ cd ~/navitia-docker-compose
+	b. Stop the running navitia dockers:
+$ docker stop $(docker ps -a -q)
+	d. Once done - run Navitia server with the secondary-cov: 
+sudo docker-compose -f compose_files/docker-compose-ondemand-YYYYMMDD.yml -p navitia-docker-compose up --remove-orphans (where YYYYMMDD is the date you put for the gtfsdate)
+
+
+Once docker is up, you can close the putty terminal and navigiate to the ond-demand index.html file on the S3 to validate that everything works.
