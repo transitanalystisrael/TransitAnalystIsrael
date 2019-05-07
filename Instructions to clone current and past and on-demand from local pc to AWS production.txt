@@ -73,36 +73,42 @@ a. Make sure that one of the Navitia docker containers is running by performing 
 
 2.1 - Monthly update graph
 --------------------------
-a. Transfer the generted Navitia graph from the local docker container` to your local pc file system:
-a.1. Open Windows power shell and run the following command to copy the graph to <some-dest-folder> on your local machine e.g. "C:\":
+a. Transfer the generted Navitia graph and the secondary graph from the local docker container` to your local pc file system:
+a.1. Open Windows power shell and run the following command to copy the graphs to <some-dest-folder> on your local machine e.g. "C:\":
 $  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/default.nav.lz4 <some-dest-folder>
-a.2. Copying the graph to your AWS EC2 machine:
-	In order to copy the file from your machine to the EC2, you need the .pem key that allows you to access the EC2 (you got the .pem key when you created the EC2 instance - probably in the s3 key bucket). 
-	a. Place both the graph and the key in the same folder.
+$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/secondary-cov.nav.lz4 <some-dest-folder>
+a.2. Copying the graphs to your AWS EC2 machine:
+	In order to copy the files from your machine to the EC2, you need the .pem key that allows you to access the EC2 (you got the .pem key when you created the EC2 instance - probably in the s3 key bucket). 
+	a. Place both the graphs and the key in the same folder.
 	b. Right-click in the widnows explorer -> Open "Git Bash" here
 	c. The copy command requries the following information:
 	   i. the name of the .pem file <pem-file>.pem, e.g. key.pem
-	   ii. name of the grpah file: default.nav.lz4
+	   ii. name of the grpah file: default.nav.lz4 or secondary-cov.nav.lz4
 	   iii. user name that you use to connect to the EC2 with putty <user-name>, e.g. ubuntu
 	   iv. public DNS of the EC2 instace that can be found at the AWS EC2 console (http://console.aws.amazon.com/ec2) -> in the EC2 instances list -> column "Public DNS (IPv4)"), <public-dns>, e.g. ec2-3-122-15-201.eu-central-1.compute.amazonaws.com
 	d. Type the command: "scp -i <pem-file>.pem default.nav.lz4 <user-name>@<public-dns>:/home/ubuntu/" e.g.
 $ scp -i key.pem default.nav.lz4 ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/
+	e. Type the command: "scp -i <pem-file>.pem secondary-cov.nav.lz4 <user-name>@<public-dns>:/home/ubuntu/" e.g.
+$ scp -i key.pem secondary-cov.nav.lz4 ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/
 
-a.3. Delete the default.nav.lz4 file from your local PC to save storage (it's still avialible inside the docker container)
+a.3. Delete the default.nav.lz4 and secondary-cov.nav.lz4 file from your local PC to save storage (it's still avialible inside the docker container)
 
-b. Copy the graph into the docker container on the EC2 machine:
-b.1. Using putty, connect to the EC2 machine and perform the following commands to move the current graph to be the past graph.     
+b. Copy the graphs into the docker container on the EC2 machine:
+b.1. Using putty, connect to the EC2 machine and perform the following commands to delete the graphs from the docker 
 	 - connect to the docker worker container:
 $ docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
 	 - Change directory to the graphs folder:
 root@9bb282f314b6:/usr/src/app# cd /srv/ed/output
-	 - Rename the current graph to past graph:
-root@9bb282f314b6:/srv/ed/output# mv  default.nav.lz4 secondary-cov.nav.lz4
+	 - Delete the secondary-cov.nav.lz4 graph:
+$ rm secondary-cov.nav.lz4
+	 - Delete the default.nav.lz4 graph:
+$ rm default.nav.lz4
 	-  Exit the internal docker terminal:
 root@9bb282f314b6:/srv/ed/output#  exit
 
-b.2. Copy the new current graph into the docker container (continue using putty):
+b.2. Copy the new graphs into the docker container (continue using putty):
 $ docker cp default.nav.lz4 navitia-docker-compose_tyr_worker_1:/srv/ed/output/
+$ docker cp secondary-cov.nav.lz4 navitia-docker-compose_tyr_worker_1:/srv/ed/output/
 
 c. Stop and Re-start Navitia containers:	
 	a. Go to the folder where you cloned the navitia-docker-compose repo e.g.:
@@ -115,7 +121,7 @@ $ sudo docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navit
 
 Once docker is up, you can close the putty terminal and navigiate to the website_current index.html file on the S3 to validate that everything works.
 
-1.2 - On-demand graph
+2.2 - On-demand graph
 ---------------------
 When the on-demand process is finished a graph named ondemand-YYYYMMDD.nav.lz4 is generted, e.g. ondemand-20190304.nav.lz4 (where YYYYMMDD is the date you put for the gtfsdate). 
 a. Transfer the generted Navitia graph from the docker container to your local pc:
