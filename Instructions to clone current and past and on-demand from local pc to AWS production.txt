@@ -45,6 +45,43 @@ c.3. Once finished,
 		the current period files should be available at https://s3.console.aws.amazon.com/s3/buckets/<<some-prefix>-current>/
 		the past period files should be available at https://s3.console.aws.amazon.com/s3/buckets/<<some-prefix>-past>/
 
+d. Update and upload to S3 config files to make the TTM client look for the TTM server on EC2 and not on the local PC. We do this by changing the config to look like the product processed is on EC2 and S3.
+d.1. copy website_current\docs\transitanalystisrael_config.js to a temp folder e.g. C:\temp\current
+d.2. copy website_past\docs\transitanalystisrael_config.js to a temp folder e.g. C:\temp\past
+d.3. edit transitanalystisrael_config.js in both current and past temp folders. 
+		Replace the following 13 lines:
+// #Monthly auto update on AWS EC2 and S3
+// #get_service_date = 'auto'
+// #python_processing = 'aws_ec2'
+// #ttm_graph_processing = 'aws_ec2'
+// #web_client_hosted_on = 'aws_s3'
+// #ttm_server_on = 'aws_ec2'
+
+// #Monthly auto update on local pc
+var cfg_get_service_date = 'auto' ;
+var cfg_python_processing = 'local_pc' ;
+var cfg_ttm_graph_processing = 'local_pc' ;
+var cfg_web_client_hosted_on = 'local_pc' ;
+var cfg_ttm_server_on = 'local_pc' ;
+
+		With the following 13 lines:
+// #Monthly auto update on AWS EC2 and S3
+var cfg_get_service_date = 'auto' ;
+var cfg_python_processing = 'aws_ec2' ;
+var cfg_ttm_graph_processing = 'aws_ec2' ;
+var cfg_web_client_hosted_on = 'aws_s3' ;
+var cfg_ttm_server_on = 'aws_ec2' ;
+
+// #Monthly auto update on local pc
+// #get_service_date = 'auto'
+// #python_processing = 'local_pc'
+// #ttm_graph_processing = 'local_pc'
+// #web_client_hosted_on = 'local_pc'
+// #ttm_server_on = 'local_pc'
+
+d.4. use the AWS S3 console to upload the edited current file to the bucket transitanalystisrael-current/docs
+d.5. use the AWS S3 console to upload the edited past file to the bucket transitanalystisrael-past/docs
+
 
 1.2 - On-demand files
 ---------------------
@@ -66,6 +103,42 @@ c. Performing the upload
 c.1. Go to TransitAnalystIsrael/root and run upload_ondemand2aws_s3.py
 c.2. Once finished, the files should be available at https://s3.console.aws.amazon.com/s3/buckets/<bucket_prefix+gtfsdate>/
 
+d. Update and upload to S3 config files to make the TTM client look for the TTM server on EC2 and not on the local PC. We do this by changing the config to look like the product processed is on EC2 and S3.
+d.1. copy website_yyyymmdd\docs\transitanalystisrael_config.js to a temp folder e.g. C:\temp\yyyymmdd
+d.2. edit transitanalystisrael_config.js in the temp folder. 
+		Replace the following 6 lines:
+// #On demand date on AWS EC2 and S3
+// #get_service_date = 'on_demand'
+// #python_processing = 'aws_ec2'
+// #ttm_graph_processing = 'aws_ec2'
+// #web_client_hosted_on = 'aws_s3'
+// #ttm_server_on = 'aws_ec2'
+
+		With the following 6 lines:
+// #On demand date on AWS EC2 and S3
+var cfg_get_service_date = 'on_demand' ;
+var cfg_python_processing = 'aws_ec2' ;
+var cfg_ttm_graph_processing = 'aws_ec2' ;
+var cfg_web_client_hosted_on = 'aws_s3' ;
+var cfg_ttm_server_on = 'aws_ec2' ;
+
+		Replace the following 6 lines:
+// #On demand date on local pc
+var cfg_get_service_date = 'on_demand' ;
+var cfg_python_processing = 'local_pc' ;
+var cfg_ttm_graph_processing = 'local_pc' ;
+var cfg_web_client_hosted_on = 'local_pc' ;
+var cfg_ttm_server_on = 'local_pc' ;
+
+		With the following 6 lines:
+// #On demand date on local pc
+// #get_service_date = 'on_demand'
+// #python_processing = 'local_pc'
+// #ttm_graph_processing = 'local_pc'
+// #web_client_hosted_on = 'local_pc'
+// #ttm_server_on = 'local_pc'
+
+d.3. use the AWS S3 console to upload the edited config file to the bucket transitanalystisrael-yyymmdd/docs
 
 2. Upload generated Navitia graph to AWS EC2
 ============================================
