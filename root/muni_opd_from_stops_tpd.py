@@ -10,9 +10,8 @@
 #   pathin = 'C:\\transitanalyst\\processed\\'
 #   pathout = 'C:\\transitanalyst\\processed\\'
 #   txt file with average tpd per stop  - 'stopswtpdand10xforrail'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
-#   israel_city_boarders.geojson
-#   israel_town_boarders.geojson # moatzot mekomiyot
-#
+#   israel_city_boarders.geojson 
+#   israel_town_boarders.geojson # moatzot mekomiyot#
 # output:
 #   txt file with average opd per muni  - 'muni_opd'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
 #
@@ -40,22 +39,13 @@ def main(gtfsdate, processedpath, serviceweekstartdate):
 	stopsfilein = 'stopswtpdand10xforrail'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' # txt file with average tpd per stop and top location
 	cityfilein = 'israel_city_boarders.geojson'
 	townfilein = 'israel_town_boarders.geojson' # moatzot mekomiyot
+	#citybuffilein = 'israel_city_boarders_buf200.geojson'
+	#townbuffilein = 'israel_town_boarders_buf200.geojson' # moatzot mekomiyot
 
 	# output:
 	munifileout = stopsfilein.replace('stopswtpdand10xforrail', 'muni_opd') #  txt file with average opd per muni 
 	print('stopsfilein, munifileout : ', stopsfilein, munifileout)
 
-
-	'''
-
-	muniboarderfile = 'israel_muni_boarders_filtered_v3.txt'
-	muniboarderandtripcountfile = 'israel_muni_boarders_and_trip_count.txt'
-	munitransitfile = 'israel_muni_transit.txt'
-	munistopsfile = 'stopswtripcountand10xforrail.txt'
-	munikmlfile = 'israel_muni_boarders.kml'
-
-	kml = Kml()
-	'''
 	gtfspathin = pathin
 	gtfspathout = pathout
 
@@ -109,6 +99,7 @@ def main(gtfsdate, processedpath, serviceweekstartdate):
 	print('stops lines scanned ', count)
 	filein.close()
 
+
 	# >>> load city boarders 
 	with open(pathin / cityfilein) as cf:
 		city_geo = json.load(cf)
@@ -120,7 +111,19 @@ def main(gtfsdate, processedpath, serviceweekstartdate):
 		town_geo = json.load(tf)
 	print('loaded town geo, feature count: ', len(town_geo['features']))
 	#print town_geo
+	'''
+	# >>> load city boarders buffered
+	with open(pathin / citybuffilein) as cbf:
+		city_buf_geo = json.load(cbf)
+	print('loaded city buf geo, feature count: ', len(city_buf_geo['features']))
+	#print city_buf_geo
 
+	# >>> load town boarders buffered
+	with open(pathin / townbuffilein) as tbf:
+		town_buf_geo = json.load(tbf)
+	print('loaded town buf geo, feature count: ', len(town_buf_geo['features']))
+	#print town_buf_geo
+	'''
 	#
 	# process loaded files
 	#
@@ -138,6 +141,7 @@ def main(gtfsdate, processedpath, serviceweekstartdate):
 
 	# for each city 
 	for feature in city_geo['features']:
+	#for feature in city_buf_geo['features']:
 	# get muni boarders multipoly to use as filter
 		#print feature['properties']
 		muni_id = feature['properties']['muni_id']
@@ -172,6 +176,7 @@ def main(gtfsdate, processedpath, serviceweekstartdate):
 
 	# for each town 
 	for feature in town_geo['features']:
+	#for feature in town_buf_geo['features']:
 	# get muni boarders multipoly to use as filter
 		#print feature['properties']
 		muni_id = feature['properties']['muni_id']
