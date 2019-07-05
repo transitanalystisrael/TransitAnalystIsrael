@@ -59,6 +59,9 @@ The time map data is served by Navitia Dockers (see 4.3). The client is HTML + J
 	- vendor.a91f00ab8da7685898bc.js (the code changes every time)
 7d. Paste these files under C:\Dev\TransitAnalystIsrael\website_no_data. When you paste them, keep in mind that the bundle.XXXXXXX.js always changes, so remove the old one.
 7e. If you don't want to re-run TransitAnalystIsrael procesess all over again, assuming you only made changes to the Navitia-time-map frontend, you can paste the files and folders directly in C:\Dev\TransitAnalystIsrael\website_current
+7f. You can also upload to S3 using the AWS S3 console. Remember to gzip the js file/s bigger than the min size (as defined in the transitanalystisrael_config.py file - e.g. 500KB). 
+    To gzip from cmd term in dir of file do 'gzip -9 -k -f <filename>' - e.g. 'C:\git\TransitAnalystIsrael\website_current\transit_time_map>gzip -9 -k -f bundle.d6828eb0c09db3d9bdd7.js' 
+    And after upload, change the gziped file/s as follows: rename to remove '.gz' from end and change the metadata to the correct values (ContentEncoding='gzip', ContentType='text/javascript').
 
 4.3 Navitia-Docker-Compose development
 ======================================
