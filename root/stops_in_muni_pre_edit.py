@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Stops Near Trainstops Pre Edit
+# Stops In Muni Pre Edit
 import transitanalystisrael_config as cfg
 import process_date
 import stopsinmuni_v1
