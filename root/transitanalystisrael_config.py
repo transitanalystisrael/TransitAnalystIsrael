@@ -15,7 +15,7 @@
 #ttm_server_on = 'aws_ec2'
 
 #Monthly auto update on local pc
-get_service_date = 'auto'
+#get_service_date = 'auto'
 python_processing = 'local_pc'
 ttm_graph_processing = 'local_pc'
 web_client_hosted_on = 'local_pc'
@@ -36,7 +36,7 @@ ttm_server_on = 'local_pc'
 #ttm_server_on = 'none'
 
 #On demand date on local pc
-#get_service_date = 'on_demand'
+get_service_date = 'on_demand'
 #python_processing = 'local_pc'
 #ttm_graph_processing = 'local_pc'
 #web_client_hosted_on = 'local_pc'
@@ -81,6 +81,9 @@ freqtpdmin = '60'
 
 # lines_on_street config
 areatpdmin = '10'
+areapeakmin = '1'
+sstarttimepeak = '07:00:00'
+sstoptimepeak = '09:00:00'
 
 # muni_fairsharescore config
 
