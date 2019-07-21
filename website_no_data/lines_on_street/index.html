@@ -12,14 +12,14 @@
   gtag('config', 'UA-130620396-1');
 </script>
 
-	<title>תדירות יומית ברחוב נבחר</title>
+	<title>תדירות בשעת שיא ברחוב נבחר</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
 	<meta property="og:image" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/docs/images/tool7.jpg" />
 	<meta property="og:type" content= "website" />
-	<meta property="og:title" content= "מנתח תחבורה לישראל - תדירות יומית ברחוב נבחר" />
+	<meta property="og:title" content= "מנתח תחבורה לישראל - תדירות בשעת שיא ברחוב נבחר" />
 	<meta property="og:description" content= "Transit Analyst Israel" />
 	<meta property="og:url" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/lines_on_street/index.html"/>
 	<meta property="og:image:width" content="441" />
@@ -76,7 +76,7 @@
 	<button type="button" onclick="displayAbout()">About - אודות</button>
 	<button type="button" onclick="displayHome()">דף הבית</button>
 	<div class="main-button">
-		<button type="button" onclick="displaySelf()">תדירות יומית ברחוב נבחר</button>
+		<button type="button" onclick="displaySelf()">תדירות בשעת שיא ברחוב נבחר</button>
 	</div>
 </div>
 
@@ -140,7 +140,7 @@
 		"israel-south": "דרום ישראל"
 	}
 	info.update = function (props) {
-		this._div.innerHTML = '<h3>בחרו אזור בישראל להצגת<br>נתוני תדירות יומית ברחובות</h3>' +
+		this._div.innerHTML = '<h3>בחרו אזור בישראל להצגת<br>תדירות בשעת שיא ברחוב נבחר</h3>' +
 			(props ? 'לחצו להצגת נתונים של ' +
 			'<b>' + regions_in_Hebrew[props.region_name] + '</b>'
 			: 'השתמשו בעכבר להצגת פרטים על כל איזור');
@@ -197,19 +197,19 @@
 				switch(regionName) {
 					case 'israel-tel-aviv-metro':
 						console.log(regionName, 'israel-tel-aviv');
-						window.location.assign("route_freq_v3telavivmetro.html");
+						window.location.assign("route_freq_peak_v4telavivmetro.html");
 						break;
 					case 'israel-jerusalem':
 						console.log(regionName, 'israel-jerusalem');
-						window.location.assign("route_freq_v3jerusalem.html");
+						window.location.assign("route_freq_peak_v4jerusalem.html");
 						break;
 					case 'israel-north':
 						console.log(regionName, 'israel-north');
-						window.location.assign("route_freq_v3north.html");
+						window.location.assign("route_freq_peak_v4north.html");
 						break;
 					case 'israel-south':
 						console.log(regionName, 'israel-south');
-						window.location.assign("route_freq_v3south.html");
+						window.location.assign("route_freq_peak_v4south.html");
 						break;
 					default:
 						console.log(regionName, 'no region selected');

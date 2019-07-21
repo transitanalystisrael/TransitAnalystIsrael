@@ -47,7 +47,7 @@ try:
     _log.info("Calculating High Freq Lines")
     import high_freq_lines_israel
     _log.info("Calculating Lines on Street")
-    import lines_on_street
+    import lines_on_street_at_peak
     _log.info("Calculating TPD as stops")
     import tpd_at_stops_israel
     _log.info("Stops in Muni - Pre Edit")

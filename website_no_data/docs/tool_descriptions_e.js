@@ -10,7 +10,7 @@ var descEtool5 = '<b>Municipal trips per day (tpd) per line</b><br>Display the t
 
 var descEtool6 = '<b>Frequent Service Lines</b><br>Frequent service lines displayed on an interactive map.<br>Use slider to set level of service to display from 60+ trips per day (tpd) to 240+ tpd.<br>Click on map shows list of frequent lines in the area sorted by frequency.<br>Useful for analyzing what neighborhoods or cities or towns are served by high frequency service and which are not.';
 
-var descEtool7 = '<b>Buses per day on street</b><br>A list of all the lines and their frequency on the street segment selected on a map.<br>The list is sorted by frequency and includes the total number of buses that pass through the selected street segment in a day.<br>Useful to analyze the potential benefit of a dedicated bus lane on a street.';
+var descEtool7 = '<b>Buses on street</b><br>A list of all the lines and their peak hour frequency on the street segment selected on a map.<br>The list is sorted by frequency and includes the total number of buses that pass through the selected street segment during two AM peak hours (07:00 to 09:00 trip count divided by 2 to get peak hour frequency).<br>Useful to analyze the potential benefit of a dedicated bus lane on a street.';
 
 var descEtool8 = '<b>Accessible level of service at stops</b><br>Level of transit service accessible within walking distance from any location.<br>Displays the total number of transit opportunities per day at all stops.<br>Click on a stop to get a breakdown of all the lines at that stop sorted by their frequency.<br>Useful for analyzing what areas in a city or town do not have access to a reasonable level of service and what needs to be improved.';
 

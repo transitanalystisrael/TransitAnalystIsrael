@@ -12,20 +12,18 @@
   gtag('config', 'UA-130620396-1');
 </script>
 
-	<title>תדירות יומית ברחוב נבחר - צפון ישראל</title>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>תדירות בשעת שיא ברחוב נבחר - צפון ישראל</title>
+    
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="shortcut icon" type="image/x-icon" href="../docs/images/favicon.ico" />
 	<meta property="og:image" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/docs/images/tool7.jpg" />
 	<meta property="og:type" content= "website" />
-	<meta property="og:title" content= "מנתח תחבורה לישראל - תדירות יומית ברחוב נבחר - צפון ישראל" />
+	<meta property="og:title" content= "מנתח תחבורה לישראל - תדירות בשעת שיא ברחוב נבחר - צפון ישראל" />
 	<meta property="og:description" content= "Transit Analyst Israel" />
-	<meta property="og:url" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/lines_on_street/route_freq_v3north.html"/>
+	<meta property="og:url" content="https://s3.eu-central-1.amazonaws.com/transitanalystisrael-current/lines_on_street/route_freq_peak_v4north.html"/>
 	<meta property="og:image:width" content="441" />
 	<meta property="og:image:height" content="401" />
-
 
     <link rel="stylesheet" href="../dist/leaflet.css" />
     <script src="../dist/leaflet.js" ></script>
@@ -53,10 +51,8 @@
 	</style>
 
 	<link rel="stylesheet" href="../css/topnav.css"/>
-
 </head>
 <body>
-
 <script>
     var showAbout = true;
     //console.log(showAbout);
@@ -84,7 +80,7 @@
 	<button type="button" onclick="displayAbout()">About - אודות</button>
 	<button type="button" onclick="displayHome()">דף הבית</button>
 	<div class="main-button">
-		<button type="button" onclick="displayParent()">תדירות יומית ברחוב נבחר</button>
+		<button type="button" onclick="displayParent()">תדירות בשעת שיא ברחוב נבחר</button>
 	</div>
 </div>
 
@@ -145,34 +141,33 @@
         //toscore = (props ? props.maxtpdperroute + 9 : 0);
         this._div.innerHTML =
             '<div class="freq-list">' +
-            '<h3>תדירות יומיות ברחוב נבחר - צפון ישראל</h3>' +
+            '<h3>תדירות בשעת שיא ברחוב נבחר - צפון ישראל</h3>' +
             'לחצו על רחוב להצגת כל נתוני הקווים ברחוב זה' +
             '</div>'
 
     };
-
     info.addTo(map);
 
-	// get color depending on tripsperday value
+	// get color depending on trips at peak value
 	function getColor(d) {
-		return  d >= 240 ? '#006837' :
-				d >= 120 ? '#1a9850' :
-				d >= 80 ? '#66bd63' :
-				d >= 60 ? '#a6d96a' :
-				d >= 50 ? '#d9ef8b' :
-				d >= 40 ? '#ffffbf' :
-				d >= 30 ? '#fee08b' :
-				d >= 20 ? '#fdae61' :
-				d >= 10 ? '#f46d43' :
+		return  d >= 24 ? '#006837' :
+				d >= 12 ? '#1a9850' :
+				d >= 8 ? '#66bd63' :
+				d >= 6 ? '#a6d96a' :
+				d >= 5 ? '#d9ef8b' :
+				d >= 4 ? '#ffffbf' :
+				d >= 3 ? '#fee08b' :
+				d >= 2 ? '#fdae61' :
+				d >= 1 ? '#f46d43' :
 				d >= 0  ? '#d73027' :
 				'#a50026';
 	}
-	// get weight depending on tripsperday value
+	// get weight depending on trips at peak value
 	function getWeight(d) {
-		return  d >= 240 ? 8 :
-				d >= 120 ? 6 :
-				d >= 80 ? 4 :
-				d >= 60 ? 2 :
+		return  d >= 24 ? 8 :
+				d >= 12 ? 6 :
+				d >= 8 ? 4 :
+				d >= 6 ? 2 :
 				1;
 	}
 	function style(feature) {
@@ -181,7 +176,7 @@
 			weight: getWeight(tpd),
 			opacity: 0.7,
 			color: getColor(tpd),
-			stroke : (tpd >= 10)
+			stroke : (tpd >= 1)
 		};
 	}
 
@@ -214,48 +209,49 @@
 			}
 		}
       })
-        // if at least one feature found, show it
-        if (intersectingFeatures.length) {
-            //console.log(intersectingFeatures[0].feature.properties.maxtpdperroute);
-            var totaltpd = 0;
-            var tpdperlinearray = intersectingFeatures.map(function(o) {
-                totaltpd += o.feature.properties.maxtpdperroute;
-                return [o.feature.properties.maxtpdperroute, o.feature.properties.route_short_name,agencies[o.feature.properties.agency_id]]
-            })
-            //console.log(tpdperlinearray);
+	  // if at least one feature found, show it
+	  if (intersectingFeatures.length) {
+		//console.log(intersectingFeatures[0].feature.properties.maxtpdperroute);
+		var totaltpd = 0;
+		var tpdperlinearray = intersectingFeatures.map(function(o) {
+		  totaltpd += o.feature.properties.maxtpdperroute;
+		  return [o.feature.properties.maxtpdperroute, o.feature.properties.route_short_name,agencies[o.feature.properties.agency_id]]
+		})
+		//console.log(tpdperlinearray);
 
-            tpdperlinearray.sort(function(a, b){return b[0] - a[0]});
-            //console.log(tpdperlinearray);
-            var displaystring = "";
-            tpdperlinearray.forEach(dispFunction);
-            function dispFunction(linetpd){
-                var tpd = linetpd[0]
-                var route_short_name = linetpd[1];
-                var agency_name = linetpd[2];
-                displaystring +=
-                    '<tr>' +
-                    '	<td>' + agency_name + '</td>' +
-                    '	<td>' + route_short_name + '</td>' +
-                    '   <td>' + tpd + '</td>' +
-                    '</tr>'
-            };
-            var html =
-                '<div class="freq-list popup-list">' +
-                '<table class="freq-table">' +
-                '<h4>נתוני הקווים העוברים ברחוב הנבחר</h4>' +
-                '    <thead>' +
-                '        <tr>' +
-                '            <th>מפעילה</th>' +
-                '            <th>מספר קו</th>' +
-                '            <th>תדירות יומית (לכיוון)</th>' +
-                '        </tr>' +
-                '    </thead>' +
-                '    <tbody>' +
-                displaystring +
-                '    </tbody>' +
-                '</table>' +
-                '<p>תדירות מוערכת לכיוון בשעת שיא:</p>' + Math.round(10*totaltpd/2/10)/10 +
-                '</>';
+		tpdperlinearray.sort(function(a, b){return b[0] - a[0]});
+		//console.log(tpdperlinearray);
+          var displaystring = "";
+          tpdperlinearray.forEach(dispFunction);
+          function dispFunction(linetpd){
+              var tpd = Math.round(10*linetpd[0]/2)/10 // counted over 2 hours of peak
+              var route_short_name = linetpd[1];
+              var agency_name = linetpd[2];
+              displaystring +=
+                  '<tr>' +
+                  '	<td>' + agency_name + '</td>' +
+                  '	<td>' + route_short_name + '</td>' +
+                  '   <td>' + tpd + '</td>' +
+                  '</tr>'
+          };
+          var html =
+              '<div class="freq-list popup-list">' +
+              '<table class="freq-table">' +
+              '<h4>נתוני הקווים העוברים ברחוב הנבחר</h4>' +
+              '    <thead>' +
+              '        <tr>' +
+              '            <th>מפעילה</th>' +
+              '            <th>מספר קו</th>' +
+              '            <th>תדירות בשעת שיא (לכיוון)</th>' +
+              '        </tr>' +
+              '    </thead>' +
+              '    <tbody>' +
+              displaystring +
+              '    </tbody>' +
+              '</table>' +
+              '<p>תדירות מוערכת לכיוון בשעת שיא:</p>' + Math.round(10*totaltpd/2/2)/10 + // counted over 2 hours of peak
+              '</>';
+
 		map.openPopup(html, e.latlng, {
 		  offset: L.point(0, 0)
 		});
@@ -312,7 +308,7 @@
 	legend.onAdd = function (map) {
 
 		var div = L.DomUtil.create('div', 'info legend'),
-			grades = [10,20,30,60, 80, 120, 240],
+			grades = [1,2,3,6, 8, 12, 24],
 			labels = [],
 			from, to;
 
@@ -331,6 +327,16 @@
 
 	legend.addTo(map);
 
+</script>
+
+<script src="../docs/transitanalystisrael_config.js" ></script>
+<script src="../docs/gtfs_start_date.js" ></script>
+<script src="../docs/tool_descriptions_e.js" ></script>
+<script src="../docs/tool_descriptions_h.js" ></script>
+<script>
+    document.getElementById("aboutE").innerHTML = descEtool7 + servicePeriodE + logos;
+    //console.log(document.getElementById("aboutE").innerHTML)
+    document.getElementById("aboutH").innerHTML = descHtool7 + servicePeriodH + logos;
 </script>
 
 
