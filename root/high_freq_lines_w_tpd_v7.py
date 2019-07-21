@@ -677,11 +677,11 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, sstarttime, sstoptime, 
 			postsline += '\n'
 			fileout.write(postsline)
 			# append to list only if frequent route: FREQUENT_TPD or more trips from start time to stop time. filter out singular events during the week like lag-ba-omer
-			if maxtpd >= FREQUENT_TPD and totaltpd > maxtpd*daysofservicetocount/2: 
+			if maxtpd >= FREQUENT_TPD and totaltpd >= maxtpd*daysofservicetocount/2: 
 				unique_route_id_list.append(out_route_list[0]) 
 				unique_route_dict[out_route_list[0]] = [out_route_list[1],out_route_list[2],out_route_list[7],maxtpd]
 
-			if maxtpd >= FREQUENT_TPD and totaltpd <= maxtpd*daysofservicetocount/2: print("filtered out :", postsline)
+			if maxtpd >= FREQUENT_TPD and totaltpd < maxtpd*daysofservicetocount/2: print("filtered out :", postsline)
 
 	fileout.close()
 	fileouthist.close()
