@@ -6,6 +6,7 @@
 # in order to allow manual editing of stops in muni in map based app
 # also enables manual renaming txt output file from pre to post to bypass the editor
 #
+# deal with boarder conditions (both inside and imediatly outside the muni by looking at what part of a circle around the stop is inside the muni polygon...
 #
 print('----------------- create files with stops in muni --------------------------')
 
