@@ -84,10 +84,10 @@ else : # on_demand date
 print('date to remove from file names : ', processdate)
 #  lines_on_street
 shutil.copyfile(srcdir / ("agency_"+processdate+".js"),dstdir / "lines_on_street" / "agency.js")
-shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+processdate+"jerusalem.js"),dstdir / "lines_on_street" / "route_freq_jerusalem.js")
-shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+processdate+"north.js"),dstdir / "lines_on_street" / "route_freq_north.js")
-shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+processdate+"south.js"),dstdir / "lines_on_street" / "route_freq_south.js")
-shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+processdate+"telavivmetro.js"),dstdir / "lines_on_street" / "route_freq_telavivmetro.js")
+shutil.copyfile(srcdir / ("route_freq_at_0700-0900_"+processdate+"jerusalem.js"),dstdir / "lines_on_street" / "route_freq_jerusalem.js")
+shutil.copyfile(srcdir / ("route_freq_at_0700-0900_"+processdate+"north.js"),dstdir / "lines_on_street" / "route_freq_north.js")
+shutil.copyfile(srcdir / ("route_freq_at_0700-0900_"+processdate+"south.js"),dstdir / "lines_on_street" / "route_freq_south.js")
+shutil.copyfile(srcdir / ("route_freq_at_0700-0900_"+processdate+"telavivmetro.js"),dstdir / "lines_on_street" / "route_freq_telavivmetro.js")
 #line_freq
 shutil.copyfile(srcdir / ("agency_"+processdate+".js"),dstdir / "line_freq" / "agency.js")
 shutil.copyfile(srcdir / ("route_freq_at_0000-2400_"+processdate+".js"),dstdir / "line_freq" / "route_freq.js")
