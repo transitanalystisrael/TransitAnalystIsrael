@@ -147,9 +147,9 @@ a. Make sure that one of the Navitia docker containers is running by performing 
 2.1 - Monthly update graph
 --------------------------
 a. Transfer the generted Navitia graph and the secondary graph from the local docker container` to your local pc file system:
-a.1. Open Windows power shell and run the following command to copy the graphs to <some-dest-folder> on your local machine e.g. "C:\":
-$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/default.nav.lz4 <some-dest-folder>
-$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/secondary-cov.nav.lz4 <some-dest-folder>
+a.1. Open Windows power shell and run the following command to copy the graphs to <some-dest-folder> on your local machine e.g. "C:\temp":
+$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/default.nav.lz4 C:\temp
+$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/secondary-cov.nav.lz4 C:\temp
 a.2. Copying the graphs to your AWS EC2 machine:
 	In order to copy the files from your machine to the EC2, you need the .pem key that allows you to access the EC2 (you got the .pem key when you created the EC2 instance - probably in the s3 key bucket). 
 	a. Place both the graphs and the key in the same folder.
@@ -160,9 +160,9 @@ a.2. Copying the graphs to your AWS EC2 machine:
 	   iii. user name that you use to connect to the EC2 with putty <user-name>, e.g. ubuntu
 	   iv. public DNS of the EC2 instace that can be found at the AWS EC2 console (http://console.aws.amazon.com/ec2) -> in the EC2 instances list -> column "Public DNS (IPv4)"), <public-dns>, e.g. ec2-3-122-15-201.eu-central-1.compute.amazonaws.com
 	d. Type the command: "scp -i <pem-file>.pem default.nav.lz4 <user-name>@<public-dns>:/home/ubuntu/" e.g.
-$ scp -i key.pem default.nav.lz4 ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/
+$ scp -i transitanalystisrael.pem default.nav.lz4 ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/
 	e. Type the command: "scp -i <pem-file>.pem secondary-cov.nav.lz4 <user-name>@<public-dns>:/home/ubuntu/" e.g.
-$ scp -i key.pem secondary-cov.nav.lz4 ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/
+$ scp -i transitanalystisrael.pem secondary-cov.nav.lz4 ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/
 
 a.3. Delete the default.nav.lz4 and secondary-cov.nav.lz4 file from your local PC to save storage (it's still avialible inside the docker container)
 
