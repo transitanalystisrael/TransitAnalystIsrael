@@ -25,8 +25,8 @@
 	<meta property="og:image:width" content="435" />
 	<meta property="og:image:height" content="441" />
 
-    <link rel="stylesheet" href="../dist/leaflet.css" />
-    <script src="../dist/leaflet.js" ></script>
+	<link rel="stylesheet" href="../dist/leaflet.css" />
+	<script src="../dist/leaflet.js" ></script>
 	<script src="../dist/turf.min.js"></script>
 
 	<style>
@@ -70,6 +70,13 @@
 			document.getElementById('about').style.display='none';
 			showAbout = true;
 		};
+	}
+	function displayHome() {
+		window.location.href="../index.html";
+	}
+
+	function displaySelf() {
+		window.location.href="index.html";
 	}
 </script>
 
@@ -123,11 +130,11 @@
 		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 	});
 
-    var baseMaps = {
-        "(Stamen Toner Lite) רקע שחור-לבן": Stamen_TonerLite,
-        "(OSM) רקע שחור-לבן": OpenStreetMap_BlackAndWhite,
-        "(OSM) רקע צבעוני": OpenStreetMap_Mapnik
-    };
+	var baseMaps = {
+		"(Stamen Toner Lite) רקע שחור-לבן": Stamen_TonerLite,
+		"(OSM) רקע שחור-לבן": OpenStreetMap_BlackAndWhite,
+		"(OSM) רקע צבעוני": OpenStreetMap_Mapnik
+	};
 
 	L.control.layers(baseMaps).addTo(map);
 
@@ -153,45 +160,45 @@
 			//console.log(ts_tpdperline);
 			ts_tpdperline.forEach(dispFunction);
 		}
-        var table_data_string  = props ?
-            '<table class="freq-table">' +
-            '    <thead>' +
-            '        <tr>' +
-            '            <th>תחנת רכבת</th>' +
-            '            <th>תדירות רכבת יומית</th>' +
-            '            <th>תדירות אוטובוסים יומית</th>' +
-            '        </tr>' +
-            '    </thead>' +
-            '    <tbody>' +
-            '<tr>' +
-            '	<td>' + trainstopsName[props.trainstop_id] + '</td>' +
-            '	<td>' +   props.train_tpd + '</td>' +
-            '   <td>' + props.total_bus_tpd + '</td>' +
-            '</tr>' +
-            '    </tbody>' +
-            '</table>' +
-            '</br>' +
-            '<table class="freq-table">' +
-            '    <thead>' +
-            '        <tr>' +
-            '            <th>מפעילה</th>' +
-            '            <th>מספר קו</th>' +
-            '            <th>תדירות יומית (לשני כיוונים)</th>' +
-            '        </tr>' +
-            '    </thead>' +
-            '    <tbody>' +
-            displaystring +
-            '    </tbody>' +
-            '</table>' +
-            '</>' : "";
+		var table_data_string  = props ?
+			'<table class="freq-table">' +
+			'	<thead>' +
+			'		<tr>' +
+			'			<th>תחנת רכבת</th>' +
+			'			<th>תדירות רכבת יומית</th>' +
+			'			<th>תדירות אוטובוסים יומית</th>' +
+			'		</tr>' +
+			'	</thead>' +
+			'	<tbody>' +
+			'<tr>' +
+			'	<td>' + trainstopsName[props.trainstop_id] + '</td>' +
+			'	<td>' +   props.train_tpd + '</td>' +
+			'   <td>' + props.total_bus_tpd + '</td>' +
+			'</tr>' +
+			'	</tbody>' +
+			'</table>' +
+			'</br>' +
+			'<table class="freq-table">' +
+			'	<thead>' +
+			'		<tr>' +
+			'			<th>מפעילה</th>' +
+			'			<th>מספר קו</th>' +
+			'			<th>תדירות יומית (לשני כיוונים)</th>' +
+			'		</tr>' +
+			'	</thead>' +
+			'	<tbody>' +
+			displaystring +
+			'	</tbody>' +
+			'</table>' +
+			'</>' : "";
 
 		this._div.innerHTML =
-        	'<div class="freq-list">' +
-        	'<h3>תדירות אוטובוסים יומית בסמוך לתחנות רכבת</h3>'
-            + '<ul class="instructions">' +
-            	'<li>העבירו את העכבר מעל לתחנה להצגת הנתונים</li>' +
-            	'<li>בחרו נקודת עניין ותחנת רכבת להצגת התחבורה הישירה ביניהן</li>' +
-            	table_data_string +
+			'<div class="freq-list">' +
+			'<h3>תדירות אוטובוסים יומית בסמוך לתחנות רכבת</h3>'
+			+ '<ul class="instructions">' +
+				'<li>העבירו את העכבר מעל לתחנה להצגת הנתונים</li>' +
+				'<li>בחרו נקודת עניין ותחנת רכבת להצגת התחבורה הישירה ביניהן</li>' +
+				table_data_string +
 			'</ul>';
 
 		function dispFunction(linetpd){
@@ -317,23 +324,23 @@
 			both_tpdperline.forEach(dispFunction);
 			//var html = '<div style="height: 400px; overflow: auto;">tpd' + ' : ' + 'line' + ' - ' + 'agency' + "<br>" + displaystring + "<br><br>Total tpd: "+ totaltpd.toString()+'</div>';
 			// var html = '<h3>Trips Between<br>PoI and<br>Train Station</h3>'+'<div>tpd' + ' : ' + 'line' + ' - ' + 'agency' + "<br>" + displaystring + "<br</div>';
-            var html =
-                '<div class="freq-list popup-list">' +
-                '<h3>נסיעות בין נקודת עניין ותחנת הרכבת</h3>' +
-                '<h4>תדירות יומית (לשני כיוונים): ' + totaltpd.toString() + '</h4>' +
-                '<table class="freq-table">' +
-                '    <thead>' +
-                '        <tr>' +
-                '            <th>מפעילה</th>' +
-                '            <th>מספר קו</th>' +
-                '            <th>תדירות יומית (לשני כיוונים)</th>' +
-                '        </tr>' +
-                '    </thead>' +
-                '    <tbody>' +
-                displaystring +
-                '    </tbody>' +
-                '</table>' +
-                '</>';
+			var html =
+				'<div class="freq-list popup-list">' +
+				'<h3>נסיעות בין נקודת עניין ותחנת הרכבת</h3>' +
+				'<h4>תדירות יומית (לשני כיוונים): ' + totaltpd.toString() + '</h4>' +
+				'<table class="freq-table">' +
+				'	<thead>' +
+				'		<tr>' +
+				'			<th>מפעילה</th>' +
+				'			<th>מספר קו</th>' +
+				'			<th>תדירות יומית (לשני כיוונים)</th>' +
+				'		</tr>' +
+				'	</thead>' +
+				'	<tbody>' +
+				displaystring +
+				'	</tbody>' +
+				'</table>' +
+				'</>';
 
 			popup
 				.setLatLng(e.latlng)
@@ -352,12 +359,12 @@
 			var route_short_name = linetpd["line_name"].split('-')[1];
 			var tpd = linetpd["tpd"]
 			totaltpd += tpd;
-            displaystring +=
-                '<tr>' +
-                '	<td>' + agencies[agency_id] + '</td>' +
-                '	<td>' + route_short_name + '</td>' +
-                '   <td>' + tpd + '</td>' +
-                '</tr>'
+			displaystring +=
+				'<tr>' +
+				'	<td>' + agencies[agency_id] + '</td>' +
+				'	<td>' + route_short_name + '</td>' +
+				'   <td>' + tpd + '</td>' +
+				'</tr>'
 		}
 	}
 
@@ -483,42 +490,42 @@
 				s_tpdperline.sort(function(a, b){return b.tpd - a.tpd});
 				s_tpdperline.forEach(dispFunction);
 				var html =
-                    '<div class="freq-list popup-list">' +
+					'<div class="freq-list popup-list">' +
 					'<h3>נסיעות בסמוך לנקודת עניין</h3>' +
-                    '<h4>תדירות יומית (לשני כיוונים): ' + totaltpd.toString() + '</h4>' +
-                    '<table class="freq-table">' +
-                    '    <thead>' +
-                    '        <tr>' +
-                    '            <th>מפעילה</th>' +
-                    '            <th>מספר קו</th>' +
-                    '            <th>נסיעות ליום (לכיוון)</th>' +
-                    '        </tr>' +
-                    '    </thead>' +
-                    '    <tbody>' +
-                    displaystring +
-                    '    </tbody>' +
-                    '</table>' +
-                    '</>';
-                map.openPopup(
-                    html +
-                    '<h4>' + e.latlng.toString() +'</h4>'
+					'<h4>תדירות יומית (לשני כיוונים): ' + totaltpd.toString() + '</h4>' +
+					'<table class="freq-table">' +
+					'	<thead>' +
+					'		<tr>' +
+					'			<th>מפעילה</th>' +
+					'			<th>מספר קו</th>' +
+					'			<th>נסיעות ליום (לכיוון)</th>' +
+					'		</tr>' +
+					'	</thead>' +
+					'	<tbody>' +
+					displaystring +
+					'	</tbody>' +
+					'</table>' +
+					'</>';
+				map.openPopup(
+					html +
+					'<h4>' + e.latlng.toString() +'</h4>'
 					, e.latlng, {
-                    offset: L.point(0, 0)
-                });
+					offset: L.point(0, 0)
+				});
 			}
 			function dispFunction(linetpd){
 				//console.log(linetpd);
 				var agency_id = linetpd["line_name"].split('-')[0];
 				var route_short_name = linetpd["line_name"].split('-')[1];
 				var tpd = linetpd["tpd"]
-                totaltpd += tpd;
-                displaystring +=
-                    '<tr>' +
-                    '	<td>' + agencies[agency_id] + '</td>' +
-                    '	<td>' + route_short_name + '</td>' +
-                    '   <td>' + tpd + '</td>' +
-                    '</tr>'
-            };
+				totaltpd += tpd;
+				displaystring +=
+					'<tr>' +
+					'	<td>' + agencies[agency_id] + '</td>' +
+					'	<td>' + route_short_name + '</td>' +
+					'   <td>' + tpd + '</td>' +
+					'</tr>'
+			};
 
 			// popup
 			// 	.setLatLng(e.latlng)
