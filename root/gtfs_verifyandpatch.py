@@ -47,16 +47,24 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	
 	# >>> load trips file
 	trips_count = 0
+	trips_header_trip_headsign_missing = False
 	txtfilein = 'trips.txt'
 	trips_dict = {}
 	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # [route_id,service_id,trip_id,trip_headsign,direction_id,shape_id]
+		if len(header) == 5 and header[3] == 'direction_id' : # trip_headsign missing
+			trips_header_trip_headsign_missing = True
+			print('trip_headsign missing')
+			print(header)
 		#print(header)
 		for row in reader:
-			#print row
+			#print(row)
 			trips_count +=1
-			trips_dict[row[2]] = [row[0],row[1],row[5]] # 'trip_id' : ['route_id','service_id','shape_id']
+			if trips_header_trip_headsign_missing :
+				trips_dict[row[2]] = [row[0],row[1],row[4]] # 'trip_id' : ['route_id','service_id','shape_id']
+			else :
+				trips_dict[row[2]] = [row[0],row[1],row[5]] # 'trip_id' : ['route_id','service_id','shape_id']
 	#print trips_dict[:4]
 	print('trips_dict loaded. trips count ', len(trips_dict))
 	
@@ -270,7 +278,40 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 			
 	
 	# >>> patch problem files
-	
+	if trips_header_trip_headsign_missing :
+		print('trips_header_trip_headsign_missing')
+		# add dummy '' trip_headsign
+		# load full trips.txt file  then apply the patch while writing back.
+		
+		# >>> load trips file
+		txtfilein = 'trips.txt'
+		trips_full_list = []
+		with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
+			reader = csv.reader(f)
+			header = next(reader) # [route_id,service_id,trip_id,direction_id,shape_id]
+			#print(header)
+			for row in reader:
+				#print row
+				trips_full_list.append([row[0],row[1],row[2],row[3],row[4]]) # [route_id,service_id,trip_id,direction_id,shape_id]
+		print('trips_full_list loaded. trips count ', len(trips_full_list))
+		
+		# >>> open and prep output txt file 
+		txtfileout = 'trips.txt'
+		print('open file ', gtfspathout / txtfileout)
+		fileout = open(gtfspathout / txtfileout, 'w', encoding="utf8") # save results in file
+		postsline = 'route_id,service_id,trip_id,trip_headsign,direction_id,shape_id\n'
+		print(postsline)
+		fileout.write(postsline)
+		outfilelinecount = 0
+		trip_headsign = ''
+		for [route_id,service_id,trip_id,direction_id,shape_id] in trips_full_list :
+			postsline = ','.join([route_id,service_id,trip_id,trip_headsign,direction_id,shape_id])+'\n'
+			fileout.write(postsline)
+			outfilelinecount += 1
+		fileout.close()
+		print('close file ', gtfspathout / txtfileout)
+		print('lines in out file count ', outfilelinecount)
+
 	if routes_agency_id_problem_count != 0 :
 		print('routes_agency_id_problem_count : ', routes_agency_id_problem_count)
 		# erase routes if agency_id referenced is missing from agency.txt or add unknown agency to agency.txt with the missing id...
