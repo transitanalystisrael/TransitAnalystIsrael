@@ -104,6 +104,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	agency_count = 0
 	txtfilein = 'agency.txt'
 	agency_dict = {}
+	agency_name_problem_count = 0
 	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone,agency_fare_url
@@ -111,9 +112,16 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		for row in reader:
 			#print row
 			agency_count +=1
-			agency_dict[row[0]] = [row[1]] # 'agency_id' : ['agency_name']
+			agency_name = row[1]
+			agency_name_clean = agency_name.replace('\"','').replace("\'","")
+			if agency_name != agency_name_clean :
+				print('agency name problem: ', agency_name, agency_name_clean)
+				agency_name_problem_count +=1
+				row[1] = agency_name_clean # patch agency name for dict, later it will be written to file
+			agency_dict[row[0]] = [row[1], row[2], row[3], row[4], row[5], row[6]] # 'agency_id': ['agency_name','agency_url','agency_timezone','agency_lang','agency_phone','agency_fare_url']
 	#print agency_dict[row[0]] # last one
 	print('agency_dict loaded. agency count ', len(agency_dict))
+	print('agency_name_problem_count : ', agency_name_problem_count)
 	
 	# >>> load shapes file. Actually loads only one point per shape!!! used only as a set of shape_ids
 	shapes_count = 0
@@ -204,15 +212,19 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	routes_agency_id_ok_count = 0
 	routes_agency_id_problem_count = 0
 	routes_agency_id_problem_list = []
+	agencies_referenced_set = set([])
 	for route_id, [agency_id] in routes_dict.items() :
 		if agency_id in agency_dict :
 			routes_agency_id_ok_count +=1
+			agencies_referenced_set.add(agency_id)
 		else :
 			routes_agency_id_problem_count +=1
 			print('routes_agency_id_problem : ', route_id, agency_id)
 			routes_agency_id_problem_list.append(route_id)
 	print('routes_agency_id_ok_count : ', routes_agency_id_ok_count)
 	print('routes_agency_id_problem_count : ', routes_agency_id_problem_count)
+	print('agencies_referenced_count : ', len(agencies_referenced_set))
+	print('agencies_referenced_set : ', agencies_referenced_set)
 	
 	# >>> process trips
 	trips_service_id_ok_count = 0
@@ -278,6 +290,23 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 			
 	
 	# >>> patch problem files
+	if agency_name_problem_count > 0 :# patch agency names, in case they include " or ' in the name (happened in GTFS file of 20190901)
+		# >>> open and prep output txt file 
+		txtfileout = 'agency.txt'
+		print('open file ', gtfspathout / txtfileout)
+		fileout = open(gtfspathout / txtfileout, 'w', encoding="utf8") # save results in file
+		postsline = 'agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone,agency_fare_url\n'
+		print(postsline)
+		fileout.write(postsline)
+		outfilelinecount = 0
+		for agency_id, [agency_name,agency_url,agency_timezone,agency_lang,agency_phone,agency_fare_url] in agency_dict.items() :
+			postsline = ','.join([agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone,agency_fare_url])+'\n'
+			fileout.write(postsline)
+			outfilelinecount += 1
+		fileout.close()
+		print('close file ', gtfspathout / txtfileout)
+		print('lines in out file count ', outfilelinecount)
+	
 	if trips_header_trip_headsign_missing :
 		print('trips_header_trip_headsign_missing')
 		# add dummy '' trip_headsign
