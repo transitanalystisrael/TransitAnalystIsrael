@@ -1,0 +1,95 @@
+Instructions for "AWS Production EC2 and S3 cloned from local PC (no processing)"
+================================================================================
+This manual is intended for transferring the outputs of the update process on a local PC to cloud-based services AWS EC2 and S3.
+   
+1. Upload the HTML and static data files to S3
+==============================================
+1.1 - Monthly update files
+--------------------------
+
+c. Performing the upload
+c.1. Go to TransitAnalystIsrael/root and run upload_current2aws_s3.py
+c.2. Go to TransitAnalystIsrael/root and run upload_past2aws_s3.py
+
+d. Update and upload to S3 config files to make the TTM client look for the TTM server on EC2 and not on the local PC. We do this by changing the config to look like the product processed is on EC2 and S3.
+d.1. copy website_current\docs\transitanalystisrael_config.js to a temp folder e.g. C:\temp\current
+d.2. copy website_past\docs\transitanalystisrael_config.js to a temp folder e.g. C:\temp\past
+d.3. edit transitanalystisrael_config.js in both current and past temp folders. 
+		Replace the following 13 lines:
+// #Monthly auto update on AWS EC2 and S3
+// #get_service_date = 'auto'
+// #python_processing = 'aws_ec2'
+// #ttm_graph_processing = 'aws_ec2'
+// #web_client_hosted_on = 'aws_s3'
+// #ttm_server_on = 'aws_ec2'
+
+// #Monthly auto update on local pc
+var cfg_get_service_date = 'auto' ;
+var cfg_python_processing = 'local_pc' ;
+var cfg_ttm_graph_processing = 'local_pc' ;
+var cfg_web_client_hosted_on = 'local_pc' ;
+var cfg_ttm_server_on = 'local_pc' ;
+
+		With the following 13 lines:
+// #Monthly auto update on AWS EC2 and S3
+var cfg_get_service_date = 'auto' ;
+var cfg_python_processing = 'aws_ec2' ;
+var cfg_ttm_graph_processing = 'aws_ec2' ;
+var cfg_web_client_hosted_on = 'aws_s3' ;
+var cfg_ttm_server_on = 'aws_ec2' ;
+
+// #Monthly auto update on local pc
+// #get_service_date = 'auto'
+// #python_processing = 'local_pc'
+// #ttm_graph_processing = 'local_pc'
+// #web_client_hosted_on = 'local_pc'
+// #ttm_server_on = 'local_pc'
+
+d.4. use the AWS S3 console to upload the edited current file to the bucket transitanalystisrael-current/docs
+d.5. use the AWS S3 console to upload the edited past file to the bucket transitanalystisrael-past/docs
+
+2. Upload generated Navitia graph to AWS EC2
+============================================
+Make sure that one of the Navitia docker containers is running by performing step 4 in "Instructions for On demand date on local pc.txt"
+2.1 - Monthly update graph
+--------------------------
+a. Transfer the generted Navitia graph and the secondary graph from the local docker container` to your local pc file system:
+a.1. Open Windows power shell and run the following command to copy the graphs to <some-dest-folder> on your local machine e.g. "C:\temp":
+$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/default.nav.lz4 C:\temp
+$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/secondary-cov.nav.lz4 C:\temp
+a.2. Copying the graphs to your AWS EC2 machine:
+	In order to copy the files from your machine to the EC2, you need the .pem key that allows you to access the EC2 (you got the .pem key when you created the EC2 instance - probably in the s3 key bucket). 
+	a. Place both the graphs and the key in the same folder.
+	b. Right-click in the widnows explorer -> Open "Git Bash" here
+
+	d. Type the command: "scp -i <pem-file>.pem default.nav.lz4 <user-name>@<public-dns>:/home/ubuntu/" e.g.
+$ scp -i transitanalystisrael.pem default.nav.lz4 ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/
+	e. Type the command: "scp -i <pem-file>.pem secondary-cov.nav.lz4 <user-name>@<public-dns>:/home/ubuntu/" e.g.
+$ scp -i transitanalystisrael.pem secondary-cov.nav.lz4 ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/
+
+b. Copy the graphs into the docker container on the EC2 machine:
+b.1. Using putty, connect to the EC2 machine and perform the following commands to delete the graphs from the docker 
+	 - connect to the docker worker container:
+$ docker exec -i -t navitia-docker-compose_tyr_worker_1 /bin/bash
+	 - Change directory to the graphs folder:
+root@9bb282f314b6:/usr/src/app# cd /srv/ed/output
+	 - Delete the secondary-cov.nav.lz4 graph:
+$ rm secondary-cov.nav.lz4
+	 - Delete the default.nav.lz4 graph:
+$ rm default.nav.lz4
+	-  Exit the internal docker terminal:
+root@9bb282f314b6:/srv/ed/output#  exit
+
+b.2. Copy the new graphs into the docker container (continue using putty):
+$ docker cp default.nav.lz4 navitia-docker-compose_tyr_worker_1:/srv/ed/output/
+$ docker cp secondary-cov.nav.lz4 navitia-docker-compose_tyr_worker_1:/srv/ed/output/
+
+c. Stop and Re-start Navitia containers:	
+	a. Go to the folder where you cloned the navitia-docker-compose repo e.g.:
+$ cd ~/navitia-docker-compose
+	b. Stop the running navitia dockers:
+$ docker stop $(docker ps -a -q)
+	d. Once done - run Navitia container with the secondary-cov: 
+$ sudo docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up  --remove-orphans
+
+Once docker is up, you can close the putty terminal and navigiate to the website_current index.html file on the S3 to validate that everything works.

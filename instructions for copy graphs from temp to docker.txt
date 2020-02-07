@@ -1,0 +1,3 @@
+Open Windows power shell and run the following command to copy the graphs from "C:\temp" on your local machine to Docker:
+$  docker cp  C:\temp\default.nav.lz4 navitia-docker-compose_tyr_worker_1:/srv/ed/output/
+$  docker cp  C:\temp\secondary-cov.nav.lz4 navitia-docker-compose_tyr_worker_1:/srv/ed/output/

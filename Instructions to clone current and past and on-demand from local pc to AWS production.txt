@@ -228,3 +228,9 @@ sudo docker-compose -f compose_files/docker-compose-ondemand-YYYYMMDD.yml -p nav
 
 
 Once docker is up, you can close the putty terminal and navigiate to the on-demand index.html file on the S3 to validate that everything works.
+
+3. copy from AWS EC2 to local pc
+---------------------------------
+like "Copying the graph to your AWS EC2 machine:"
+but use command:
+scp -i transitanalystisrael.pem ubuntu@ec2-3-122-15-201.eu-central-1.compute.amazonaws.com:/home/ubuntu/default.nav.lz4 default.nav.lz4
