@@ -568,8 +568,7 @@ def validate_osm_gtfs_convertion_to_graph_is_running(docker_client, coverage_nam
     if not beat_con:
         # restarting tyr_beat
         _log.info("tyr_beat is down, attempting to re-run")
-        tyr_beat_start_command = "docker-compose -f" + navitia_docker_compose_file_name + " -p navitia-docker-compose" \
-                                                                                          " up tyr_beat"
+        tyr_beat_start_command = "docker-compose -f" + navitia_docker_compose_file_name + " -p navitia-docker-compose up tyr_beat"
         time_beat_restarted = dt.utcnow()
         with open("tyr_beat_output.txt", "w", encoding="UTF-8") as tyr_beat_output:
             subprocess.Popen(tyr_beat_start_command, cwd=navitia_docker_compose_file_path,
