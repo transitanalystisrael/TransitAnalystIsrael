@@ -108,9 +108,9 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 		reader = csv.reader(f)
 		header = next(reader) # agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone,agency_fare_url
-		#print(header)
+		print(header)
 		for row in reader:
-			#print row
+			print(row)
 			agency_count +=1
 			agency_name = row[1]
 			agency_name_clean = agency_name.replace('\"','').replace("\'","")
