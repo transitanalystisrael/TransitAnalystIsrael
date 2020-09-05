@@ -1,3 +1,49 @@
+
+copy the graphs from "C:\temp" on your local machine to Docker:
 Open Windows power shell and run the following command to copy the graphs from "C:\temp" on your local machine to Docker:
 $  docker cp  C:\temp\default.nav.lz4 navitia-docker-compose_tyr_worker_1:/srv/ed/output/
 $  docker cp  C:\temp\secondary-cov.nav.lz4 navitia-docker-compose_tyr_worker_1:/srv/ed/output/
+
+======================================================================================================================================
+
+change on-demand graphs to default:
+Open Windows power shell and run the following commands to change on-demand graphs to default
+$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/on-demand-20200405.nav.lz4 C:\temp
+in temp folder rename on-demand-20200405.nav.lz4 to default.nav.lz4
+$  docker cp  C:\temp\default.nav.lz4 navitia-docker-compose_tyr_worker_1:/srv/ed/output/
+
+======================================================================================================================================
+
+13. Testing the ttm graph created by the monthly auto update processing - or the above. 
+	Note that both the current and past ttm clients access the secondary-cov graph (at different dates) that was created in the previous month update.
+	So, to test the ttm graph just created we need to do docker compose up with the default coverage and to patch the config file to make the client access the default coverage. Test and then undo the patch in the config file.
+	a. docker compose up with the default coverage
+		* follow instructions in 10. a,b, and c to stop the the navitia docker containers
+		* if docker is down then run the Docker Desktop for Windows application and wait for it to come up.
+		* Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
+		* Right-click and select run "Git Bash Here" to open a terminal window.
+		* type at the prompt "docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up --remove-orphans" 
+$ docker-compose -f compose_files/docker-compose.yml -p navitia-docker-compose up --remove-orphans
+	b. patch the config file to make the client access the default coverage
+		* edit the file "transitanalystisrael_config.js" in the \website_current\docs dir. e.g. C:\git\TransitAnalystIsrael\website_current\docs
+		* replace the line "var cfg_secondary_custom_coverage_name = 'secondary-cov' ;" 
+			with the line "var cfg_secondary_custom_coverage_name = 'default' ;"
+			the resulting line should be :
+var cfg_secondary_custom_coverage_name = 'default' ;
+		* save 
+	c. test
+		* Run the TransitAnalystIsrael as in 9.
+		* open the ttm tool and see that it opens with the expected date and that is works...
+	d. undo the patch in the config file
+		* edit the file "transitanalystisrael_config.js" in the \website_current\docs dir. e.g. C:\git\TransitAnalystIsrael\website_current\docs
+		* replace the line "var cfg_secondary_custom_coverage_name = 'default' ;" 
+			with the line "var cfg_secondary_custom_coverage_name = 'secondary-cov' ;"
+			the resulting line should be :
+var cfg_secondary_custom_coverage_name = 'secondary-cov' ;
+		* save 
+	e. docker compose up with the secondary coverage
+		* follow instructions in 10. a,b, and c to stop the the navitia docker containers
+		* Go to the folder where you cloned the Navitia-docker-compose repo e.g. C:\git\navitia-docker-compose
+		* Right-click and select run "Git Bash Here" to open a terminal window.
+		* type at the prompt "docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up --remove-orphans" 
+$ docker-compose -f compose_files/docker-compose-secondary-cov.yml -p navitia-docker-compose up --remove-orphans
