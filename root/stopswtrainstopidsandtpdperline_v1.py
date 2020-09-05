@@ -58,7 +58,7 @@ def main(gtfsdate, processedpath):
 				stopsneartrainstop[trainstop_id].append(stop_id)
 			else :
 				stopsneartrainstop[trainstop_id] = [stop_id]
-	print(stopsneartrainstop[trainstop_id]) # last one
+	#print(stopsneartrainstop[trainstop_id]) # last one
 	print('stopsneartrainstop loaded. trainstop count ', len(stopsneartrainstop))
 
 	#

@@ -132,7 +132,10 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 		nf.write(outstr)
 		if '/' in stop_name : stop_name = stop_name[:stop_name.find('/')]
 		outstr = stop_id+': "'+stop_name+'",\n'
-	outstr = outstr[:-2]+'\n}'
+	if outstr[-2] == ',' : 
+		outstr = outstr[:-2]+'\n}'
+	else :
+		outstr += '}'
 	nf.write(outstr)
 	nf.close()
 	print(("Saved file: ", jsfileout))

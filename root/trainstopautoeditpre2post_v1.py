@@ -82,7 +82,7 @@ with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
 			stopsneartrainstop_pre[trainstop_id].append(stop_id)
 		else :
 			stopsneartrainstop_pre[trainstop_id] = [stop_id]
-print(stopsneartrainstop_pre[trainstop_id]) # last one
+#print(stopsneartrainstop_pre[trainstop_id]) # last one
 print('stopsneartrainstop_pre loaded. trainstop count ', len(stopsneartrainstop_pre))
 
 # extract set of stops from each ref dict
