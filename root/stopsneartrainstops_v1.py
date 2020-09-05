@@ -105,7 +105,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, neartrainstop):
 				stopneartrainstopcount +=1
 				stopsneartrainstop[trainstop_id].append(stop_id)
 		print('trainstopcount, stopneartrainstopcount : ', trainstopcount, stopneartrainstopcount)
-	print('stopsneartrainstop[trainstop_id] - last one: ', stopsneartrainstop[trainstop_id]) # last one
+	#print('stopsneartrainstop[trainstop_id] - last one: ', stopsneartrainstop[trainstop_id]) # last one
 
 	# output js file of stopsneartrainstop pre edit
 	fileoutname = stopsneartrainstop_pre_edit
@@ -117,7 +117,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout, neartrainstop):
 			postsline += stop_id+'","'
 		postsline = postsline[:-2]
 		postsline += '],\n'
-	postsline = postsline[:-2]
+	if postsline[-2] == ',' : postsline = postsline[:-2]
 	postsline += '\n}'
 	fileout.write(postsline)
 	fileout.close()

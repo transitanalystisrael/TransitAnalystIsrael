@@ -480,7 +480,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, processedpath, serviceweekstartd
 					stopsneartrainstop[trainstop_id] = [stop_id]
 			'''
 
-	print(stopsneartrainstop[trainstop_id]) # last one
+	#print(stopsneartrainstop[trainstop_id]) # last one
 	print('stopsneartrainstop loaded. trainstop count ', len(stopsneartrainstop))
 
 	#
@@ -489,6 +489,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, processedpath, serviceweekstartd
 	#   merge the tripsatstop_dict from all stops near trainstop to create mergedtripsneartrainstop_dict
 	#
 	trainstopcount = 0
+	stopneartrainstopcount = 0
 	tripsneartrainstop_dict = {} # trainstop_id: mergedtripsneartrainstop_dict
 	# for each trainstop
 	# get near stop list to use as filter
@@ -569,8 +570,8 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, processedpath, serviceweekstartd
 				tpdperline_dict[line_name_i] = [xinweek, copy.deepcopy(xpdlist)]
 		tpdperlineneartrainstop_dict[trainstop_id] = tpdperline_dict
 		print('trainstop_id, len(tpdperline_dict) : ', trainstop_id, len(tpdperline_dict))
-	print(trainstop_id) # last one
-	for line_name_i, [tpw, tpdlist] in tpdperline_dict.items() : print(tpw, tpdlist) # last one
+	#print(trainstop_id) # last one
+	#for line_name_i, [tpw, tpdlist] in tpdperline_dict.items() : print(tpw, tpdlist) # last one
 	#
 	#   output to txt file
 	#
@@ -684,7 +685,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, processedpath, serviceweekstartd
 		#print count, stop_id
 		count +=1
 	print('stopsforoutput_dict created , len: ', len(stopsforoutput_dict), count)
-	print(stop_id, stopsforoutput_dict[stop_id]) # print last one
+	#print(stop_id, stopsforoutput_dict[stop_id]) # print last one
 
 	#
 	#   output js file of stops with max and average trips per day and tpd per line (agency_id, route short name) -'stops_w_tpd_per_line'+'_'+sserviceweekstartdate+'.js'
