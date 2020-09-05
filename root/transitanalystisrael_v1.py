@@ -17,7 +17,7 @@ try:
     if cfg.get_service_date == 'auto':
         next_month_operation_date = process_date.get_auto_date_nextmonth()  # The date that the product should already be working
         next_month_operation_date = datetime.datetime.strptime(next_month_operation_date, '%Y%m%d')
-        next_month_operation_date = next_month_operation_date + datetime.timedelta(hours=22) + datetime.timedelta(minutes=30)
+        next_month_operation_date = next_month_operation_date + datetime.timedelta(hours=23) + datetime.timedelta(minutes=45)
         _log.info("Setting the next data update date to be %s local time.", next_month_operation_date)
         set_next_month_invocation.set_next_invocation_date(os.path.basename(__file__))
 
@@ -25,7 +25,7 @@ try:
         #get gtfs files and osm file
         _log.info("Download OSM & GTFS")
         import gtfs_osm_download
-
+    
     # Stop docker running to release memory for processing
     docker_client = utils.get_docker_service_client()
     containers = docker_client.containers.list(filters={"name": "worker"})
@@ -34,7 +34,7 @@ try:
     
     # unzip gtfs file
     import gtfs_unzip
-
+    
     # copy static files to processed dir
     _log.info("Loading static files")
     import load_static_files
@@ -64,7 +64,7 @@ try:
     import trainstopautoeditpre2post_v1 # you can also manually edit the pre file to create the post file and rerun the script with this commented out
     _log.info("TPD near train stops")
     import tpd_near_trainstops_per_line
-
+    
     # convert the py file to js to use in index.html js code
     _log.info("Convert py config file to js config file")
     import config_py2js
