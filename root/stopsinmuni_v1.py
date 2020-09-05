@@ -112,7 +112,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 				#print stop_loc
 				stopinmunicount +=1
 	print('len(munisforoutput_dict) with cities: ', len(munisforoutput_dict))
-	print(munisforoutput_dict[muni_id]) # last one
+	#print(munisforoutput_dict[muni_id]) # last one
 	# for each town 
 	for feature in town_geo['features']:
 	# get muni boarders multipoly to use as filter
@@ -140,7 +140,7 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
 				#print stop_loc
 				stopinmunicount +=1
 	print('len(munisforoutput_dict) with cities and towns: ', len(munisforoutput_dict))
-	print(munisforoutput_dict[muni_id]) # last one
+	#print(munisforoutput_dict[muni_id]) # last one - the print has error if no last one
 
 	# output js file of stopsinmuni pre edit
 	fileoutname = stopsinmuni_pre_edit

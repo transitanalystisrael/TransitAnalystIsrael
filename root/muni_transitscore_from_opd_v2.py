@@ -186,7 +186,10 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 		#feature['properties']['muni_type'] = 'city'
 		spopulation = muniinfodict[muni_id][0]
 		sbuilt_area = muniinfodict[muni_id][1]
-		smuni_opd = munitransitdict[muni_id][0]
+		if muni_id in munitransitdict :
+			smuni_opd = munitransitdict[muni_id][0]
+		else:
+			smuni_opd = '0'
 		feature['properties']['pop'] = spopulation
 		feature['properties']['built_area'] = sbuilt_area
 		feature['properties']['muni_opd'] = smuni_opd
@@ -214,7 +217,10 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 		#feature['properties']['muni_type'] = 'city'
 		spopulation = muniinfodict[muni_id][0]
 		sbuilt_area = muniinfodict[muni_id][1]
-		smuni_opd = munitransitdict[muni_id][0]
+		if muni_id in munitransitdict :
+			smuni_opd = munitransitdict[muni_id][0]
+		else:
+			smuni_opd = '0'
 		feature['properties']['pop'] = spopulation
 		feature['properties']['built_area'] = sbuilt_area
 		feature['properties']['muni_opd'] = smuni_opd
