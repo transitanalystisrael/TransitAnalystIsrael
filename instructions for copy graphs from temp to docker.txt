@@ -8,8 +8,8 @@ $  docker cp  C:\temp\secondary-cov.nav.lz4 navitia-docker-compose_tyr_worker_1:
 
 change on-demand graphs to default:
 Open Windows power shell and run the following commands to change on-demand graphs to default
-$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/on-demand-20200405.nav.lz4 C:\temp
-in temp folder rename on-demand-20200405.nav.lz4 to default.nav.lz4
+$  docker cp navitia-docker-compose_tyr_worker_1:/srv/ed/output/ondemand-20200405.nav.lz4 C:\temp
+in temp folder rename ondemand-20200405.nav.lz4 to default.nav.lz4
 $  docker cp  C:\temp\default.nav.lz4 navitia-docker-compose_tyr_worker_1:/srv/ed/output/
 
 ======================================================================================================================================
