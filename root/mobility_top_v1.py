@@ -33,11 +33,11 @@ import mobility_spectrum_cfg as cfg
 import mobility_navitia_up
 import mobility_spectrum_v8
 import mobility_compare
-'''
+
 mobility_navitia_up.main(cfg.gtfsdate1)
 mobility_spectrum_v8.main(cfg.gtfsdate1, cfg.servicedate1)
 
 mobility_navitia_up.main(cfg.gtfsdate2)
 mobility_spectrum_v8.main(cfg.gtfsdate2, cfg.servicedate2)
-'''
+
 mobility_compare.main()

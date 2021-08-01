@@ -5,8 +5,8 @@ analysis_locs = [
     {'name': 'RLZ_center_HertzelxRothchild', 'loc': ['31.963961', '34.803033'] },
     {'name': 'RLZ_Azrieli_Rishonim', 'loc': ['31.949232', '34.803299'] },
     {'name': 'RLZ_Canyon_Hazahav', 'loc': ['31.990121', '34.774849'] },
-    {'name': 'RLZ_Ikea', 'loc': ['31.951411', '34.771101'] }, 
     {'name': 'Moshe_Dayan_Train_Station', 'loc': ['31.987453', '34.757259'] }, 
+    {'name': 'ramathahayal', 'loc': ['32.10959', '34.83878'] }, 
     {'name': 'Tel_Aviv_City_Hall', 'loc': ['32.081656', '34.781205'] }, 
     {'name': 'hashalom_Azrieli_Tel_Aviv', 'loc': ['32.073600', '34.790000'] }
 ]
@@ -21,10 +21,10 @@ analysis_locs = [
     {'name': 'TAU', 'loc': ['32.11249', '34.80559'] }, 
     {'name': 'ramathahayal', 'loc': ['32.10959', '34.83878'] }, 
 '''
-gtfsdate1 = '20180526'
-servicedate1 = '20180527'
-gtfsdate2 = '20190526'
-servicedate2 = '20190526'
+gtfsdate1 = '20190526'
+servicedate1 = '20190526'
+gtfsdate2 = '20210425'
+servicedate2 = '20210425'
 
 analysis_time = '080000'
 
