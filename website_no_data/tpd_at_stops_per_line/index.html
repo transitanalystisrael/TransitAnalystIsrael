@@ -117,7 +117,7 @@
 	var map = L.map('map').setView([32.11057,34.83797], 11);
 
 
-	var tpdLevels = [0, 10, 20, 30, 40, 60, 80, 120, 240, 1200];
+	var tpdLevels = [0, 10, 20, 30, 40, 60, 80, 120, 240, 400, 600, 800, 1200];
 	var initslidervalue = 5;
 	var slidervalue = tpdLevels[initslidervalue];
 
@@ -411,7 +411,7 @@
 			//console.log(slidervalue);
 		}, {
 		position: 'topleft',
-		max: 9,
+		max: 12,
 		min: 0,
 		value: initslidervalue,
 		getValue: function(value){return tpdLevels[value];},
