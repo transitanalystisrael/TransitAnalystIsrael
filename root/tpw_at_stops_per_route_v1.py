@@ -526,6 +526,6 @@ def main(gtfsdate, gtfsparentpath, gtfsdirbase, processedpath, serviceweekstartd
     print(("Saved file: " + geojsonfileout))
     """
 #main(gtfsdate, gtfsparentpath, gtfsdirbase, processedpath, serviceweekstartdate)
-main('20210704', 'gtfs', 'israel', 'processed', '20210704')
+main('20170517', 'gtfs', 'israel', 'processed', '20170517')
 
 
