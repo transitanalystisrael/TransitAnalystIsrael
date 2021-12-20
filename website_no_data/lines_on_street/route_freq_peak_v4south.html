@@ -188,13 +188,14 @@
 	  //console.log(line);
 	  //var distance = turf.pointToLineDistance(pt, line);
 	  //console.log(distance);
-	  var maxDistance = 0.1 // Km
+	  var zoom_circle = 2**(13 - map.getZoom());
+	  var maxDistance = 0.1; // Km for zoom 13
 	  var point = e.latlng;
 	  var pt = turf.point([point.lng,point.lat]);
 	  //console.log(pt);
 	  //var circle;
 	  if (typeof circle !== 'undefined') {circle.removeFrom(map);}
-	  circle = L.circle([point.lat,point.lng], { color: 'red', radius: maxDistance * 1000 }).addTo(map);
+	  circle = L.circle([point.lat,point.lng], { color: 'red', radius: zoom_circle * maxDistance * 1000 }).addTo(map);
 	  var intersectingFeatures = [];
 	  map.eachLayer(function(layer){
 		if (typeof layer.feature !== 'undefined') {
@@ -202,7 +203,7 @@
 			//console.log(line);
 			var distance = turf.pointToLineDistance(pt, line);
 			//console.log(distance);
-			if (distance < maxDistance) {
+			if (distance < zoom_circle * maxDistance) {
 				//console.log(layer.feature.properties.route_short_name, distance);
 				intersectingFeatures.push(layer);
 				//layer.setStyle({ weight: 6, color: '#666', opacity: 1 });
@@ -249,7 +250,7 @@
               displaystring +
               '    </tbody>' +
               '</table>' +
-              '<p>תדירות מוערכת לכיוון בשעת שיא:</p>' + Math.round(10*totaltpd/2/2)/10 + // counted over 2 hours of peak
+              '<p>תדירות מוערכת בשעת שיא:</p>' + Math.round(10*totaltpd/2)/10 + // counted over 2 hours of peak
               '</>';
 
 		map.openPopup(html, e.latlng, {
