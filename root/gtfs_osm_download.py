@@ -99,8 +99,10 @@ def get_gtfs_file_from_url_ftp(url, file_name_on_server, _log):
 
             local_file_name = cfg.gtfsdirbase
             processdate = process_date.get_date_now()
+            #ftp.cwd('TestGTFS')
             ftp.dir("", file_lines.append)
             for line in file_lines:
+                print(line)
                 tokens = line.split(maxsplit=4)
                 name = tokens[3]
                 if name == file_name_on_server:

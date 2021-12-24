@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # stops near train station auto editor pre to post txt file
 # find what stops need to be removed in new file by collecting the stops removed in the manual edit of stopsneartrainstop_pre_edit_20181021
+# skip edit if config parameter stops_near_tainstop_auto_edit == 0
 #
 print('----------------- stops near train station auto editor pre to post txt file --------------------------')
 import transitanalystisrael_config as cfg
@@ -106,7 +107,8 @@ print 'stopssetpre len : ',len(stopssetpre)
 
 # compute set of removed stops from reference sets
 removedset = ([])
-removedset = stopssetpreref.difference(stopssetpostref)
+if cfg.stops_near_tainstop_auto_edit == '1' : # edit only if cfg.stops_near_tainstop_auto_edit is '1'. skip if it is '0'
+    removedset = stopssetpreref.difference(stopssetpostref)
 print('removedset len : ',len(removedset))
 
 # create post edit dict by itirating on pre and adding to post only if not in removed set
