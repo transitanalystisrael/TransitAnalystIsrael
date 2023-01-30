@@ -389,9 +389,10 @@
 	var selectedlinetpd = "";
 	function clicklinefunction(e){
 		var linename = e.target.innerHTML;
-		selectedlineagency = e.path[1].cells[0].innerText;
-		selectedlinenumber = e.path[1].cells[1].innerText;
-		selectedlinetpd = e.path[1].cells[2].innerText;
+        var e_path = e.composedPath();
+		selectedlineagency = e_path[1].cells[0].innerText;
+		selectedlinenumber = e_path[1].cells[1].innerText;
+		selectedlinetpd = e_path[1].cells[2].innerText;
 		//console.log(linename);
 		//console.log(e.path);
 		//console.log(e.path[1].rowIndex);
