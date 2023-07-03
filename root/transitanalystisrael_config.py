@@ -3,7 +3,6 @@
 #
 # config file for transitanalystisrael tools  
 #
-
 # product templates - remove comment from one product
 #
 
