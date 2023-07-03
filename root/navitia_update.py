@@ -46,13 +46,14 @@ def process_new_data_to_current_coverage(docker_client, navitia_docker_compose_f
     # Re-start Navitia docker with default coverage only in order to process the OSM & GTFS
     # Later we will restart with the custom coverage as well
     utils.stop_all_containers(docker_client)
+    
     if cfg.get_service_date == "auto":
         utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_default_file_name,
                                                  default_coverage_name)
     elif cfg.get_service_date == "on_demand":
         utils.start_navitia_with_single_coverage(navitia_docker_compose_file_path, navitia_docker_compose_file_name,
                                                  coverage_name)
-
+    
     # Get the new worker container
     worker_con = docker_client.containers.list(filters={"name": "worker"})[0]
 

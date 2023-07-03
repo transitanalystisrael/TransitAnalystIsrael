@@ -43,22 +43,24 @@ ttm_server_on = 'local_pc'
 #ttm_server_on = 'local_pc'
 
 #On demand date on local pc no TTM
-# get_service_date = 'on_demand'
-# python_processing = 'local_pc'
-# ttm_graph_processing = 'none'
-# web_client_hosted_on = 'local_pc'
-# ttm_server_on = 'none'
+#get_service_date = 'on_demand'
+#python_processing = 'local_pc'
+#ttm_graph_processing = 'none'
+#web_client_hosted_on = 'local_pc'
+#ttm_server_on = 'none'
 
 
 # common config
 # note - gtfsdate and serviceweekstartdate must be the same!!! (untill all scripts support different dates...)
-gtfsdate = '20190602'
-serviceweekstartdate = '20190602'
+gtfsdate = '20230101'
+serviceweekstartdate = '20230101'
 autodatefile = 'auto_dates_to_process.json'
 gtfsdirbase = 'israel'
 gtfs_url = 'gtfs.mot.gov.il'
+gtfs_url_test = 'gtfs.mot.gov.il\TestGTFS'
 gtfs_file_name_on_mot_server = 'israel-public-transportation.zip' 
 gtfspath = 'gtfs'
+gtfs_url_https = 'https://gtfs.mot.gov.il//gtfsfiles//israel-public-transportation.zip'
 osm_url='https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf'
 osm_file_name = "israel-and-palestine-latest.osm.pbf"
 osmpath = 'osm'
@@ -75,6 +77,18 @@ sstarttimeall = '00:00:00'
 sstoptimeall = '24:00:00'
 bigjs2gzip = '500000'
 language = 'hebrew'
+
+# verify and patch config. change from 'no' to 'yes' as needed
+patch_calendar = 'no'
+patch_stoptimes_trip_id = 'no'
+
+# service weight for transitscore and muni_transitscore
+train_weight = '10.0'
+lrt_weight = '5.0'
+brt_weight = '3.0'
+funic_weight = '3.0'
+cable_weight = '0.25'
+bus_weight = '1.0'
 
 # line_freq config
 freqtpdmin = '60'
@@ -99,8 +113,11 @@ sstoptimepeak = '09:00:00'
 # meters for stop to be considered near trainstop before editing
 neartrainstop = '500.0'
 autoeditrefdate = '20181021'
+# set to '0' to skip autoedit, set to '1' to enable autoedit
+stops_near_tainstop_auto_edit = '0'
 
 # transitscore config
+maxrawtransitscore20230101 = '62899.3'
 
 # transit_time_map config
 # curent_or_past is changed to past in the js config file by copyprocessed2website.py when moving website_current to website_past
