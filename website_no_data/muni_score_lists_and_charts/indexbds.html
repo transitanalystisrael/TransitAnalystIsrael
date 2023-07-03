@@ -471,8 +471,9 @@ td {
 <script type="text/javascript">
 	function clicknamefunction(e){
 		var muniName = e.target.innerHTML;
-		//console.log(e.path[1].rowIndex);
-		var listIndex = e.path[1].rowIndex
+        var e_path = e.composedPath();
+		//console.log(e_path[1].rowIndex);
+		var listIndex = e_path[1].rowIndex
 		var muniIndex = namelist.indexOf(muniName);
 		//console.log(muniIndex, muniName);
 		barColor[muniIndex] = barColor[muniIndex] == 'grey' ? 'red' :
