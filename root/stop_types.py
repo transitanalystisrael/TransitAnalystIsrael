@@ -14,156 +14,201 @@ cwd = Path.cwd()
 print("Local current time :", time.asctime( time.localtime(time.time()) ))
 #
 def main(gtfsdate, gtfsparentpath, gtfsdirbase, pathout):
-	# input:
-	parent_path = cwd.parent / gtfsparentpath
-	gtfsdir = gtfsdirbase+gtfsdate
-	txtfilein = ''
-	
-	# output:
-	txtfileout = 'stop_types'+'_'+gtfsdate+'.txt'
-	jsfileout  = 'stop_types'+'_'+gtfsdate+'.js'
-	
-	gtfspathin = parent_path / gtfsdir
-	gtfspath = gtfspathin
-	gtfspathout = cwd.parent / pathout
-	
-	# >>> load routes file
-	txtfilein = 'routes.txt'
-	routes_list = []
-	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
-		reader = csv.reader(f)
-		header = next(reader) # [route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_color]
-		print(header)
-		for row in reader:
-			#print row
-			routes_list.append([row[0], row[1]]) # [route_id,agency_id]
-	#print routes_list[:4]
-	print('routes_list loaded. routes count ', len(routes_list))
-	
-	# >>> load trips file
-	txtfilein = 'trips.txt'
-	trips_list = []
-	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
-		reader = csv.reader(f)
-		header = next(reader) # [route_id,service_id,trip_id,trip_headsign,direction_id,shape_id]
-		print(header)
-		for row in reader:
-			#print row
-			trips_list.append([row[0], row[2]]) # [route_id,trip_id]
-	#print trips_list[:4]
-	print('trips_list loaded. trips count ', len(trips_list))
-	
-	# >>> load stop_times file
-	txtfilein = 'stop_times.txt'
-	stop_times_list = []
-	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
-		reader = csv.reader(f)
-		header = next(reader) # [trip_id,arrival_time,departure_time,stop_id,stop_sequence,pickup_type,drop_off_type,shape_dist_traveled]
-		print(header)
-		for row in reader:
-			#print row
-			stop_times_list.append([row[0], row[3]]) # [trip_id,stop_id]
-	#print stop_times_list[:4]
-	print('stop_times_list loaded. stop_times count ', len(stop_times_list))
-	
-	# >>> load stops file
-	txtfilein = 'stops.txt'
-	stops_dict = {}
-	with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
-		reader = csv.reader(f)
-		header = next(reader) # ['stop_id', 'stop_code', 'stop_name', 'stop_desc', 'stop_lat', 'stop_lon', 'location_type', 'parent_station', 'zone_id']
-		print(header)
-		for row in reader:
-			#print row
-			stops_dict[row[0]] = [row[2], row[3], row[4], row[5]] # 'stop_id' : ['stop_name', 'stop_desc', 'stop_lat', 'stop_lon']
-	#print stops_dict[row[0]] # last one
-	print('stops_dict loaded. stop count ', len(stops_dict))
-	
-	# >>> process loaded files
-	
-	train_routes_set = set([])
-	lrt_routes_set = set([])
-	brt_routes_set = set([])
-	bus_routes_set = set([])
-	for [route_id,agency_id] in routes_list :
-		if agency_id == '2' : train_routes_set.add(route_id)
-		elif agency_id == '21' : lrt_routes_set.add(route_id)
-		elif agency_id == '30' : brt_routes_set.add(route_id)
-		else : bus_routes_set.add(route_id)
-	#print train_routes_set
-	
-	train_trips_set = set([])
-	lrt_trips_set = set([])
-	brt_trips_set = set([])
-	bus_trips_set = set([])
-	for [route_id,trip_id] in trips_list :
-		if route_id in train_routes_set : train_trips_set.add(trip_id)
-		elif route_id in lrt_routes_set : lrt_trips_set.add(trip_id)
-		elif route_id in brt_routes_set : brt_trips_set.add(trip_id)
-		else : bus_trips_set.add(trip_id)
-	#print train_trips_set
-	
-	train_stops_set = set([])
-	lrt_stops_set = set([])
-	brt_stops_set = set([])
-	bus_stops_set = set([])
-	for [trip_id,stop_id] in stop_times_list :
-		if trip_id in train_trips_set : train_stops_set.add(stop_id)
-		elif trip_id in lrt_trips_set : lrt_stops_set.add(stop_id)
-		elif trip_id in brt_trips_set : brt_stops_set.add(stop_id)
-		else : bus_stops_set.add(stop_id)
-	#print train_stops_set
-	print('len(train_stops_set) : ', len(train_stops_set))
-	print('len(lrt_stops_set) : ', len(lrt_stops_set))
-	print('len(brt_stops_set) : ', len(brt_stops_set))
-	print('len(bus_stops_set) : ', len(bus_stops_set))
-	
-	stop_types_list = []
-	for stop_id in train_stops_set :
-		[stop_name, stop_desc, stop_lat, stop_lon] = stops_dict[stop_id]
-		stop_types_list.append([stop_id, stop_name, 'train', stop_lat, stop_lon])
-	for stop_id in lrt_stops_set :
-		[stop_name, stop_desc, stop_lat, stop_lon] = stops_dict[stop_id]
-		stop_types_list.append([stop_id, stop_name, 'lrt', stop_lat, stop_lon])
-	for stop_id in brt_stops_set :
-		[stop_name, stop_desc, stop_lat, stop_lon] = stops_dict[stop_id]
-		stop_types_list.append([stop_id, stop_name, 'brt', stop_lat, stop_lon])
-	for stop_id in bus_stops_set :
-		[stop_name, stop_desc, stop_lat, stop_lon] = stops_dict[stop_id]
-		stop_types_list.append([stop_id, stop_name, 'bus', stop_lat, stop_lon])
-	
-	# ************************************************************************************************************************
-	# open and prep output txt file 
-	#
-	print('open file ', gtfspathout / txtfileout)
-	fileout = open(gtfspathout / txtfileout, 'w', encoding="utf8") # save results in file
-	postsline = 'stop_id,stop_name,stop_type,stop_lat,stop_lon\n'
-	print(postsline)
-	fileout.write(postsline)
-	outfilelinecount = 0
-	
-	for [stop_id, stop_name, stop_type, stop_lat, stop_lon] in stop_types_list :
-		if '/' in stop_name : stop_name = stop_name[:stop_name.find('/')]
-		postsline = ','.join([stop_id, stop_name, stop_type, str(stop_lat), str(stop_lon)])+'\n'
-		fileout.write(postsline)
-		outfilelinecount += 1
-	fileout.close()
-	print('close file ', gtfspathout / txtfileout)
-	print('lines in out file count ', outfilelinecount)
-	
-	# ************************************************************************************************************************
-	# open and output js file 
-	#
-	print("Saving file: ", gtfspathout / jsfileout, " ...")
-	nf = open(gtfspathout / jsfileout, "w", encoding="utf8")
-	outstr = 'var stopsType = {\n'
-	for [stop_id, stop_name, stop_type, stop_lat, stop_lon] in stop_types_list :
-		nf.write(outstr)
-		outstr = stop_id+': "'+stop_type+'",\n'
-	outstr = outstr[:-2]+'\n}'
-	nf.write(outstr)
-	nf.close()
-	print(("Saved file: ", jsfileout))
-	
-	print("Local current time :", time.asctime( time.localtime(time.time()) ))
+    # input:
+    parent_path = cwd.parent / gtfsparentpath
+    gtfsdir = gtfsdirbase+gtfsdate
+    txtfilein = ''
+    
+    # output:
+    txtfileout = 'stop_types'+'_'+gtfsdate+'.txt'
+    jsfileout  = 'stop_types'+'_'+gtfsdate+'.js'
+    
+    gtfspathin = parent_path / gtfsdir
+    gtfspath = gtfspathin
+    gtfspathout = cwd.parent / pathout
+    
+    # >>> load ClusterToLineToWeight file
+    txtfilein = 'ClusterToLineToWeight.csv'
+    weight_dict = {}
+    with open(parent_path / txtfilein, newline='', encoding="utf8") as f:
+        reader = csv.reader(f)
+        header = next(reader) # ['\ufeffOperatorName', 'OfficeLineId', 'OperatorLineId', 'ClusterName', 'FromDate', 'ToDate', 'ClusterId', 'LineType', 'LineTypeDesc', 'ClusterSubDesc', 'ServiceType']
+        print(header)
+        for row in reader:
+            print(row)
+            weight_dict[row[1]] = [row[10]] # 'OfficeLineId' :  ['ServiceType']
+    print(weight_dict)
+    print('weight_dict loaded. count ', len(weight_dict))
+    
+    # >>> load routes file
+    txtfilein = 'routes.txt'
+    routes_list = []
+    with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
+        reader = csv.reader(f)
+        header = next(reader) # [route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_color]
+        print(header)
+        for row in reader:
+            #print row
+            routes_list.append([row[0], row[1], row[4][0:5]]) # [route_id,agency_id, OfficeLineId]
+    print(routes_list[:4])
+    print('routes_list loaded. routes count ', len(routes_list))
+    
+    # >>> load trips file
+    txtfilein = 'trips.txt'
+    trips_list = []
+    with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
+        reader = csv.reader(f)
+        header = next(reader) # [route_id,service_id,trip_id,trip_headsign,direction_id,shape_id]
+        print(header)
+        for row in reader:
+            #print row
+            trips_list.append([row[0], row[2]]) # [route_id,trip_id]
+    #print trips_list[:4]
+    print('trips_list loaded. trips count ', len(trips_list))
+    
+    # >>> load stop_times file
+    txtfilein = 'stop_times.txt'
+    stop_times_list = []
+    with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
+        reader = csv.reader(f)
+        header = next(reader) # [trip_id,arrival_time,departure_time,stop_id,stop_sequence,pickup_type,drop_off_type,shape_dist_traveled]
+        print(header)
+        for row in reader:
+            #print row
+            stop_times_list.append([row[0], row[3]]) # [trip_id,stop_id]
+    #print stop_times_list[:4]
+    print('stop_times_list loaded. stop_times count ', len(stop_times_list))
+    
+    # >>> load stops file
+    txtfilein = 'stops.txt'
+    stops_dict = {}
+    with open(gtfspathin / txtfilein, newline='', encoding="utf8") as f:
+        reader = csv.reader(f)
+        header = next(reader) # ['stop_id', 'stop_code', 'stop_name', 'stop_desc', 'stop_lat', 'stop_lon', 'location_type', 'parent_station', 'zone_id']
+        print(header)
+        for row in reader:
+            #print row
+            stops_dict[row[0]] = [row[2], row[3], row[4], row[5]] # 'stop_id' : ['stop_name', 'stop_desc', 'stop_lat', 'stop_lon']
+    #print stops_dict[row[0]] # last one
+    print('stops_dict loaded. stop count ', len(stops_dict))
+    
+    # >>> process loaded files
+    
+    train_routes_set = set([])
+    lrt_routes_set = set([])
+    brt_routes_set = set([])
+    funic_routes_set = set([])
+    cable_routes_set = set([])
+    bus_routes_set = set([])
+    for [route_id, agency_id, OfficeLineId] in routes_list :
+        if agency_id == '2' : train_routes_set.add(route_id)
+        elif OfficeLineId in weight_dict :
+            if weight_dict[OfficeLineId][0] == 'lrt' : lrt_routes_set.add(route_id)
+            elif weight_dict[OfficeLineId][0] == 'brt' : brt_routes_set.add(route_id)
+            elif weight_dict[OfficeLineId][0] == 'funic' : funic_routes_set.add(route_id)
+            elif weight_dict[OfficeLineId][0] == 'cable' : cable_routes_set.add(route_id)
+            else : print('**************************************error')
+        else : bus_routes_set.add(route_id)
+    #print(train_routes_set)
+    print(lrt_routes_set)
+    print(brt_routes_set)
+    print(funic_routes_set)
+    print(cable_routes_set)
+    
+    train_trips_set = set([])
+    lrt_trips_set = set([])
+    brt_trips_set = set([])
+    funic_trips_set = set([])
+    cable_trips_set = set([])
+    bus_trips_set = set([])
+    for [route_id,trip_id] in trips_list :
+        if route_id in train_routes_set : train_trips_set.add(trip_id)
+        elif route_id in lrt_routes_set : lrt_trips_set.add(trip_id)
+        elif route_id in brt_routes_set : brt_trips_set.add(trip_id)
+        elif route_id in funic_routes_set : funic_trips_set.add(trip_id)
+        elif route_id in cable_routes_set : cable_trips_set.add(trip_id)
+        else : bus_trips_set.add(trip_id)
+    print(len(train_trips_set))
+    print(len(lrt_trips_set))
+    print(len(brt_trips_set))
+    print(len(funic_trips_set))
+    print(len(cable_trips_set))
+    
+    train_stops_set = set([])
+    lrt_stops_set = set([])
+    brt_stops_set = set([])
+    funic_stops_set = set([])
+    cable_stops_set = set([])
+    bus_stops_set = set([])
+    for [trip_id,stop_id] in stop_times_list :
+        if trip_id in train_trips_set : train_stops_set.add(stop_id)
+        elif trip_id in lrt_trips_set : lrt_stops_set.add(stop_id)
+        elif trip_id in brt_trips_set : brt_stops_set.add(stop_id)
+        elif trip_id in funic_trips_set : funic_stops_set.add(stop_id)
+        elif trip_id in cable_trips_set : cable_stops_set.add(stop_id)
+        else : bus_stops_set.add(stop_id)
+    #print train_stops_set
+    print('len(train_stops_set) : ', len(train_stops_set))
+    print('len(lrt_stops_set) : ', len(lrt_stops_set))
+    print('len(brt_stops_set) : ', len(brt_stops_set))
+    print('len(funic_stops_set) : ', len(funic_stops_set))
+    print('len(cable_stops_set) : ', len(cable_stops_set))
+    print('len(bus_stops_set) : ', len(bus_stops_set))
+    
+    stop_types_list = []
+    for stop_id in train_stops_set :
+        [stop_name, stop_desc, stop_lat, stop_lon] = stops_dict[stop_id]
+        stop_types_list.append([stop_id, stop_name, 'train', stop_lat, stop_lon])
+    for stop_id in lrt_stops_set :
+        [stop_name, stop_desc, stop_lat, stop_lon] = stops_dict[stop_id]
+        stop_types_list.append([stop_id, stop_name, 'lrt', stop_lat, stop_lon])
+    for stop_id in brt_stops_set :
+        [stop_name, stop_desc, stop_lat, stop_lon] = stops_dict[stop_id]
+        stop_types_list.append([stop_id, stop_name, 'brt', stop_lat, stop_lon])
+    for stop_id in funic_stops_set :
+        [stop_name, stop_desc, stop_lat, stop_lon] = stops_dict[stop_id]
+        stop_types_list.append([stop_id, stop_name, 'funic', stop_lat, stop_lon])
+    for stop_id in cable_stops_set :
+        [stop_name, stop_desc, stop_lat, stop_lon] = stops_dict[stop_id]
+        stop_types_list.append([stop_id, stop_name, 'cable', stop_lat, stop_lon])
+    for stop_id in bus_stops_set :
+        [stop_name, stop_desc, stop_lat, stop_lon] = stops_dict[stop_id]
+        stop_types_list.append([stop_id, stop_name, 'bus', stop_lat, stop_lon])
+    
+    # ************************************************************************************************************************
+    # open and prep output txt file 
+    #
+    print('open file ', gtfspathout / txtfileout)
+    fileout = open(gtfspathout / txtfileout, 'w', encoding="utf8") # save results in file
+    postsline = 'stop_id,stop_name,stop_type,stop_lat,stop_lon\n'
+    print(postsline)
+    fileout.write(postsline)
+    outfilelinecount = 0
+    
+    for [stop_id, stop_name, stop_type, stop_lat, stop_lon] in stop_types_list :
+        if '/' in stop_name : stop_name = stop_name[:stop_name.find('/')]
+        postsline = ','.join([stop_id, stop_name, stop_type, str(stop_lat), str(stop_lon)])+'\n'
+        fileout.write(postsline)
+        outfilelinecount += 1
+    fileout.close()
+    print('close file ', gtfspathout / txtfileout)
+    print('lines in out file count ', outfilelinecount)
+    
+    # ************************************************************************************************************************
+    # open and output js file 
+    #
+    print("Saving file: ", gtfspathout / jsfileout, " ...")
+    nf = open(gtfspathout / jsfileout, "w", encoding="utf8")
+    outstr = 'var stopsType = {\n'
+    for [stop_id, stop_name, stop_type, stop_lat, stop_lon] in stop_types_list :
+        nf.write(outstr)
+        outstr = stop_id+': "'+stop_type+'",\n'
+    outstr = outstr[:-2]+'\n}'
+    nf.write(outstr)
+    nf.close()
+    print(("Saved file: ", jsfileout))
+    
+    print("Local current time :", time.asctime( time.localtime(time.time()) ))
+    
+# main('20221106', 'gtfs', 'israel', 'processed')
 

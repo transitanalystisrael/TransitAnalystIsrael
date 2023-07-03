@@ -16,7 +16,7 @@
 #   pathin = 'C:\\transitanalyst\\processed\\'
 #   pathout = 'C:\\transitanalyst\\processed\\'#   israel_city_boarders.geojson
 #   israel_town_boarders.geojson # moatzot mekomiyot
-#   muni_pop2017_built-area2017.csv
+#   muni_pop2017_built-area2017.csv (changed to 2022)
 #   'muni_opd'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt' - txt file with average opd per muni  - muni_opd_20180425_20180425.txt
 #   'muni_names.txt' - map names from english to hebrew
 #
@@ -60,7 +60,8 @@ def main(gtfsdate, processedpath, serviceweekstartdate, language):
 	sserviceweekstartdate = serviceweekstartdate
 	cityfilein = 'israel_city_boarders.geojson'
 	townfilein = 'israel_town_boarders.geojson' # moatzot mekomiyot
-	muniinfofilein = 'muni_pop2017_built-area2017.csv'
+	#muniinfofilein = 'muni_pop2017_built-area2017.csv'
+	muniinfofilein = 'muni_pop2022_built-area2022.csv'
 	munitransitfilein = 'muni_opd'+'_'+sserviceweekstartdate+'_'+gtfsdate+'.txt'
 	muninamesfilein = 'muni_names.txt'
 

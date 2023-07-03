@@ -23,6 +23,8 @@ import copy
 import csv
 import gtfs_config as gtfscfg
 from pathlib import Path
+import transitanalystisrael_config as cfg
+
 
 cwd = Path.cwd()
 
@@ -346,10 +348,12 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	for stop_id, [stop_desc, stop_lat, stop_lon, tripset, tpdlist, totaltpdatstop] in stops_dict.items():
 		#print stop_id
 		if stop_id in stop_types_dict :
-			if stop_types_dict[stop_id] == 'train' : totaltpdatstop *=10
-			elif stop_types_dict[stop_id] == 'lrt' : totaltpdatstop *=5
-			elif stop_types_dict[stop_id] == 'brt' : totaltpdatstop *=3
-			else : totaltpdatstop *=1 # 'bus'
+			if stop_types_dict[stop_id] == 'train' : totaltpdatstop *= float(cfg.train_weight)
+			elif stop_types_dict[stop_id] == 'lrt' : totaltpdatstop *= float(cfg.lrt_weight)
+			elif stop_types_dict[stop_id] == 'brt' : totaltpdatstop *= float(cfg.brt_weight)
+			elif stop_types_dict[stop_id] == 'funic' : totaltpdatstop *= float(cfg.funic_weight)
+			elif stop_types_dict[stop_id] == 'cable' : totaltpdatstop *= float(cfg.cable_weight)
+			else : totaltpdatstop *= float(cfg.bus_weight) # 'bus'
 		else :
 			print('stop_id not in stop_types.txt probably empty tripset and zero tpd ****************')
 			print('stop_id, tripset, totaltpdatstop : ', stop_id, tripset, totaltpdatstop)
@@ -362,3 +366,4 @@ def main(gtfsdate, gtfspath, gtfsdirbase, processedpath, serviceweekstartdate):
 	print('count ', count)
 	print('maxtotaltripsanystop, maxaveragetpdatanystop after 10x for rail', maxtotaltripsanystop, maxtotaltripsanystop/daysofservicetocount)
 
+#main('20221106', 'gtfs', 'israel', 'processed', '20221106')

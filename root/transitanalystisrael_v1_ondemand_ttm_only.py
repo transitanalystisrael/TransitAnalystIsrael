@@ -64,7 +64,7 @@ try:
     import trainstopautoeditpre2post_v1 # you can also manually edit the pre file to create the post file and rerun the script with this commented out
     _log.info("TPD near train stops")
     import tpd_near_trainstops_per_line
-    """
+    
     # convert the py file to js to use in index.html js code
     _log.info("Convert py config file to js config file")
     import config_py2js
@@ -81,7 +81,7 @@ try:
         #upload files to cloud website dir from local website dir
         _log.info("Upload website to AWS S3")
         import upload2aws_s3
-    
+    """
     if cfg.ttm_graph_processing != 'none':
         # process TTM files
         _log.info("Update Navitia Time Map server")
