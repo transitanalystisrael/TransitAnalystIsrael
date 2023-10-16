@@ -51,8 +51,8 @@ ttm_server_on = 'local_pc'
 
 # common config
 # note - gtfsdate and serviceweekstartdate must be the same!!! (untill all scripts support different dates...)
-gtfsdate = '20230101'
-serviceweekstartdate = '20230101'
+gtfsdate = '20230820'
+serviceweekstartdate = '20230820'
 autodatefile = 'auto_dates_to_process.json'
 gtfsdirbase = 'israel'
 gtfs_url = 'gtfs.mot.gov.il'

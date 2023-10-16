@@ -1,0 +1,317 @@
+
+
+ubuntu@ip-172-31-11-11:/$ sudo du -d 1 -h /usr/
+4.0K    /usr/games
+872M    /usr/lib
+193M    /usr/include
+324M    /usr/bin
+25M     /usr/sbin
+12M     /usr/local
+8.0G    /usr/src
+254M    /usr/share
+9.6G    /usr/
+ubuntu@ip-172-31-11-11:/$ sudo du -d 1 -h /usr/src
+113M    /usr/src/linux-aws-headers-4.15.0-1051
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1085
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1084
+113M    /usr/src/linux-aws-headers-4.15.0-1063
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1048
+115M    /usr/src/linux-aws-headers-4.15.0-1021
+113M    /usr/src/linux-aws-headers-4.15.0-1048
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1063
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1056
+113M    /usr/src/linux-aws-headers-4.15.0-1060
+109M    /usr/src/linux-aws-5.3-headers-5.3.0-1030
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1069
+109M    /usr/src/linux-aws-5.3-headers-5.3.0-1017
+113M    /usr/src/linux-aws-headers-4.15.0-1050
+115M    /usr/src/linux-aws-headers-4.15.0-1037
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1081
+21M     /usr/src/linux-headers-5.4.0-1088-aws
+19M     /usr/src/linux-headers-4.15.0-1058-aws
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1059
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1060
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1064
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1071
+115M    /usr/src/linux-aws-headers-4.15.0-1034
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1028
+19M     /usr/src/linux-headers-4.15.0-1021-aws
+109M    /usr/src/linux-aws-5.3-headers-5.3.0-1033
+109M    /usr/src/linux-aws-5.3-headers-5.3.0-1034
+115M    /usr/src/linux-aws-headers-4.15.0-1033
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1035
+115M    /usr/src/linux-aws-headers-4.15.0-1041
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1058
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1068
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1034
+113M    /usr/src/linux-aws-headers-4.15.0-1058
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1032
+113M    /usr/src/linux-aws-headers-4.15.0-1047
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1080
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1065
+109M    /usr/src/linux-aws-5.3-headers-5.3.0-1023
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1038
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1086
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1041
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1045
+115M    /usr/src/linux-aws-headers-4.15.0-1040
+113M    /usr/src/linux-aws-headers-4.15.0-1054
+109M    /usr/src/linux-aws-5.3-headers-5.3.0-1035
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1047
+113M    /usr/src/linux-aws-headers-4.15.0-1057
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1037
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1029
+115M    /usr/src/linux-aws-headers-4.15.0-1044
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1055
+115M    /usr/src/linux-aws-headers-4.15.0-1035
+21M     /usr/src/linux-headers-5.4.0-1086-aws
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1051
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1043
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1049
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1075
+115M    /usr/src/linux-aws-headers-4.15.0-1043
+113M    /usr/src/linux-aws-headers-4.15.0-1052
+115M    /usr/src/linux-aws-headers-4.15.0-1045
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1083
+21M     /usr/src/linux-headers-5.4.0-1085-aws
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1078
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1054
+109M    /usr/src/linux-aws-5.3-headers-5.3.0-1032
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1072
+109M    /usr/src/linux-aws-5.3-headers-5.3.0-1028
+113M    /usr/src/linux-aws-headers-4.15.0-1056
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1057
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1030
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1061
+115M    /usr/src/linux-aws-headers-4.15.0-1039
+113M    /usr/src/linux-aws-headers-4.15.0-1065
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1025
+109M    /usr/src/linux-aws-5.3-headers-5.3.0-1019
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1066
+108M    /usr/src/linux-aws-5.4-headers-5.4.0-1039
+8.0G    /usr/src
+ubuntu@ip-172-31-11-11:/$ sudo apt-get autoremove
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+You might want to run 'apt --fix-broken install' to correct these.
+The following packages have unmet dependencies:
+ linux-headers-5.4.0-1088-aws : Depends: linux-aws-5.4-headers-5.4.0-1088 but it is not installed
+ linux-image-5.4.0-1088-aws : Depends: linux-modules-5.4.0-1088-aws but it is not installed
+E: Unmet dependencies. Try 'apt --fix-broken install' with no packages (or specify a solution).
+ubuntu@ip-172-31-11-11:/$ ^C
+ubuntu@ip-172-31-11-11:/$ sudo apt --fix-broken install
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+Correcting dependencies... Done
+The following packages were automatically installed and are no longer required:
+  linux-aws-5.3-headers-5.3.0-1017 linux-aws-5.3-headers-5.3.0-1019 linux-aws-5.3-headers-5.3.0-1023 linux-aws-5.3-headers-5.3.0-1028 linux-aws-5.3-headers-5.3.0-1030
+  linux-aws-5.3-headers-5.3.0-1032 linux-aws-5.3-headers-5.3.0-1033 linux-aws-5.3-headers-5.3.0-1034 linux-aws-5.3-headers-5.3.0-1035 linux-aws-5.4-headers-5.4.0-1025
+  linux-aws-5.4-headers-5.4.0-1028 linux-aws-5.4-headers-5.4.0-1029 linux-aws-5.4-headers-5.4.0-1030 linux-aws-5.4-headers-5.4.0-1032 linux-aws-5.4-headers-5.4.0-1034
+  linux-aws-5.4-headers-5.4.0-1035 linux-aws-5.4-headers-5.4.0-1037 linux-aws-5.4-headers-5.4.0-1038 linux-aws-5.4-headers-5.4.0-1039 linux-aws-5.4-headers-5.4.0-1041
+  linux-aws-5.4-headers-5.4.0-1043 linux-aws-5.4-headers-5.4.0-1045 linux-aws-5.4-headers-5.4.0-1047 linux-aws-5.4-headers-5.4.0-1048 linux-aws-5.4-headers-5.4.0-1049
+  linux-aws-5.4-headers-5.4.0-1051 linux-aws-5.4-headers-5.4.0-1054 linux-aws-5.4-headers-5.4.0-1055 linux-aws-5.4-headers-5.4.0-1056 linux-aws-5.4-headers-5.4.0-1057
+  linux-aws-5.4-headers-5.4.0-1058 linux-aws-5.4-headers-5.4.0-1059 linux-aws-5.4-headers-5.4.0-1060 linux-aws-5.4-headers-5.4.0-1061 linux-aws-5.4-headers-5.4.0-1063
+  linux-aws-5.4-headers-5.4.0-1064 linux-aws-5.4-headers-5.4.0-1065 linux-aws-5.4-headers-5.4.0-1066 linux-aws-5.4-headers-5.4.0-1068 linux-aws-5.4-headers-5.4.0-1069
+  linux-aws-5.4-headers-5.4.0-1071 linux-aws-5.4-headers-5.4.0-1072 linux-aws-5.4-headers-5.4.0-1075 linux-aws-5.4-headers-5.4.0-1078 linux-aws-5.4-headers-5.4.0-1080
+  linux-aws-5.4-headers-5.4.0-1081 linux-aws-5.4-headers-5.4.0-1083 linux-aws-5.4-headers-5.4.0-1084 linux-aws-headers-4.15.0-1033 linux-aws-headers-4.15.0-1034 linux-aws-headers-4.15.0-1035
+  linux-aws-headers-4.15.0-1037 linux-aws-headers-4.15.0-1039 linux-aws-headers-4.15.0-1040 linux-aws-headers-4.15.0-1041 linux-aws-headers-4.15.0-1043 linux-aws-headers-4.15.0-1044
+  linux-aws-headers-4.15.0-1045 linux-aws-headers-4.15.0-1047 linux-aws-headers-4.15.0-1048 linux-aws-headers-4.15.0-1050 linux-aws-headers-4.15.0-1051 linux-aws-headers-4.15.0-1052
+  linux-aws-headers-4.15.0-1054 linux-aws-headers-4.15.0-1056 linux-aws-headers-4.15.0-1057 linux-aws-headers-4.15.0-1060 linux-aws-headers-4.15.0-1063 linux-aws-headers-4.15.0-1065
+Use 'sudo apt autoremove' to remove them.
+The following additional packages will be installed:
+  linux-aws-5.4-headers-5.4.0-1088 linux-modules-5.4.0-1088-aws
+The following NEW packages will be installed:
+  linux-aws-5.4-headers-5.4.0-1088 linux-modules-5.4.0-1088-aws
+0 upgraded, 2 newly installed, 0 to remove and 119 not upgraded.
+5 not fully installed or removed.
+Need to get 0 B/25.2 MB of archives.
+After this operation, 144 MB of additional disk space will be used.
+Do you want to continue? [Y/n] Y
+(Reading database ... 1414059 files and directories currently installed.)
+Preparing to unpack .../linux-modules-5.4.0-1088-aws_5.4.0-1088.96~18.04.1_amd64.deb ...
+Unpacking linux-modules-5.4.0-1088-aws (5.4.0-1088.96~18.04.1) ...
+Preparing to unpack .../linux-aws-5.4-headers-5.4.0-1088_5.4.0-1088.96~18.04.1_all.deb ...
+Unpacking linux-aws-5.4-headers-5.4.0-1088 (5.4.0-1088.96~18.04.1) ...
+Setting up linux-aws-5.4-headers-5.4.0-1088 (5.4.0-1088.96~18.04.1) ...
+Setting up linux-headers-5.4.0-1088-aws (5.4.0-1088.96~18.04.1) ...
+Setting up linux-headers-aws (5.4.0.1088.67) ...
+Setting up linux-modules-5.4.0-1088-aws (5.4.0-1088.96~18.04.1) ...
+Setting up linux-image-5.4.0-1088-aws (5.4.0-1088.96~18.04.1) ...
+I: /vmlinuz.old is now a symlink to boot/vmlinuz-5.4.0-1086-aws
+I: /initrd.img.old is now a symlink to boot/initrd.img-5.4.0-1086-aws
+I: /vmlinuz is now a symlink to boot/vmlinuz-5.4.0-1088-aws
+I: /initrd.img is now a symlink to boot/initrd.img-5.4.0-1088-aws
+Setting up linux-image-aws (5.4.0.1088.67) ...
+Setting up linux-aws (5.4.0.1088.67) ...
+Processing triggers for linux-image-5.4.0-1088-aws (5.4.0-1088.96~18.04.1) ...
+/etc/kernel/postinst.d/initramfs-tools:
+update-initramfs: Generating /boot/initrd.img-5.4.0-1088-aws
+/etc/kernel/postinst.d/x-grub-legacy-ec2:
+Searching for GRUB installation directory ... found: /boot/grub
+Searching for default file ... found: /boot/grub/default
+Testing for an existing GRUB menu.lst file ... found: /boot/grub/menu.lst
+Searching for splash image ... none found, skipping ...
+Found kernel: /boot/vmlinuz-4.15.0-34-generic
+Found kernel: /boot/vmlinuz-5.4.0-1088-aws
+Found kernel: /boot/vmlinuz-5.4.0-1086-aws
+Found kernel: /boot/vmlinuz-5.4.0-1085-aws
+Found kernel: /boot/vmlinuz-4.15.0-1058-aws
+Found kernel: /boot/vmlinuz-4.15.0-1021-aws
+Updating /boot/grub/menu.lst ... done
+
+/etc/kernel/postinst.d/zz-update-grub:
+Sourcing file `/etc/default/grub'
+Sourcing file `/etc/default/grub.d/50-cloudimg-settings.cfg'
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-5.4.0-1088-aws
+Found initrd image: /boot/initrd.img-5.4.0-1088-aws
+Found linux image: /boot/vmlinuz-5.4.0-1086-aws
+Found initrd image: /boot/initrd.img-5.4.0-1086-aws
+Found linux image: /boot/vmlinuz-5.4.0-1085-aws
+Found initrd image: /boot/initrd.img-5.4.0-1085-aws
+Found linux image: /boot/vmlinuz-4.15.0-1058-aws
+Found initrd image: /boot/initrd.img-4.15.0-1058-aws
+Found linux image: /boot/vmlinuz-4.15.0-1021-aws
+Found initrd image: /boot/initrd.img-4.15.0-1021-aws
+done
+ubuntu@ip-172-31-11-11:/$ sudo apt-get autoremove
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following packages will be REMOVED:
+  linux-aws-5.3-headers-5.3.0-1017 linux-aws-5.3-headers-5.3.0-1019 linux-aws-5.3-headers-5.3.0-1023 linux-aws-5.3-headers-5.3.0-1028 linux-aws-5.3-headers-5.3.0-1030
+  linux-aws-5.3-headers-5.3.0-1032 linux-aws-5.3-headers-5.3.0-1033 linux-aws-5.3-headers-5.3.0-1034 linux-aws-5.3-headers-5.3.0-1035 linux-aws-5.4-headers-5.4.0-1025
+  linux-aws-5.4-headers-5.4.0-1028 linux-aws-5.4-headers-5.4.0-1029 linux-aws-5.4-headers-5.4.0-1030 linux-aws-5.4-headers-5.4.0-1032 linux-aws-5.4-headers-5.4.0-1034
+  linux-aws-5.4-headers-5.4.0-1035 linux-aws-5.4-headers-5.4.0-1037 linux-aws-5.4-headers-5.4.0-1038 linux-aws-5.4-headers-5.4.0-1039 linux-aws-5.4-headers-5.4.0-1041
+  linux-aws-5.4-headers-5.4.0-1043 linux-aws-5.4-headers-5.4.0-1045 linux-aws-5.4-headers-5.4.0-1047 linux-aws-5.4-headers-5.4.0-1048 linux-aws-5.4-headers-5.4.0-1049
+  linux-aws-5.4-headers-5.4.0-1051 linux-aws-5.4-headers-5.4.0-1054 linux-aws-5.4-headers-5.4.0-1055 linux-aws-5.4-headers-5.4.0-1056 linux-aws-5.4-headers-5.4.0-1057
+  linux-aws-5.4-headers-5.4.0-1058 linux-aws-5.4-headers-5.4.0-1059 linux-aws-5.4-headers-5.4.0-1060 linux-aws-5.4-headers-5.4.0-1061 linux-aws-5.4-headers-5.4.0-1063
+  linux-aws-5.4-headers-5.4.0-1064 linux-aws-5.4-headers-5.4.0-1065 linux-aws-5.4-headers-5.4.0-1066 linux-aws-5.4-headers-5.4.0-1068 linux-aws-5.4-headers-5.4.0-1069
+  linux-aws-5.4-headers-5.4.0-1071 linux-aws-5.4-headers-5.4.0-1072 linux-aws-5.4-headers-5.4.0-1075 linux-aws-5.4-headers-5.4.0-1078 linux-aws-5.4-headers-5.4.0-1080
+  linux-aws-5.4-headers-5.4.0-1081 linux-aws-5.4-headers-5.4.0-1083 linux-aws-5.4-headers-5.4.0-1084 linux-aws-5.4-headers-5.4.0-1085 linux-aws-headers-4.15.0-1033 linux-aws-headers-4.15.0-1034
+  linux-aws-headers-4.15.0-1035 linux-aws-headers-4.15.0-1037 linux-aws-headers-4.15.0-1039 linux-aws-headers-4.15.0-1040 linux-aws-headers-4.15.0-1041 linux-aws-headers-4.15.0-1043
+  linux-aws-headers-4.15.0-1044 linux-aws-headers-4.15.0-1045 linux-aws-headers-4.15.0-1047 linux-aws-headers-4.15.0-1048 linux-aws-headers-4.15.0-1050 linux-aws-headers-4.15.0-1051
+  linux-aws-headers-4.15.0-1052 linux-aws-headers-4.15.0-1054 linux-aws-headers-4.15.0-1056 linux-aws-headers-4.15.0-1057 linux-aws-headers-4.15.0-1060 linux-aws-headers-4.15.0-1063
+  linux-aws-headers-4.15.0-1065 linux-headers-5.4.0-1085-aws linux-image-5.4.0-1085-aws linux-modules-5.4.0-1085-aws
+0 upgraded, 0 newly installed, 73 to remove and 119 not upgraded.
+After this operation, 5293 MB disk space will be freed.
+Do you want to continue? [Y/n] y
+(Reading database ... 1433035 files and directories currently installed.)
+Removing linux-aws-5.3-headers-5.3.0-1017 (5.3.0-1017.18~18.04.1) ...
+Removing linux-aws-5.3-headers-5.3.0-1019 (5.3.0-1019.21~18.04.1) ...
+Removing linux-aws-5.3-headers-5.3.0-1023 (5.3.0-1023.25~18.04.1) ...
+Removing linux-aws-5.3-headers-5.3.0-1028 (5.3.0-1028.30~18.04.1) ...
+Removing linux-aws-5.3-headers-5.3.0-1030 (5.3.0-1030.32~18.04.1) ...
+Removing linux-aws-5.3-headers-5.3.0-1032 (5.3.0-1032.34~18.04.2) ...
+Removing linux-aws-5.3-headers-5.3.0-1033 (5.3.0-1033.35) ...
+Removing linux-aws-5.3-headers-5.3.0-1034 (5.3.0-1034.36) ...
+Removing linux-aws-5.3-headers-5.3.0-1035 (5.3.0-1035.37) ...
+Removing linux-aws-5.4-headers-5.4.0-1025 (5.4.0-1025.25~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1028 (5.4.0-1028.29~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1029 (5.4.0-1029.30~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1030 (5.4.0-1030.31~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1032 (5.4.0-1032.33~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1034 (5.4.0-1034.35~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1035 (5.4.0-1035.37~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1037 (5.4.0-1037.39~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1038 (5.4.0-1038.40~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1039 (5.4.0-1039.41~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1041 (5.4.0-1041.43~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1043 (5.4.0-1043.45~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1045 (5.4.0-1045.47~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1047 (5.4.0-1047.49~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1048 (5.4.0-1048.50~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1049 (5.4.0-1049.51~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1051 (5.4.0-1051.53~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1054 (5.4.0-1054.57~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1055 (5.4.0-1055.58~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1056 (5.4.0-1056.59~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1057 (5.4.0-1057.60~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1058 (5.4.0-1058.61~18.04.3) ...
+Removing linux-aws-5.4-headers-5.4.0-1059 (5.4.0-1059.62~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1060 (5.4.0-1060.63~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1061 (5.4.0-1061.64~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1063 (5.4.0-1063.66~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1064 (5.4.0-1064.67~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1065 (5.4.0-1065.68~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1066 (5.4.0-1066.69~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1068 (5.4.0-1068.72~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1069 (5.4.0-1069.73~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1071 (5.4.0-1071.76~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1072 (5.4.0-1072.77~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1075 (5.4.0-1075.80~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1078 (5.4.0-1078.84~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1080 (5.4.0-1080.87~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1081 (5.4.0-1081.88~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1083 (5.4.0-1083.90~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1084 (5.4.0-1084.91~18.04.1) ...
+Removing linux-headers-5.4.0-1085-aws (5.4.0-1085.92~18.04.1) ...
+Removing linux-aws-5.4-headers-5.4.0-1085 (5.4.0-1085.92~18.04.1) ...
+Removing linux-aws-headers-4.15.0-1033 (4.15.0-1033.35) ...
+Removing linux-aws-headers-4.15.0-1034 (4.15.0-1034.36) ...
+Removing linux-aws-headers-4.15.0-1035 (4.15.0-1035.37) ...
+Removing linux-aws-headers-4.15.0-1037 (4.15.0-1037.39) ...
+Removing linux-aws-headers-4.15.0-1039 (4.15.0-1039.41) ...
+Removing linux-aws-headers-4.15.0-1040 (4.15.0-1040.42) ...
+Removing linux-aws-headers-4.15.0-1041 (4.15.0-1041.43) ...
+Removing linux-aws-headers-4.15.0-1043 (4.15.0-1043.45) ...
+Removing linux-aws-headers-4.15.0-1044 (4.15.0-1044.46) ...
+Removing linux-aws-headers-4.15.0-1045 (4.15.0-1045.47) ...
+Removing linux-aws-headers-4.15.0-1047 (4.15.0-1047.49) ...
+Removing linux-aws-headers-4.15.0-1048 (4.15.0-1048.50) ...
+Removing linux-aws-headers-4.15.0-1050 (4.15.0-1050.52) ...
+Removing linux-aws-headers-4.15.0-1051 (4.15.0-1051.53) ...
+Removing linux-aws-headers-4.15.0-1052 (4.15.0-1052.54) ...
+Removing linux-aws-headers-4.15.0-1054 (4.15.0-1054.56) ...
+Removing linux-aws-headers-4.15.0-1056 (4.15.0-1056.58) ...
+Removing linux-aws-headers-4.15.0-1057 (4.15.0-1057.59) ...
+Removing linux-aws-headers-4.15.0-1060 (4.15.0-1060.62) ...
+Removing linux-aws-headers-4.15.0-1063 (4.15.0-1063.67) ...
+Removing linux-aws-headers-4.15.0-1065 (4.15.0-1065.69) ...
+Removing linux-image-5.4.0-1085-aws (5.4.0-1085.92~18.04.1) ...
+/etc/kernel/postrm.d/initramfs-tools:
+update-initramfs: Deleting /boot/initrd.img-5.4.0-1085-aws
+/etc/kernel/postrm.d/x-grub-legacy-ec2:
+Searching for GRUB installation directory ... found: /boot/grub
+Searching for default file ... found: /boot/grub/default
+Testing for an existing GRUB menu.lst file ... found: /boot/grub/menu.lst
+Searching for splash image ... none found, skipping ...
+Found kernel: /boot/vmlinuz-4.15.0-34-generic
+Found kernel: /boot/vmlinuz-5.4.0-1088-aws
+Found kernel: /boot/vmlinuz-5.4.0-1086-aws
+Found kernel: /boot/vmlinuz-4.15.0-1058-aws
+Found kernel: /boot/vmlinuz-4.15.0-1021-aws
+Updating /boot/grub/menu.lst ... done
+
+/etc/kernel/postrm.d/zz-update-grub:
+Sourcing file `/etc/default/grub'
+Sourcing file `/etc/default/grub.d/50-cloudimg-settings.cfg'
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-5.4.0-1088-aws
+Found initrd image: /boot/initrd.img-5.4.0-1088-aws
+Found linux image: /boot/vmlinuz-5.4.0-1086-aws
+Found initrd image: /boot/initrd.img-5.4.0-1086-aws
+Found linux image: /boot/vmlinuz-4.15.0-1058-aws
+Found initrd image: /boot/initrd.img-4.15.0-1058-aws
+Found linux image: /boot/vmlinuz-4.15.0-1021-aws
+Found initrd image: /boot/initrd.img-4.15.0-1021-aws
+done
+Removing linux-modules-5.4.0-1085-aws (5.4.0-1085.92~18.04.1) ...
+ubuntu@ip-172-31-11-11:/$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            3.9G     0  3.9G   0% /dev
+tmpfs           788M  1.3M  787M   1% /run
+/dev/nvme0n1p1   30G   21G  8.1G  73% /
+tmpfs           3.9G     0  3.9G   0% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+tmpfs           3.9G     0  3.9G   0% /sys/fs/cgroup
+/dev/loop2       25M   25M     0 100% /snap/amazon-ssm-agent/6563
+/dev/loop1       56M   56M     0 100% /snap/core18/2785
+/dev/loop4       56M   56M     0 100% /snap/core18/2790
+/dev/loop0       25M   25M     0 100% /snap/amazon-ssm-agent/7528
+/dev/loop3      106M  106M     0 100% /snap/core/16091
+/dev/loop5      106M  106M     0 100% /snap/core/16202
+tmpfs           788M     0  788M   0% /run/user/1000
+ubuntu@ip-172-31-11-11:/$ sudo apt --fix-broken install
