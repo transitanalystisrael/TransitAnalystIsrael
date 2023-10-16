@@ -97,13 +97,23 @@
 
 	var map = L.map('map').setView([31.27, 34.82], 8);
 
-	var Stamen_TonerLite = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
-		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    map.createPane('labels');
+    map.getPane('labels').style.zIndex = 650;
+    map.getPane('labels').style.pointerEvents = 'none';
+
+	var CartoDB_Positron = L.layerGroup([
+		L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
 		subdomains: 'abcd',
 		minZoom: 0,
-		maxZoom: 18,
-		ext: 'png'
-	}).addTo(map);
+		maxZoom: 18
+	}),
+	L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+		subdomains: 'abcd',
+		pane: 'labels'
+		})
+	]).addTo(map);
 
 	var OpenStreetMap_BlackAndWhite = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
 		maxZoom: 18,
@@ -116,7 +126,7 @@
 	});
 
     var baseMaps = {
-        "(Stamen Toner Lite) רקע שחור-לבן": Stamen_TonerLite,
+        "רקע שחור-לבן": CartoDB_Positron,
         "(OSM) רקע שחור-לבן": OpenStreetMap_BlackAndWhite,
         "(OSM) רקע צבעוני": OpenStreetMap_Mapnik
     };
@@ -196,23 +206,23 @@
 			setTimeout(function(){
 				switch(regionName) {
 					case 'israel-tel-aviv-metro':
-						console.log(regionName, 'israel-tel-aviv');
+						//console.log(regionName, 'israel-tel-aviv');
 						window.location.assign("route_freq_peak_v4telavivmetro.html");
 						break;
 					case 'israel-jerusalem':
-						console.log(regionName, 'israel-jerusalem');
+						//console.log(regionName, 'israel-jerusalem');
 						window.location.assign("route_freq_peak_v4jerusalem.html");
 						break;
 					case 'israel-north':
-						console.log(regionName, 'israel-north');
+						//console.log(regionName, 'israel-north');
 						window.location.assign("route_freq_peak_v4north.html");
 						break;
 					case 'israel-south':
-						console.log(regionName, 'israel-south');
+						//console.log(regionName, 'israel-south');
 						window.location.assign("route_freq_peak_v4south.html");
 						break;
 					default:
-						console.log(regionName, 'no region selected');
+						//console.log(regionName, 'no region selected');
 				}
 			}, 1500);
 		//});

@@ -45,7 +45,7 @@ try:
     _log.info("GTFS pre-processing")
     import gtfs_preprocessing_v2
     
-    #_log.info("Calculating TransitScore Israel")
+    _log.info("Calculating TransitScore Israel")
     import transitscore_israel # check that long processing steps (2 hours)are not commented out in imported file
     
     _log.info("Calculating High Freq Lines")
